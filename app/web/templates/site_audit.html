@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Site Audit - Comprehensive SEO Analysis</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#07111f;color:#e7eaf3;margin:0}
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#0d1830;border-bottom:1px solid #1f2a44}
+    .brand{font-weight:700}
+    .container{padding:24px;max-width:1400px;margin:0 auto}
+    a{color:#93c5fd;text-decoration:none}
+    a:hover{text-decoration:underline}
+    .input-group{margin:20px 0}
+    .input-group label{display:block;margin-bottom:8px;font-weight:500;color:#93c5fd}
+    .input-group input,.input-group select{width:100%;max-width:600px;padding:10px;border:1px solid #1f2a44;border-radius:6px;background:#0d1830;color:#e7eaf3;font-size:14px}
+    .btn{background:#10b981;color:#fff;border:none;border-radius:6px;padding:12px 24px;cursor:pointer;font-size:14px;font-weight:600;transition:background 0.2s}
+    .btn:hover{background:#059669}
+    .btn:disabled{opacity:0.6;cursor:not-allowed;background:#4b5563}
+    #results{margin-top:24px}
+    .score-box{background:#0d1830;border:1px solid #1f2a44;border-radius:8px;padding:24px;margin:16px 0;text-align:center}
+    .score-value{font-size:48px;font-weight:700;color:#10b981;margin:8px 0}
+    .section{background:#0d1830;border:1px solid #1f2a44;border-radius:8px;padding:20px;margin:16px 0}
+    .section h3{color:#93c5fd;margin-top:0;border-bottom:1px solid #1f2a44;padding-bottom:12px}
+    .metric{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1f2a44}
+    .metric:last-child{border-bottom:none}
+    .metric-label{color:#a0aec0}
+    .metric-value{color:#e7eaf3;font-weight:600}
+    .badge{display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600}
+    .badge-good{background:#10b981;color:white}
+    .badge-warning{background:#f59e0b;color:white}
+    .badge-error{background:#ef4444;color:white}
+    .loading{text-align:center;padding:40px;color:#a0aec0}
+    .error{background:#ef4444;color:white;padding:16px;border-radius:8px;margin:16px 0}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">SEO Tools</div>
+    <nav>
+      <a href="/dashboard">Dashboard</a> &nbsp; | &nbsp;
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+  <div class="container">
+    <h1>🔍 Site Audit - Comprehensive SEO Analysis</h1>
+    <p style="color:#a0aec0">Complete site audit combining Technical SEO, CRO, E-E-A-T, Local SEO, and more</p>
+    
+    <div class="input-group">
+      <label for="url">Website URL:</label>
+      <input id="url" type="text" placeholder="https://example.com" />
+    </div>
+    
+    <div class="input-group">
+      <label for="auditType">Audit Type:</label>
+      <select id="auditType">
+        <option value="full">Full Audit (All Analyzers)</option>
+        <option value="quick">Quick Audit (Basic + Technical)</option>
+        <option value="technical">Technical Only</option>
+        <option value="content">Content & E-E-A-T</option>
+        <option value="conversion">CRO Analysis</option>
+        <option value="local">Local SEO</option>
+      </select>
+    </div>
+    
+    <button class="btn" id="runBtn" onclick="runAudit()">Run Site Audit</button>
+    
+    <div id="results"></div>
+  </div>
+  
+  <script>
+    function runAudit() {
+      const url = document.getElementById('url').value.trim();
+      const auditType = document.getElementById('auditType').value;
+      const btn = document.getElementById('runBtn');
+      const results = document.getElementById('results');
+      
+      if (!url) {
+        results.innerHTML = '<div class="error">Please enter a URL</div>';
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.textContent = 'Running Audit...';
+      results.innerHTML = '<div class="loading">🔍 Analyzing website... This may take a minute.</div>';
+      
+      fetch('/site-audit/api/audit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url, type: auditType})
+      })
+      .then(r => r.json())
+      .then(data => {
+        btn.disabled = false;
+        btn.textContent = 'Run Site Audit';
+        
+        if (data.error) {
+          results.innerHTML = `<div class="error">${data.error}</div>`;
+          return;
+        }
+        
+        displayResults(data.results);
+      })
+      .catch(e => {
+        btn.disabled = false;
+        btn.textContent = 'Run Site Audit';
+        results.innerHTML = `<div class="error">Error: ${e.message}</div>`;
+      });
+    }
+    
+    function displayResults(results) {
+      let html = '';
+      
+      // Overall Score
+      html += `
+        <div class="score-box">
+          <h2>Overall Score</h2>
+          <div class="score-value">${results.overall_score || 0}</div>
+          <p style="color:#a0aec0">Comprehensive SEO Score</p>
+        </div>
+      `;
+      
+      // Priority Actions
+      if (results.priority_actions && results.priority_actions.length > 0) {
+        html += '<div class="section"><h3>⚠️ Priority Actions</h3>';
+        results.priority_actions.forEach(action => {
+          const badgeClass = action.priority === 'high' ? 'badge-error' : action.priority === 'medium' ? 'badge-warning' : 'badge-good';
+          html += `
+            <div class="metric">
+              <span><span class="badge ${badgeClass}">${action.priority.toUpperCase()}</span> ${action.category}</span>
+              <span>${action.action}</span>
+            </div>
+          `;
+        });
+        html += '</div>';
+      }
+      
+      // Basic SEO
+      if (results.basic_seo) {
+        html += '<div class="section"><h3>📊 Basic SEO</h3>';
+        if (results.basic_seo.title) {
+          html += `<div class="metric"><span class="metric-label">Title:</span><span class="metric-value">${results.basic_seo.title.substring(0, 60)}...</span></div>`;
+        }
+        if (results.basic_seo.meta_description) {
+          html += `<div class="metric"><span class="metric-label">Meta Description:</span><span class="metric-value">${results.basic_seo.meta_description.substring(0, 60)}...</span></div>`;
+        }
+        html += '</div>';
+      }
+      
+      // Technical SEO
+      if (results.technical_seo) {
+        html += '<div class="section"><h3>🔧 Technical SEO</h3>';
+        const tech = results.technical_seo;
+        if (tech.schema_markup) {
+          html += `<div class="metric"><span class="metric-label">Schema Markup:</span><span class="metric-value"><span class="badge ${tech.schema_markup ? 'badge-good' : 'badge-error'}">${tech.schema_markup ? 'Found' : 'Missing'}</span></span></div>`;
+        }
+        html += '</div>';
+      }
+      
+      // Core Web Vitals
+      if (results.core_web_vitals) {
+        html += '<div class="section"><h3>⚡ Core Web Vitals</h3>';
+        const cwv = results.core_web_vitals;
+        html += `<div class="metric"><span class="metric-label">Overall Score:</span><span class="metric-value">${cwv.overall_score || 0}/100</span></div>`;
+        html += `<div class="metric"><span class="metric-label">Grade:</span><span class="metric-value">${cwv.grade || 'N/A'}</span></div>`;
+        html += '</div>';
+      }
+      
+      // CRO
+      if (results.cro) {
+        html += '<div class="section"><h3>💰 Conversion Rate Optimization</h3>';
+        html += `<div class="metric"><span class="metric-label">Total CTAs:</span><span class="metric-value">${results.cro.cta_analysis.total_ctas || 0}</span></div>`;
+        html += `<div class="metric"><span class="metric-label">Trust Score:</span><span class="metric-value">${results.cro.trust_signals.trust_score || 0}/100</span></div>`;
+        html += '</div>';
+      }
+      
+      // E-E-A-T
+      if (results.eeat) {
+        html += '<div class="section"><h3>🎓 E-E-A-T Analysis</h3>';
+        html += `<div class="metric"><span class="metric-label">Overall Score:</span><span class="metric-value">${results.eeat.overall_score || 0}/100</span></div>`;
+        html += `<div class="metric"><span class="metric-label">Grade:</span><span class="metric-value">${results.eeat.overall_grade || 'N/A'}</span></div>`;
+        html += '</div>';
+      }
+      
+      // Local SEO
+      if (results.local_seo) {
+        html += '<div class="section"><h3>📍 Local SEO</h3>';
+        html += `<div class="metric"><span class="metric-label">NAP Consistency:</span><span class="metric-value"><span class="badge ${results.local_seo.nap_consistency.consistent ? 'badge-good' : 'badge-error'}">${results.local_seo.nap_consistency.consistent ? 'Consistent' : 'Inconsistent'}</span></span></div>`;
+        html += `<div class="metric"><span class="metric-label">Overall Score:</span><span class="metric-value">${results.local_seo.overall_score || 0}/100</span></div>`;
+        html += '</div>';
+      }
+      
+      results.innerHTML = html;
+    }
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Competitor Monitor</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#07111f;color:#e7eaf3;margin:0}
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#0d1830;border-bottom:1px solid #1f2a44}
+    .brand{font-weight:700}
+    .container{padding:24px;max-width:1200px;margin:0 auto}
+    a{color:#93c5fd;text-decoration:none}
+    .input-group{margin:20px 0}
+    .input-group label{display:block;margin-bottom:8px;font-weight:500;color:#93c5fd}
+    .input-group input{width:100%;max-width:300px;padding:10px;border:1px solid #1f2a44;border-radius:6px;background:#0d1830;color:#e7eaf3;font-size:14px;margin-right:12px}
+    .btn{background:#10b981;color:#fff;border:none;border-radius:6px;padding:10px 20px;cursor:pointer;font-size:14px;font-weight:600;margin-right:8px}
+    .btn:hover{background:#059669}
+    .btn-danger{background:#ef4444}
+    .btn-danger:hover{background:#dc2626}
+    .section{background:#0d1830;border:1px solid #1f2a44;border-radius:8px;padding:20px;margin:16px 0}
+    .section h3{color:#93c5fd;margin-top:0}
+    .competitor-item{padding:12px;margin:8px 0;background:#1f2a44;border-radius:4px;display:flex;justify-content:space-between;align-items:center}
+    .change-item{padding:12px;margin:8px 0;background:#1f2a44;border-left:4px solid #f59e0b;border-radius:4px}
+    .loading{text-align:center;padding:40px;color:#a0aec0}
+    .error{background:#ef4444;color:white;padding:16px;border-radius:8px;margin:16px 0}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">SEO Tools</div>
+    <nav>
+      <a href="/dashboard">Dashboard</a> &nbsp; | &nbsp;
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+  <div class="container">
+    <h1>👁️ Competitor Monitor</h1>
+    <p style="color:#a0aec0">Track competitor changes over time</p>
+    
+    <div class="section">
+      <h3>Add Competitor</h3>
+      <div style="display:flex;align-items:end;gap:12px">
+        <div class="input-group" style="margin:0;flex:1">
+          <label for="url">Competitor URL:</label>
+          <input id="url" type="text" placeholder="https://competitor.com" />
+        </div>
+        <div class="input-group" style="margin:0;flex:1">
+          <label for="name">Name (Optional):</label>
+          <input id="name" type="text" placeholder="Competitor Name" />
+        </div>
+        <button class="btn" onclick="addCompetitor()" style="margin-top:24px">Add</button>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h3>Tracked Competitors</h3>
+      <div id="competitorsList"></div>
+    </div>
+    
+    <div class="section">
+      <button class="btn" onclick="checkAll()">Check All Competitors</button>
+      <div id="changes"></div>
+    </div>
+  </div>
+  <script>
+    loadCompetitors();
+    function loadCompetitors() {
+      fetch('/competitor-monitor/api/competitors').then(r => r.json()).then(d => {
+        const list = document.getElementById('competitorsList');
+        if (!d.competitors || Object.keys(d.competitors).length === 0) {
+          list.innerHTML = '<p style="color:#a0aec0">No competitors tracked yet</p>';
+          return;
+        }
+        let html = '';
+        Object.entries(d.competitors).forEach(([url, data]) => {
+          html += `<div class="competitor-item"><div><strong>${data.name || url}</strong><br><span style="color:#a0aec0;font-size:12px">${url}</span></div><button class="btn btn-danger" onclick="removeCompetitor('${url}')">Remove</button></div>`;
+        });
+        list.innerHTML = html;
+      });
+    }
+    function addCompetitor() {
+      const url = document.getElementById('url').value.trim();
+      const name = document.getElementById('name').value.trim();
+      if (!url) { alert('Enter URL'); return; }
+      fetch('/competitor-monitor/api/competitors', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url, name})})
+      .then(r => r.json()).then(d => { if (d.success) { document.getElementById('url').value = ''; document.getElementById('name').value = ''; loadCompetitors(); } else alert(d.error); });
+    }
+    function removeCompetitor(url) {
+      if (!confirm('Remove competitor?')) return;
+      fetch(`/competitor-monitor/api/competitors/${encodeURIComponent(url)}`, {method:'DELETE'})
+      .then(r => r.json()).then(d => { if (d.success) loadCompetitors(); });
+    }
+    function checkAll() {
+      const changes = document.getElementById('changes');
+      changes.innerHTML = '<div class="loading">Checking competitors...</div>';
+      fetch('/competitor-monitor/api/check', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})})
+      .then(r => r.json()).then(d => {
+        if (d.error) { changes.innerHTML = `<div class="error">${d.error}</div>`; return; }
+        let html = `<h3>Changes Found: ${d.changes_found}</h3>`;
+        if (d.changes && d.changes.length > 0) {
+          d.changes.forEach(change => {
+            html += `<div class="change-item"><strong>${change.name}</strong><br>`;
+            change.changes.forEach(c => {
+              html += `${c.type}: Changed<br>`;
+            });
+            html += '</div>';
+          });
+        } else {
+          html += '<p style="color:#a0aec0">No changes detected</p>';
+        }
+        changes.innerHTML = html;
+      });
+    }
+  </script>
+</body>
+</html>
+

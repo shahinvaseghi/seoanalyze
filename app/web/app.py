@@ -29,6 +29,16 @@ def create_app() -> Flask:
     from .core_web_vitals import core_web_vitals_bp
     from .technical_seo import technical_seo_bp
     from .search_console import search_console_bp
+    from .site_audit import site_audit_bp
+    from .cro_analysis import cro_analysis_bp
+    from .eeat_analysis import eeat_analysis_bp
+    from .local_seo import local_seo_bp
+    from .broken_links import broken_links_bp
+    from .sitemap_analyzer import sitemap_analyzer_bp
+    from .rank_tracker import rank_tracker_bp
+    from .content_audit import content_audit_bp
+    from .backlink_analyzer import backlink_analyzer_bp
+    from .competitor_monitor import competitor_monitor_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(routes_bp)
@@ -39,6 +49,16 @@ def create_app() -> Flask:
     app.register_blueprint(core_web_vitals_bp)
     app.register_blueprint(technical_seo_bp)
     app.register_blueprint(search_console_bp)
+    app.register_blueprint(site_audit_bp)
+    app.register_blueprint(cro_analysis_bp)
+    app.register_blueprint(eeat_analysis_bp)
+    app.register_blueprint(local_seo_bp)
+    app.register_blueprint(broken_links_bp)
+    app.register_blueprint(sitemap_analyzer_bp)
+    app.register_blueprint(rank_tracker_bp)
+    app.register_blueprint(content_audit_bp)
+    app.register_blueprint(backlink_analyzer_bp)
+    app.register_blueprint(competitor_monitor_bp)
 
     @app.context_processor
     def inject_roles():

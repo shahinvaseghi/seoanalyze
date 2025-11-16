@@ -6,3 +6,6 @@ configs/smtp_config.json
 app/users.json
 __pycache__/
 *.pyc
+
+# User data directories
+data/
