@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>گزارشات سرچ کنسول - GSC Reports</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+      background: #07111f;
+      color: #e7eaf3;
+      margin: 0;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: #0d1830;
+      border-bottom: 1px solid #1f2a44;
+    }
+    
+    .brand {
+      font-weight: 700;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    
+    .page-header {
+      margin-bottom: 32px;
+    }
+    
+    .page-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      color: #10b981;
+    }
+    
+    .page-subtitle {
+      color: #a0aec0;
+      font-size: 16px;
+      margin: 0;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    
+    select, button {
+      padding: 10px 14px;
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 6px;
+      color: #e7eaf3;
+      font-size: 14px;
+    }
+    
+    button {
+      background: #10b981;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    
+    button:hover {
+      background: #059669;
+    }
+    
+    button:disabled {
+      background: #4b5563;
+      cursor: not-allowed;
+    }
+    
+    .report-section {
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .report-section h3 {
+      margin: 0 0 20px 0;
+      color: #93c5fd;
+      font-size: 20px;
+      border-bottom: 1px solid #1f2a44;
+      padding-bottom: 12px;
+    }
+    
+    .summary-box {
+      background: #0a1520;
+      border: 1px solid #1f2a44;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .summary-box h4 {
+      margin: 0 0 12px 0;
+      color: #10b981;
+    }
+    
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #1f2a44;
+    }
+    
+    .summary-item:last-child {
+      border-bottom: none;
+    }
+    
+    .summary-label {
+      color: #a0aec0;
+    }
+    
+    .summary-value {
+      color: #e7eaf3;
+      font-weight: 600;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #1f2a44;
+    }
+    
+    th {
+      color: #93c5fd;
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+    
+    td {
+      font-size: 14px;
+    }
+    
+    tr:hover {
+      background: rgba(16, 185, 129, 0.1);
+    }
+    
+    .page-url {
+      max-width: 400px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #93c5fd;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .badge-positive {
+      background: #10b981;
+      color: white;
+    }
+    
+    .badge-negative {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .badge-neutral {
+      background: #6b7280;
+      color: white;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #a0aec0;
+    }
+    
+    .error {
+      background: #ef4444;
+      color: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+      color: #a0aec0;
+    }
+    
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+    
+    a {
+      color: #93c5fd;
+      text-decoration: none;
+    }
+    
+    a:hover {
+      text-decoration: underline;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #10b981;
+      color: white;
+      border-radius: 6px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    
+    .btn:hover {
+      background: #059669;
+      text-decoration: none;
+    }
+    
+    .info-box {
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .info-box h3 {
+      margin: 0 0 12px 0;
+      color: #93c5fd;
+    }
+    
+    .info-box p {
+      margin: 0;
+      color: #a0aec0;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">SEO Tools</div>
+    <nav>
+      <span>Signed in as {{ username }}</span>
+      &nbsp; | &nbsp;
+      <a href="/dashboard">Dashboard</a> &nbsp; | &nbsp;
+      <a href="/search-console/">Search Console</a> &nbsp; | &nbsp;
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+  
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">📈 گزارشات سرچ کنسول</h1>
+      <p class="page-subtitle">GSC Reports - Advanced Analytics & Reporting</p>
+    </div>
+    
+    {% if not has_connection %}
+      <div class="info-box">
+        <h3>⚠️ اتصال به Search Console</h3>
+        <p>
+          برای استفاده از گزارشات، ابتدا باید حساب کاربری خود را به Google Search Console متصل کنید.
+          <br>
+          <a href="/search-console/connect" class="btn" style="margin-top: 16px;">اتصال به Search Console</a>
+        </p>
+      </div>
+    {% else %}
+      <div class="controls">
+        <select id="propertySelect">
+          <option value="">انتخاب Property...</option>
+          {% for prop in properties %}
+            <option value="{{ prop }}">{{ prop }}</option>
+          {% endfor %}
+        </select>
+        
+        <select id="daysSelect">
+          <option value="7">آخرین 7 روز</option>
+          <option value="14">آخرین 14 روز</option>
+          <option value="30" selected>آخرین 30 روز</option>
+          <option value="90">آخرین 90 روز</option>
+        </select>
+        
+        <button onclick="generateReports()" id="generateBtn">تولید گزارشات</button>
+        <button onclick="generateInternalLinks()" id="internalLinksBtn">تحلیل Internal Links</button>
+      </div>
+      
+      <div id="messageArea"></div>
+      <div id="reportsArea"></div>
+    {% endif %}
+  </div>
+  
+  <script>
+    function showMessage(text, type = 'error') {
+      const area = document.getElementById('messageArea');
+      const className = type === 'error' ? 'error' : 'success';
+      area.innerHTML = `<div class="${className}">${text}</div>`;
+      setTimeout(() => {
+        area.innerHTML = '';
+      }, 5000);
+    }
+    
+    function generateReports() {
+      const siteUrl = document.getElementById('propertySelect').value;
+      const days = document.getElementById('daysSelect').value;
+      const btn = document.getElementById('generateBtn');
+      
+      if (!siteUrl) {
+        showMessage('لطفاً یک Property انتخاب کنید', 'error');
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.textContent = 'در حال تولید گزارشات...';
+      
+      const reportsArea = document.getElementById('reportsArea');
+      reportsArea.innerHTML = '<div class="loading">در حال بارگذاری داده‌ها...</div>';
+      
+      fetch('/search-console/reports/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_url: siteUrl,
+          days: parseInt(days)
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        btn.disabled = false;
+        btn.textContent = 'تولید گزارشات';
+        
+        if (data.error) {
+          showMessage(data.error, 'error');
+          reportsArea.innerHTML = '';
+          return;
+        }
+        
+        displayReports(data);
+      })
+      .catch(error => {
+        btn.disabled = false;
+        btn.textContent = 'تولید گزارشات';
+        showMessage('خطا در تولید گزارشات: ' + error.message, 'error');
+        reportsArea.innerHTML = '';
+      });
+    }
+    
+    function generateInternalLinks() {
+      const siteUrl = document.getElementById('propertySelect').value;
+      const days = document.getElementById('daysSelect').value;
+      const btn = document.getElementById('internalLinksBtn');
+      
+      if (!siteUrl) {
+        showMessage('لطفاً یک Property انتخاب کنید', 'error');
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.textContent = 'در حال تحلیل...';
+      
+      fetch('/search-console/reports/internal-links', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_url: siteUrl,
+          days: parseInt(days),
+          limit: 50
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        btn.disabled = false;
+        btn.textContent = 'تحلیل Internal Links';
+        
+        if (data.error) {
+          showMessage(data.error, 'error');
+          return;
+        }
+        
+        displayInternalLinks(data);
+      })
+      .catch(error => {
+        btn.disabled = false;
+        btn.textContent = 'تحلیل Internal Links';
+        showMessage('خطا در تحلیل Internal Links: ' + error.message, 'error');
+      });
+    }
+    
+    function displayReports(data) {
+      const reportsArea = document.getElementById('reportsArea');
+      let html = '';
+      
+      // Summary
+      html += `
+        <div class="summary-box">
+          <h4>خلاصه گزارشات</h4>
+          <div class="summary-item">
+            <span class="summary-label">بازه زمانی:</span>
+            <span class="summary-value">${data.period}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">تغییر میانگین Position:</span>
+            <span class="summary-value">${data.avg_position_change > 0 ? '+' : ''}${data.avg_position_change}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">دوره قبلی:</span>
+            <span class="summary-value">${data.previous_period}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">دوره فعلی:</span>
+            <span class="summary-value">${data.current_period}</span>
+          </div>
+        </div>
+      `;
+      
+      const reports = data.reports;
+      
+      // 1. High impressions, low clicks
+      if (reports.high_impressions_low_clicks && reports.high_impressions_low_clicks.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>5 صفحه با بیشترین Impression و کمترین Click (غیر صفر)</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>Impressions</th>
+                  <th>Clicks</th>
+                  <th>CTR</th>
+                  <th>Position</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        reports.high_impressions_low_clicks.forEach(page => {
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td>${page.impressions.toLocaleString()}</td>
+              <td>${page.clicks.toLocaleString()}</td>
+              <td>${page.ctr}%</td>
+              <td>${page.position}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      // 2. High impressions, zero clicks
+      if (reports.high_impressions_zero_clicks && reports.high_impressions_zero_clicks.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>5 صفحه با بیشترین Impression و 0 Click</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>Impressions</th>
+                  <th>Clicks</th>
+                  <th>CTR</th>
+                  <th>Position</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        reports.high_impressions_zero_clicks.forEach(page => {
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td>${page.impressions.toLocaleString()}</td>
+              <td>${page.clicks.toLocaleString()}</td>
+              <td>${page.ctr}%</td>
+              <td>${page.position}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      // 3. Clicks decreased > 25%
+      if (reports.clicks_decreased_25pct && reports.clicks_decreased_25pct.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>5 صفحه با کاهش بیش از 25% در Clicks</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>Clicks قبلی</th>
+                  <th>Clicks فعلی</th>
+                  <th>تغییر</th>
+                  <th>Position</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        reports.clicks_decreased_25pct.forEach(page => {
+          const changePercent = page.clicks_change_percent.toFixed(1);
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td>${page.previous_clicks ? page.previous_clicks.toLocaleString() : 0}</td>
+              <td>${page.current_clicks ? page.current_clicks.toLocaleString() : 0}</td>
+              <td><span class="badge badge-negative">${changePercent}%</span></td>
+              <td>${page.current_position || page.position || '-'}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      // 4. Highest clicks
+      if (reports.highest_clicks && reports.highest_clicks.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>5 صفحه با بیشترین Click</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>Clicks</th>
+                  <th>Impressions</th>
+                  <th>CTR</th>
+                  <th>Position</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        reports.highest_clicks.forEach(page => {
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td>${page.clicks.toLocaleString()}</td>
+              <td>${page.impressions.toLocaleString()}</td>
+              <td>${page.ctr}%</td>
+              <td>${page.position}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      // 5. Lowest impressions and clicks
+      if (reports.lowest_impressions_clicks && reports.lowest_impressions_clicks.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>5 صفحه با کمترین Impression و Click (غیر صفر)</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>Impressions</th>
+                  <th>Clicks</th>
+                  <th>CTR</th>
+                  <th>Position</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        reports.lowest_impressions_clicks.forEach(page => {
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td>${page.impressions.toLocaleString()}</td>
+              <td>${page.clicks.toLocaleString()}</td>
+              <td>${page.ctr}%</td>
+              <td>${page.position}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      // 6. Highest CTR
+      if (reports.highest_ctr && reports.highest_ctr.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>5 صفحه با بیشترین CTR</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>CTR</th>
+                  <th>Clicks</th>
+                  <th>Impressions</th>
+                  <th>Position</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        reports.highest_ctr.forEach(page => {
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td><span class="badge badge-positive">${page.ctr}%</span></td>
+              <td>${page.clicks.toLocaleString()}</td>
+              <td>${page.impressions.toLocaleString()}</td>
+              <td>${page.position}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      // 7. Lowest CTR
+      if (reports.lowest_ctr && reports.lowest_ctr.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>5 صفحه با کمترین CTR</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>CTR</th>
+                  <th>Clicks</th>
+                  <th>Impressions</th>
+                  <th>Position</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        reports.lowest_ctr.forEach(page => {
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td><span class="badge badge-negative">${page.ctr}%</span></td>
+              <td>${page.clicks.toLocaleString()}</td>
+              <td>${page.impressions.toLocaleString()}</td>
+              <td>${page.position}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      // 8. Zero clicks, low CTR
+      if (reports.zero_clicks_low_ctr && reports.zero_clicks_low_ctr.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>صفحاتی با 0 Click و CTR زیر 10%</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>Impressions</th>
+                  <th>Clicks</th>
+                  <th>CTR</th>
+                  <th>Position</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        reports.zero_clicks_low_ctr.slice(0, 20).forEach(page => {
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td>${page.impressions.toLocaleString()}</td>
+              <td>${page.clicks.toLocaleString()}</td>
+              <td>${page.ctr}%</td>
+              <td>${page.position}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      // 9. Clicks with position > 6
+      if (reports.clicks_high_position && reports.clicks_high_position.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>صفحاتی با Click و Position بالای 6</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>Position</th>
+                  <th>Clicks</th>
+                  <th>Impressions</th>
+                  <th>CTR</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        reports.clicks_high_position.slice(0, 20).forEach(page => {
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td>${page.position}</td>
+              <td>${page.clicks.toLocaleString()}</td>
+              <td>${page.impressions.toLocaleString()}</td>
+              <td>${page.ctr}%</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      reportsArea.innerHTML = html;
+    }
+    
+    function displayInternalLinks(data) {
+      const reportsArea = document.getElementById('reportsArea');
+      let html = '';
+      
+      if (data.highest_internal_links && data.highest_internal_links.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>5 صفحه با بیشترین Internal Links</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>Internal Links</th>
+                  <th>Impressions</th>
+                  <th>Clicks</th>
+                  <th>Position</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        data.highest_internal_links.forEach(page => {
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td>${page.internal_links}</td>
+              <td>${page.impressions.toLocaleString()}</td>
+              <td>${page.clicks.toLocaleString()}</td>
+              <td>${page.position}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      if (data.lowest_internal_links && data.lowest_internal_links.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>5 صفحه با کمترین Internal Links</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>Internal Links</th>
+                  <th>Impressions</th>
+                  <th>Clicks</th>
+                  <th>Position</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        data.lowest_internal_links.forEach(page => {
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td>${page.internal_links}</td>
+              <td>${page.impressions.toLocaleString()}</td>
+              <td>${page.clicks.toLocaleString()}</td>
+              <td>${page.position}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      if (html) {
+        reportsArea.innerHTML = html + '<p style="color: #a0aec0; margin-top: 16px;">تعداد صفحات تحلیل شده: ' + data.total_pages_analyzed + '</p>';
+      }
+    }
+  </script>
+</body>
+</html>

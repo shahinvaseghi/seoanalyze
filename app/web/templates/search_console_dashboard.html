@@ -104,10 +104,8 @@
     }
     
     h2 {
-      margin: 0 0 20px 0;
+      margin: 0;
       font-size: 20px;
-      border-bottom: 1px solid #1f2a44;
-      padding-bottom: 12px;
     }
     
     .table-container {
@@ -202,6 +200,56 @@
       font-size: 48px;
       margin-bottom: 16px;
     }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      margin: 0 0 20px 0;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #1f2a44;
+    }
+    
+    .section-header:hover {
+      color: #93c5fd;
+    }
+    
+    .section-title {
+      font-size: 20px;
+      margin: 0;
+    }
+    
+    .toggle-icon {
+      font-size: 18px;
+      transition: transform 0.3s ease;
+      color: #8b5cf6;
+    }
+    
+    .section-header.collapsed .toggle-icon {
+      transform: rotate(-90deg);
+    }
+    
+    .section-content {
+      overflow: hidden;
+      transition: max-height 0.3s ease, opacity 0.3s ease;
+      max-height: 10000px;
+      opacity: 1;
+    }
+    
+    .section-content.collapsed {
+      max-height: 0;
+      opacity: 0;
+      padding: 0;
+    }
+    
+    .section-count {
+      font-size: 14px;
+      color: #a0aec0;
+      margin-left: 12px;
+      font-weight: normal;
+    }
   </style>
 </head>
 <body>
@@ -278,7 +326,7 @@
         body: JSON.stringify({
           site_url: siteUrl,
           days: parseInt(days),
-          limit: 50
+          limit: 25000  // Max limit from Google Search Console API
         })
       })
       .then(response => response.json())
@@ -327,19 +375,26 @@
       if (data.top_queries && data.top_queries.length > 0) {
         html += `
           <div class="data-section">
-            <h2>Top Search Queries</h2>
-            <div class="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Query</th>
-                    <th>Impressions</th>
-                    <th>Clicks</th>
-                    <th>CTR</th>
-                    <th>Position</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <div class="section-header" onclick="toggleSection('queries-section', 'queries-toggle')">
+              <h2 class="section-title">
+                Top Search Queries
+                <span class="section-count">(${data.top_queries.length} results)</span>
+              </h2>
+              <span class="toggle-icon" id="queries-toggle">▼</span>
+            </div>
+            <div class="section-content" id="queries-section">
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Query</th>
+                      <th>Impressions</th>
+                      <th>Clicks</th>
+                      <th>CTR</th>
+                      <th>Position</th>
+                    </tr>
+                  </thead>
+                  <tbody>
         `;
         
         data.top_queries.forEach((row, index) => {
@@ -356,8 +411,9 @@
         });
         
         html += `
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         `;
@@ -366,19 +422,26 @@
       if (data.top_pages && data.top_pages.length > 0) {
         html += `
           <div class="data-section">
-            <h2>Top Landing Pages</h2>
-            <div class="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Page</th>
-                    <th>Impressions</th>
-                    <th>Clicks</th>
-                    <th>CTR</th>
-                    <th>Position</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <div class="section-header" onclick="toggleSection('pages-section', 'pages-toggle')">
+              <h2 class="section-title">
+                Top Landing Pages
+                <span class="section-count">(${data.top_pages.length} results)</span>
+              </h2>
+              <span class="toggle-icon" id="pages-toggle">▼</span>
+            </div>
+            <div class="section-content" id="pages-section">
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Page</th>
+                      <th>Impressions</th>
+                      <th>Clicks</th>
+                      <th>CTR</th>
+                      <th>Position</th>
+                    </tr>
+                  </thead>
+                  <tbody>
         `;
         
         data.top_pages.forEach((row, index) => {
@@ -395,8 +458,9 @@
         });
         
         html += `
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         `;
@@ -407,6 +471,20 @@
       }
       
       contentArea.innerHTML = html;
+    }
+    
+    function toggleSection(sectionId, toggleId) {
+      const section = document.getElementById(sectionId);
+      const toggle = document.getElementById(toggleId);
+      const header = toggle.closest('.section-header');
+      
+      if (section.classList.contains('collapsed')) {
+        section.classList.remove('collapsed');
+        header.classList.remove('collapsed');
+      } else {
+        section.classList.add('collapsed');
+        header.classList.add('collapsed');
+      }
     }
   </script>
 </body>

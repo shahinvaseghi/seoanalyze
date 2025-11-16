@@ -93,7 +93,7 @@ class GSCAnalyzer:
         self,
         site_url: str,
         days: int = 7,
-        limit: int = 50
+        limit: int = 25000  # Max limit from Google Search Console API
     ) -> List[Dict[str, Any]]:
         """
         Get top search queries for the last N days
@@ -136,7 +136,7 @@ class GSCAnalyzer:
         self,
         site_url: str,
         days: int = 7,
-        limit: int = 50
+        limit: int = 25000  # Max limit from Google Search Console API
     ) -> List[Dict[str, Any]]:
         """
         Get top landing pages for the last N days
@@ -381,4 +381,118 @@ class GSCAnalyzer:
         except Exception as e:
             print(f"❌ Error getting sitemaps: {e}")
             return []
+    
+    def get_pages_data(
+        self,
+        site_url: str,
+        start_date: str,
+        end_date: str,
+        limit: int = 25000
+    ) -> List[Dict[str, Any]]:
+        """
+        Get all pages data with metrics for date range comparison
+        
+        Args:
+            site_url: Search Console property URL
+            start_date: Start date (YYYY-MM-DD)
+            end_date: End date (YYYY-MM-DD)
+            limit: Maximum rows to return
+            
+        Returns:
+            List of pages with impressions, clicks, CTR, position
+        """
+        result = self.get_search_analytics(
+            site_url,
+            start_date,
+            end_date,
+            dimensions=['page'],
+            row_limit=limit
+        )
+        
+        if not result['success']:
+            return []
+        
+        pages = []
+        for row in result.get('rows', []):
+            pages.append({
+                'page': row['keys'][0],
+                'impressions': row['impressions'],
+                'clicks': row['clicks'],
+                'ctr': round(row['ctr'] * 100, 2),  # Convert to percentage
+                'position': round(row['position'], 1)
+            })
+        
+        return pages
+    
+    def get_pages_comparison(
+        self,
+        site_url: str,
+        previous_start: str,
+        previous_end: str,
+        current_start: str,
+        current_end: str,
+        limit: int = 25000
+    ) -> Dict[str, Any]:
+        """
+        Compare pages performance between two date ranges
+        
+        Args:
+            site_url: Search Console property URL
+            previous_start: Previous period start date
+            previous_end: Previous period end date
+            current_start: Current period start date
+            current_end: Current period end date
+            limit: Maximum rows to return
+            
+        Returns:
+            Dictionary with comparison data including position changes
+        """
+        previous_pages = self.get_pages_data(site_url, previous_start, previous_end, limit)
+        current_pages = self.get_pages_data(site_url, current_start, current_end, limit)
+        
+        # Create lookup dictionaries
+        previous_dict = {page['page']: page for page in previous_pages}
+        current_dict = {page['page']: page for page in current_pages}
+        
+        # Combine and calculate changes
+        comparison = []
+        all_pages = set(list(previous_dict.keys()) + list(current_dict.keys()))
+        
+        for page_url in all_pages:
+            prev = previous_dict.get(page_url, {
+                'impressions': 0,
+                'clicks': 0,
+                'ctr': 0,
+                'position': 0
+            })
+            curr = current_dict.get(page_url, {
+                'impressions': 0,
+                'clicks': 0,
+                'ctr': 0,
+                'position': 0
+            })
+            
+            comparison.append({
+                'page': page_url,
+                'previous_impressions': prev['impressions'],
+                'previous_clicks': prev['clicks'],
+                'previous_ctr': prev['ctr'],
+                'previous_position': prev['position'],
+                'current_impressions': curr['impressions'],
+                'current_clicks': curr['clicks'],
+                'current_ctr': curr['ctr'],
+                'current_position': curr['position'],
+                'impressions_change': curr['impressions'] - prev['impressions'],
+                'clicks_change': curr['clicks'] - prev['clicks'],
+                'clicks_change_percent': ((curr['clicks'] - prev['clicks']) / prev['clicks'] * 100) if prev['clicks'] > 0 else (100 if curr['clicks'] > 0 else 0),
+                'ctr_change': curr['ctr'] - prev['ctr'],
+                'position_change': curr['position'] - prev['position']
+            })
+        
+        return {
+            'success': True,
+            'comparison': comparison,
+            'previous_period': f'{previous_start} to {previous_end}',
+            'current_period': f'{current_start} to {current_end}'
+        }
 

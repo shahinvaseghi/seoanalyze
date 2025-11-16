@@ -281,7 +281,7 @@ def get_analytics():
     data = request.json or {}
     site_url = data.get('site_url')
     days = int(data.get('days', 7))
-    limit = int(data.get('limit', 50))
+    limit = int(data.get('limit', 25000))  # Max limit from Google Search Console API
     
     if not site_url:
         return jsonify({'error': 'site_url is required'}), 400
@@ -449,4 +449,327 @@ def upload_credentials():
         
     except Exception as e:
         return jsonify({'error': f'خطا در آپلود: {str(e)}'}), 500
+
+
+@search_console_bp.route('/reports/')
+@login_required
+def gsc_reports():
+    """
+    Google Search Console Reports - Advanced analytics and reporting
+    """
+    username = session.get("user")
+    
+    # Check if connected
+    has_connection = storage.has_gsc_connection(username)
+    
+    # Get user's properties if connected
+    properties = []
+    if has_connection:
+        try:
+            tokens = storage.get_gsc_tokens(username)
+            oauth_handler = GSCOAuthHandler()
+            
+            def save_tokens_callback(updated_tokens):
+                storage.save_gsc_tokens(username, updated_tokens)
+            
+            credentials, _ = oauth_handler.get_valid_credentials(tokens, save_tokens_callback)
+            analyzer = GSCAnalyzer(credentials)
+            properties_list = analyzer.list_properties()
+            properties = [prop['url'] for prop in properties_list]
+        except Exception as e:
+            print(f"Error fetching properties: {e}")
+            properties = []
+    
+    return render_template('gsc_reports.html', 
+                         username=username,
+                         has_connection=has_connection,
+                         properties=properties)
+
+
+@search_console_bp.route('/reports/generate', methods=['POST'])
+@login_required
+def generate_reports():
+    """
+    Generate comprehensive GSC reports based on user requirements
+    """
+    username = session.get("user")
+    
+    if not storage.has_gsc_connection(username):
+        return jsonify({'error': 'Search Console not connected'}), 401
+    
+    data = request.json or {}
+    site_url = data.get('site_url')
+    days = int(data.get('days', 30))
+    
+    if not site_url:
+        return jsonify({'error': 'site_url is required'}), 400
+    
+    try:
+        # Get user's tokens
+        tokens = storage.get_gsc_tokens(username)
+        oauth_handler = GSCOAuthHandler()
+        
+        def save_tokens_callback(updated_tokens):
+            storage.save_gsc_tokens(username, updated_tokens)
+        
+        credentials, _ = oauth_handler.get_valid_credentials(tokens, save_tokens_callback)
+        analyzer = GSCAnalyzer(credentials)
+        
+        # Calculate date ranges
+        from datetime import datetime, timedelta
+        end_date = datetime.now().date() - timedelta(days=1)  # GSC has 1-2 day delay
+        start_date = end_date - timedelta(days=days-1)
+        
+        # Previous period for comparison
+        previous_end = start_date - timedelta(days=1)
+        previous_start = previous_end - timedelta(days=days-1)
+        
+        # Get all pages data
+        current_pages = analyzer.get_pages_data(
+            site_url,
+            start_date.isoformat(),
+            end_date.isoformat(),
+            limit=25000
+        )
+        
+        # Get comparison data
+        comparison_data = analyzer.get_pages_comparison(
+            site_url,
+            previous_start.isoformat(),
+            previous_end.isoformat(),
+            start_date.isoformat(),
+            end_date.isoformat(),
+            limit=25000
+        )
+        
+        # Calculate average position change
+        position_changes = []
+        for item in comparison_data['comparison']:
+            if item['previous_position'] > 0:  # Only pages that existed in previous period
+                position_changes.append({
+                    'page': item['page'],
+                    'previous_position': item['previous_position'],
+                    'current_position': item['current_position'],
+                    'position_change': item['position_change']
+                })
+        
+        # Sort by position change (biggest improvement = negative change)
+        position_changes.sort(key=lambda x: x['position_change'])
+        avg_position_change = sum(item['position_change'] for item in position_changes) / len(position_changes) if position_changes else 0
+        
+        # 1. Pages with highest impressions, clicks > 0, but lowest clicks
+        high_imp_low_clicks = [
+            p for p in current_pages 
+            if p['clicks'] > 0
+        ]
+        high_imp_low_clicks.sort(key=lambda x: (x['impressions'], -x['clicks']), reverse=True)
+        top5_high_imp_low_clicks = high_imp_low_clicks[:5]
+        
+        # 2. Pages with highest impressions but 0 clicks
+        high_imp_zero_clicks = [
+            p for p in current_pages 
+            if p['clicks'] == 0 and p['impressions'] > 0
+        ]
+        high_imp_zero_clicks.sort(key=lambda x: x['impressions'], reverse=True)
+        top5_high_imp_zero_clicks = high_imp_zero_clicks[:5]
+        
+        # 3. Pages with clicks decreased by more than 25%
+        clicks_decreased = [
+            item for item in comparison_data['comparison']
+            if item['previous_clicks'] > 0 and item['clicks_change_percent'] <= -25
+        ]
+        clicks_decreased.sort(key=lambda x: x['clicks_change_percent'])
+        top5_clicks_decreased = clicks_decreased[:5]
+        
+        # 4. Pages with highest clicks
+        high_clicks = sorted(current_pages, key=lambda x: x['clicks'], reverse=True)
+        top5_high_clicks = high_clicks[:5]
+        
+        # 5. Pages with lowest impressions and clicks (excluding 0)
+        low_imp_clicks = [
+            p for p in current_pages 
+            if p['impressions'] > 0 and p['clicks'] > 0
+        ]
+        low_imp_clicks.sort(key=lambda x: (x['impressions'], x['clicks']))
+        top5_low_imp_clicks = low_imp_clicks[:5]
+        
+        # 6. Pages with highest CTR
+        high_ctr = sorted(current_pages, key=lambda x: x['ctr'], reverse=True)
+        top5_high_ctr = high_ctr[:5]
+        
+        # 7. Pages with lowest CTR (excluding 0 clicks)
+        low_ctr = [
+            p for p in current_pages 
+            if p['clicks'] > 0
+        ]
+        low_ctr.sort(key=lambda x: x['ctr'])
+        top5_low_ctr = low_ctr[:5]
+        
+        # 8. Pages with 0 clicks and CTR < 10% (but impressions > 0)
+        zero_clicks_low_ctr = [
+            p for p in current_pages 
+            if p['clicks'] == 0 and p['impressions'] > 0 and p['ctr'] < 10
+        ]
+        zero_clicks_low_ctr.sort(key=lambda x: x['impressions'], reverse=True)
+        
+        # 9. Pages with clicks and position > 6
+        clicks_high_position = [
+            p for p in current_pages 
+            if p['clicks'] > 0 and p['position'] > 6
+        ]
+        clicks_high_position.sort(key=lambda x: x['position'], reverse=True)
+        
+        return jsonify({
+            'success': True,
+            'period': f'{start_date.isoformat()} to {end_date.isoformat()}',
+            'previous_period': comparison_data['previous_period'],
+            'current_period': comparison_data['current_period'],
+            'avg_position_change': round(avg_position_change, 2),
+            'position_changes': position_changes[:10],  # Top 10 for display
+            'reports': {
+                'high_impressions_low_clicks': top5_high_imp_low_clicks,
+                'high_impressions_zero_clicks': top5_high_imp_zero_clicks,
+                'clicks_decreased_25pct': top5_clicks_decreased,
+                'highest_clicks': top5_high_clicks,
+                'lowest_impressions_clicks': top5_low_imp_clicks,
+                'highest_ctr': top5_high_ctr,
+                'lowest_ctr': top5_low_ctr,
+                'zero_clicks_low_ctr': zero_clicks_low_ctr,
+                'clicks_high_position': clicks_high_position
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to generate reports: {str(e)}'}), 500
+
+
+@search_console_bp.route('/reports/internal-links', methods=['POST'])
+@login_required
+def get_internal_links_report():
+    """
+    Get internal links analysis for pages from GSC
+    """
+    username = session.get("user")
+    
+    if not storage.has_gsc_connection(username):
+        return jsonify({'error': 'Search Console not connected'}), 401
+    
+    data = request.json or {}
+    site_url = data.get('site_url')
+    days = int(data.get('days', 30))
+    limit = int(data.get('limit', 50))  # Limit number of pages to analyze
+    
+    if not site_url:
+        return jsonify({'error': 'site_url is required'}), 400
+    
+    try:
+        # Get user's tokens
+        tokens = storage.get_gsc_tokens(username)
+        oauth_handler = GSCOAuthHandler()
+        
+        def save_tokens_callback(updated_tokens):
+            storage.save_gsc_tokens(username, updated_tokens)
+        
+        credentials, _ = oauth_handler.get_valid_credentials(tokens, save_tokens_callback)
+        analyzer = GSCAnalyzer(credentials)
+        
+        # Calculate date range
+        end_date = datetime.now().date() - timedelta(days=1)
+        start_date = end_date - timedelta(days=days-1)
+        
+        # Get top pages
+        pages_data = analyzer.get_pages_data(
+            site_url,
+            start_date.isoformat(),
+            end_date.isoformat(),
+            limit=limit
+        )
+        
+        # Extract base URL from site_url
+        base_url = site_url.replace('sc-domain:', 'https://').replace('https://', '').split('/')[0]
+        if not base_url.startswith('http'):
+            base_url = f'https://{base_url}'
+        
+        # Import SEOAnalyzer for scraping
+        from app.core.seo_analyzer import SEOAnalyzer
+        seo_analyzer = SEOAnalyzer()
+        
+        pages_with_links = []
+        
+        for page_data in pages_data[:limit]:  # Limit to avoid too many requests
+            page_url = page_data['page']
+            
+            # Make sure URL is absolute
+            if not page_url.startswith('http'):
+                if page_url.startswith('/'):
+                    full_url = f"{base_url}{page_url}"
+                else:
+                    full_url = f"{base_url}/{page_url}"
+            else:
+                full_url = page_url
+            
+            try:
+                # Scrape page for internal links
+                import requests
+                from bs4 import BeautifulSoup
+                from urllib.parse import urlparse, urljoin
+                
+                response = requests.get(full_url, timeout=10, headers=seo_analyzer.headers)
+                if response.status_code == 200:
+                    soup = BeautifulSoup(response.content, 'html.parser')
+                    
+                    # Count internal links
+                    domain = urlparse(full_url).netloc
+                    links = soup.find_all('a', href=True)
+                    internal_count = 0
+                    
+                    for link in links:
+                        href = link['href']
+                        if domain in href or (not href.startswith('http') and not href.startswith('//')):
+                            internal_count += 1
+                    
+                    pages_with_links.append({
+                        'page': page_url,
+                        'impressions': page_data['impressions'],
+                        'clicks': page_data['clicks'],
+                        'ctr': page_data['ctr'],
+                        'position': page_data['position'],
+                        'internal_links': internal_count
+                    })
+                else:
+                    # If page can't be accessed, still include it with 0 links
+                    pages_with_links.append({
+                        'page': page_url,
+                        'impressions': page_data['impressions'],
+                        'clicks': page_data['clicks'],
+                        'ctr': page_data['ctr'],
+                        'position': page_data['position'],
+                        'internal_links': 0
+                    })
+            except Exception as e:
+                print(f"Error analyzing {full_url}: {e}")
+                # Include page with 0 links if scraping fails
+                pages_with_links.append({
+                    'page': page_url,
+                    'impressions': page_data['impressions'],
+                    'clicks': page_data['clicks'],
+                    'ctr': page_data['ctr'],
+                    'position': page_data['position'],
+                    'internal_links': 0
+                })
+        
+        # Sort by internal links
+        pages_with_links.sort(key=lambda x: x['internal_links'], reverse=True)
+        highest_internal_links = pages_with_links[:5]
+        lowest_internal_links = sorted([p for p in pages_with_links if p['internal_links'] > 0], key=lambda x: x['internal_links'])[:5]
+        
+        return jsonify({
+            'success': True,
+            'highest_internal_links': highest_internal_links,
+            'lowest_internal_links': lowest_internal_links,
+            'total_pages_analyzed': len(pages_with_links)
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to analyze internal links: {str(e)}'}), 500
 
