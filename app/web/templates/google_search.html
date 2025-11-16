@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Custom Search - SERP Analysis</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#07111f;color:#e7eaf3;margin:0}
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#0d1830;border-bottom:1px solid #1f2a44}
+    .brand{font-weight:700}
+    .container{padding:24px;max-width:1400px;margin:0 auto}
+    a{color:#93c5fd;text-decoration:none}
+    .input-group{margin:20px 0}
+    .input-group label{display:block;margin-bottom:8px;font-weight:500;color:#93c5fd}
+    .input-group input,.input-group select{width:100%;max-width:600px;padding:10px;border:1px solid #1f2a44;border-radius:6px;background:#0d1830;color:#e7eaf3;font-size:14px}
+    .btn{background:#10b981;color:#fff;border:none;border-radius:6px;padding:12px 24px;cursor:pointer;font-size:14px;font-weight:600;margin-right:8px}
+    .btn:hover{background:#059669}
+    .btn-secondary{background:#3b82f6}
+    .btn-secondary:hover{background:#2563eb}
+    .section{background:#0d1830;border:1px solid #1f2a44;border-radius:8px;padding:20px;margin:16px 0}
+    .section h3{color:#93c5fd;margin-top:0;border-bottom:1px solid #1f2a44;padding-bottom:12px}
+    .result-item{padding:16px;margin:12px 0;background:#1f2a44;border-left:4px solid #10b981;border-radius:4px}
+    .result-item h4{margin:0 0 8px 0;color:#93c5fd}
+    .result-item a{color:#60a5fa;font-size:14px;word-break:break-all}
+    .result-item p{color:#a0aec0;font-size:13px;margin:8px 0 0 0}
+    .rank-badge{display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;margin-left:8px}
+    .rank-badge-top{background:#10b981;color:white}
+    .rank-badge-middle{background:#f59e0b;color:white}
+    .rank-badge-bottom{background:#ef4444;color:white}
+    .info-box{background:#1e3a8a;border:1px solid #3b82f6;border-radius:8px;padding:16px;margin:16px 0}
+    .info-box h4{color:#93c5fd;margin-top:0}
+    .warning-box{background:#78350f;border:1px solid #f59e0b;border-radius:8px;padding:16px;margin:16px 0}
+    .loading{text-align:center;padding:40px;color:#a0aec0}
+    .error{background:#ef4444;color:white;padding:16px;border-radius:8px;margin:16px 0}
+    .tabs{display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid #1f2a44}
+    .tab{padding:12px 24px;cursor:pointer;border-bottom:2px solid transparent;color:#a0aec0}
+    .tab.active{border-bottom-color:#10b981;color:#10b981;font-weight:600}
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">SEO Tools</div>
+    <nav>
+      <a href="/dashboard">Dashboard</a> &nbsp; | &nbsp;
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+  <div class="container">
+    <h1>🔍 Google Custom Search - SERP Analysis</h1>
+    <p style="color:#a0aec0">Real Google search results using Custom Search API (100 queries/day free)</p>
+    
+    <div id="configStatus"></div>
+    
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('search')">Search</div>
+      <div class="tab" onclick="switchTab('rank')">Find Rank</div>
+      <div class="tab" onclick="switchTab('serp')">SERP Features</div>
+      <div class="tab" onclick="switchTab('competitors')">Compare Competitors</div>
+    </div>
+    
+    <!-- Search Tab -->
+    <div id="searchTab" class="tab-content active">
+      <div class="section">
+        <h3>Google Search</h3>
+        <div class="input-group">
+          <label for="searchQuery">Search Query:</label>
+          <input id="searchQuery" type="text" placeholder="seo tools" />
+        </div>
+        <div style="display:flex;gap:12px;align-items:end">
+          <div class="input-group" style="margin:0;flex:1;max-width:200px">
+            <label for="numResults">Results:</label>
+            <input id="numResults" type="number" min="1" max="10" value="10" />
+          </div>
+          <div class="input-group" style="margin:0;flex:1;max-width:150px">
+            <label for="country">Country:</label>
+            <select id="country">
+              <option value="us">US</option>
+              <option value="ir">IR</option>
+              <option value="uk">UK</option>
+              <option value="de">DE</option>
+            </select>
+          </div>
+          <div class="input-group" style="margin:0;flex:1;max-width:150px">
+            <label for="language">Language:</label>
+            <select id="language">
+              <option value="en">English</option>
+              <option value="fa">Persian</option>
+              <option value="de">German</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="siteFilter">Site Filter (Optional):</label>
+          <input id="siteFilter" type="text" placeholder="example.com" />
+        </div>
+        <button class="btn" onclick="performSearch()">Search</button>
+        <div id="searchResults"></div>
+      </div>
+    </div>
+    
+    <!-- Find Rank Tab -->
+    <div id="rankTab" class="tab-content">
+      <div class="section">
+        <h3>Find Keyword Ranking</h3>
+        <div class="input-group">
+          <label for="rankKeyword">Keyword:</label>
+          <input id="rankKeyword" type="text" placeholder="seo tools" />
+        </div>
+        <div class="input-group">
+          <label for="rankUrl">Target URL:</label>
+          <input id="rankUrl" type="text" placeholder="https://example.com" />
+        </div>
+        <div style="display:flex;gap:12px">
+          <div class="input-group" style="margin:0;flex:1;max-width:200px">
+            <label for="rankCountry">Country:</label>
+            <select id="rankCountry">
+              <option value="us">US</option>
+              <option value="ir">IR</option>
+            </select>
+          </div>
+          <div class="input-group" style="margin:0;flex:1;max-width:200px">
+            <label for="maxPages">Max Pages:</label>
+            <input id="maxPages" type="number" min="1" max="10" value="3" />
+          </div>
+        </div>
+        <button class="btn" onclick="findRank()">Find Rank</button>
+        <div id="rankResults"></div>
+      </div>
+    </div>
+    
+    <!-- SERP Features Tab -->
+    <div id="serpTab" class="tab-content">
+      <div class="section">
+        <h3>SERP Features Analysis</h3>
+        <div class="input-group">
+          <label for="serpQuery">Query:</label>
+          <input id="serpQuery" type="text" placeholder="seo tools" />
+        </div>
+        <button class="btn" onclick="analyzeSERP()">Analyze SERP</button>
+        <div id="serpResults"></div>
+      </div>
+    </div>
+    
+    <!-- Competitors Tab -->
+    <div id="competitorsTab" class="tab-content">
+      <div class="section">
+        <h3>Compare Competitor Rankings</h3>
+        <div class="input-group">
+          <label for="compKeyword">Keyword:</label>
+          <input id="compKeyword" type="text" placeholder="seo tools" />
+        </div>
+        <div class="input-group">
+          <label for="compUrls">Competitor URLs (one per line):</label>
+          <textarea id="compUrls" rows="5" placeholder="https://competitor1.com&#10;https://competitor2.com"></textarea>
+        </div>
+        <button class="btn" onclick="compareCompetitors()">Compare</button>
+        <div id="compResults"></div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    checkConfig();
+    function checkConfig() {
+      fetch('/google-search/api/config').then(r => r.json()).then(d => {
+        const status = document.getElementById('configStatus');
+        if (!d.configured) {
+          status.innerHTML = '<div class="warning-box"><h4>⚠️ API Not Configured</h4><p>Please add Google Custom Search API key and Search Engine ID to <code>configs/api_keys.json</code></p></div>';
+        } else {
+          status.innerHTML = `<div class="info-box"><h4>✓ API Configured</h4><p>Daily Queries: ${d.daily_queries_used}/100 (${d.daily_queries_remaining} remaining)</p></div>`;
+        }
+      });
+    }
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tab + 'Tab').classList.add('active');
+    }
+    function performSearch() {
+      const query = document.getElementById('searchQuery').value.trim();
+      const results = document.getElementById('searchResults');
+      if (!query) { results.innerHTML = '<div class="error">Enter search query</div>'; return; }
+      results.innerHTML = '<div class="loading">Searching...</div>';
+      fetch('/google-search/api/search', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query, num_results:parseInt(document.getElementById('numResults').value), country:document.getElementById('country').value, language:document.getElementById('language').value, site:document.getElementById('siteFilter').value.trim()||null})})
+      .then(r => r.json()).then(d => {
+        if (d.error) { results.innerHTML = `<div class="error">${d.error}</div>`; return; }
+        let html = `<p><strong>Total Results:</strong> ${d.total_results.toLocaleString()} | <strong>Search Time:</strong> ${d.search_time}s</p>`;
+        if (d.items && d.items.length > 0) {
+          d.items.forEach(item => {
+            const badgeClass = item.position <= 3 ? 'rank-badge-top' : item.position <= 7 ? 'rank-badge-middle' : 'rank-badge-bottom';
+            html += `<div class="result-item"><h4>${item.title} <span class="rank-badge ${badgeClass}">#${item.position}</span></h4><a href="${item.link}" target="_blank">${item.display_link || item.link}</a><p>${item.snippet}</p></div>`;
+          });
+        }
+        html += `<p style="color:#a0aec0;margin-top:16px">Queries Used: ${d.daily_queries_used}/100</p>`;
+        results.innerHTML = html;
+        checkConfig();
+      }).catch(e => results.innerHTML = `<div class="error">Error: ${e.message}</div>`);
+    }
+    function findRank() {
+      const keyword = document.getElementById('rankKeyword').value.trim();
+      const url = document.getElementById('rankUrl').value.trim();
+      const results = document.getElementById('rankResults');
+      if (!keyword || !url) { results.innerHTML = '<div class="error">Enter keyword and URL</div>'; return; }
+      results.innerHTML = '<div class="loading">Searching for rank...</div>';
+      fetch('/google-search/api/rank', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keyword, url, country:document.getElementById('rankCountry').value, max_pages:parseInt(document.getElementById('maxPages').value)})})
+      .then(r => r.json()).then(d => {
+        if (d.error) { results.innerHTML = `<div class="error">${d.error}</div>`; return; }
+        let html = '';
+        if (d.found) {
+          html = `<div class="info-box"><h4>✓ Rank Found!</h4><p><strong>Position:</strong> #${d.position}</p><p><strong>Keyword:</strong> ${d.keyword}</p><p><strong>URL:</strong> ${d.target_url}</p><p style="color:#10b981">✓ Rank saved to Rank Tracker</p></div>`;
+        } else {
+          html = `<div class="warning-box"><h4>Rank Not Found</h4><p>URL not found in top ${d.total_results_checked} results</p></div>`;
+        }
+        if (d.top_10_results && d.top_10_results.length > 0) {
+          html += '<h4>Top Results:</h4>';
+          d.top_10_results.forEach(item => {
+            html += `<div class="result-item"><h4>#${item.position} - ${item.title}</h4><a href="${item.url}" target="_blank">${item.url}</a></div>`;
+          });
+        }
+        html += `<p style="color:#a0aec0;margin-top:16px">Queries Used: ${d.daily_queries_used}/100</p>`;
+        results.innerHTML = html;
+        checkConfig();
+      }).catch(e => results.innerHTML = `<div class="error">Error: ${e.message}</div>`);
+    }
+    function analyzeSERP() {
+      const query = document.getElementById('serpQuery').value.trim();
+      const results = document.getElementById('serpResults');
+      if (!query) { results.innerHTML = '<div class="error">Enter query</div>'; return; }
+      results.innerHTML = '<div class="loading">Analyzing SERP...</div>';
+      fetch('/google-search/api/serp-features', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query})})
+      .then(r => r.json()).then(d => {
+        if (d.error) { results.innerHTML = `<div class="error">${d.error}</div>`; return; }
+        const f = d.features;
+        let html = `<div class="section"><h3>SERP Features</h3><p>Organic Results: ${f.organic_results_count}</p></div>`;
+        results.innerHTML = html;
+      }).catch(e => results.innerHTML = `<div class="error">Error: ${e.message}</div>`);
+    }
+    function compareCompetitors() {
+      const keyword = document.getElementById('compKeyword').value.trim();
+      const urls = document.getElementById('compUrls').value.trim().split('\n').filter(u => u.trim());
+      const results = document.getElementById('compResults');
+      if (!keyword || urls.length === 0) { results.innerHTML = '<div class="error">Enter keyword and competitor URLs</div>'; return; }
+      results.innerHTML = '<div class="loading">Comparing competitors...</div>';
+      fetch('/google-search/api/compare-competitors', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keyword, competitor_urls:urls})})
+      .then(r => r.json()).then(d => {
+        if (d.error) { results.innerHTML = `<div class="error">${d.error}</div>`; return; }
+        let html = '<div class="section"><h3>Competitor Rankings</h3>';
+        Object.entries(d.rankings).forEach(([url, data]) => {
+          if (data.found) {
+            html += `<p><strong>${url}</strong>: Position #${data.position} <span class="rank-badge rank-badge-top">Found</span></p>`;
+          } else {
+            html += `<p><strong>${url}</strong>: <span style="color:#a0aec0">Not in top 30</span></p>`;
+          }
+        });
+        html += '</div>';
+        html += `<p style="color:#a0aec0;margin-top:16px">Queries Used: ${d.daily_queries_used}/100</p>`;
+        results.innerHTML = html;
+        checkConfig();
+      }).catch(e => results.innerHTML = `<div class="error">Error: ${e.message}</div>`);
+    }
+  </script>
+</body>
+</html>
+

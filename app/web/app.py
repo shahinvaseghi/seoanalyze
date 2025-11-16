@@ -39,6 +39,7 @@ def create_app() -> Flask:
     from .content_audit import content_audit_bp
     from .backlink_analyzer import backlink_analyzer_bp
     from .competitor_monitor import competitor_monitor_bp
+    from .google_search import google_search_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(routes_bp)
@@ -59,6 +60,7 @@ def create_app() -> Flask:
     app.register_blueprint(content_audit_bp)
     app.register_blueprint(backlink_analyzer_bp)
     app.register_blueprint(competitor_monitor_bp)
+    app.register_blueprint(google_search_bp)
 
     @app.context_processor
     def inject_roles():

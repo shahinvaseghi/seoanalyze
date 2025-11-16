@@ -81,11 +81,11 @@ def run_audit():
             response_time = response.elapsed.total_seconds()
             cwv = cwv_analyzer.analyze_cwv(soup, url, response_time)
             results['core_web_vitals'] = {
-                'lcp': cwv.lcp,
-                'inp': cwv.inp,
-                'cls': cwv.cls,
-                'fcp': cwv.fcp,
-                'ttfb': cwv.ttfb,
+                'lcp': cwv.cwv_metrics.lcp if cwv.cwv_metrics else None,
+                'inp': cwv.cwv_metrics.inp if cwv.cwv_metrics else None,
+                'cls': cwv.cwv_metrics.cls if cwv.cwv_metrics else None,
+                'fcp': cwv.cwv_metrics.fcp if cwv.cwv_metrics else None,
+                'ttfb': cwv.cwv_metrics.ttfb if cwv.cwv_metrics else None,
                 'overall_score': cwv.overall_score,
                 'grade': cwv.grade
             }
@@ -113,7 +113,11 @@ def run_audit():
                 },
                 'accessibility': {
                     'score': cro.accessibility.score,
-                    'issues': cro.accessibility.issues
+                    'grade': cro.accessibility.grade,
+                    'passed': cro.accessibility.passed,
+                    'failed': cro.accessibility.failed,
+                    'warnings': cro.accessibility.warnings,
+                    'aria_issues': cro.accessibility.aria_issues if hasattr(cro.accessibility, 'aria_issues') else []
                 }
             }
         
@@ -216,7 +220,13 @@ def run_audit():
         })
         
     except requests.RequestException as e:
-        return jsonify({'error': f'Failed to fetch URL: {str(e)}'}), 500
+        import traceback
+        print(f"Request error: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({'error': f'Failed to fetch URL: {str(e)}', 'success': False}), 500
     except Exception as e:
-        return jsonify({'error': f'Audit failed: {str(e)}'}), 500
+        import traceback
+        print(f"Audit error: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({'error': f'Audit failed: {str(e)}', 'success': False, 'traceback': traceback.format_exc()}), 500
 

@@ -87,43 +87,81 @@
       fetch('/site-audit/api/audit', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({url, type: auditType})
+        body: JSON.stringify({url, type: auditType}),
+        timeout: 120000  // 2 minutes timeout
       })
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) {
+          throw new Error(`HTTP error! status: ${r.status}`);
+        }
+        return r.json();
+      })
       .then(data => {
+        console.log('Response received:', data);
         btn.disabled = false;
         btn.textContent = 'Run Site Audit';
         
-        if (data.error) {
-          results.innerHTML = `<div class="error">${data.error}</div>`;
+        if (!data) {
+          results.innerHTML = `<div class="error">No response received from server</div>`;
           return;
         }
         
-        displayResults(data.results);
+        if (data.error) {
+          results.innerHTML = `<div class="error">${data.error}${data.traceback ? '<br><details><summary>Details</summary><pre style="font-size:11px;overflow:auto">' + data.traceback + '</pre></details>' : ''}</div>`;
+          return;
+        }
+        
+        if (!data.success) {
+          results.innerHTML = `<div class="error">Request failed. Response: ${JSON.stringify(data)}</div>`;
+          return;
+        }
+        
+        if (!data.results) {
+          results.innerHTML = `<div class="error">No results returned. Response: ${JSON.stringify(data)}</div>`;
+          return;
+        }
+        
+        console.log('Calling displayResults with:', data.results);
+        try {
+          displayResults(data.results);
+          console.log('displayResults completed successfully');
+        } catch (err) {
+          console.error('Error in displayResults:', err);
+          results.innerHTML = `<div class="error">Error displaying results: ${err.message}. Check console for details.</div>`;
+        }
       })
       .catch(e => {
         btn.disabled = false;
         btn.textContent = 'Run Site Audit';
-        results.innerHTML = `<div class="error">Error: ${e.message}</div>`;
+        console.error('Audit error:', e);
+        results.innerHTML = `<div class="error">Error: ${e.message}. Please check browser console for details.</div>`;
       });
     }
     
-    function displayResults(results) {
+    function displayResults(data) {
+      const resultsDiv = document.getElementById('results');
+      if (!resultsDiv) {
+        console.error('Results div not found!');
+        return;
+      }
       let html = '';
+      
+      console.log('Displaying results:', data);
+      console.log('Results div found:', resultsDiv);
       
       // Overall Score
       html += `
         <div class="score-box">
           <h2>Overall Score</h2>
-          <div class="score-value">${results.overall_score || 0}</div>
+          <div class="score-value">${data.overall_score || 0}</div>
           <p style="color:#a0aec0">Comprehensive SEO Score</p>
         </div>
       `;
       
       // Priority Actions
-      if (results.priority_actions && results.priority_actions.length > 0) {
+      if (data.priority_actions && data.priority_actions.length > 0) {
         html += '<div class="section"><h3>⚠️ Priority Actions</h3>';
-        results.priority_actions.forEach(action => {
+        data.priority_actions.forEach(action => {
           const badgeClass = action.priority === 'high' ? 'badge-error' : action.priority === 'medium' ? 'badge-warning' : 'badge-good';
           html += `
             <div class="metric">
@@ -136,61 +174,94 @@
       }
       
       // Basic SEO
-      if (results.basic_seo) {
+      if (data.basic_seo) {
         html += '<div class="section"><h3>📊 Basic SEO</h3>';
-        if (results.basic_seo.title) {
-          html += `<div class="metric"><span class="metric-label">Title:</span><span class="metric-value">${results.basic_seo.title.substring(0, 60)}...</span></div>`;
+        if (data.basic_seo.title) {
+          html += `<div class="metric"><span class="metric-label">Title:</span><span class="metric-value">${(data.basic_seo.title || '').substring(0, 60)}...</span></div>`;
         }
-        if (results.basic_seo.meta_description) {
-          html += `<div class="metric"><span class="metric-label">Meta Description:</span><span class="metric-value">${results.basic_seo.meta_description.substring(0, 60)}...</span></div>`;
+        if (data.basic_seo.meta_description) {
+          html += `<div class="metric"><span class="metric-label">Meta Description:</span><span class="metric-value">${(data.basic_seo.meta_description || '').substring(0, 60)}...</span></div>`;
         }
         html += '</div>';
       }
       
       // Technical SEO
-      if (results.technical_seo) {
+      if (data.technical_seo) {
         html += '<div class="section"><h3>🔧 Technical SEO</h3>';
-        const tech = results.technical_seo;
-        if (tech.schema_markup) {
-          html += `<div class="metric"><span class="metric-label">Schema Markup:</span><span class="metric-value"><span class="badge ${tech.schema_markup ? 'badge-good' : 'badge-error'}">${tech.schema_markup ? 'Found' : 'Missing'}</span></span></div>`;
+        const tech = data.technical_seo;
+        if (tech.checks) {
+          const schemaCheck = tech.checks.schema || tech.checks.schema_markup;
+          if (schemaCheck !== undefined) {
+            html += `<div class="metric"><span class="metric-label">Schema Markup:</span><span class="metric-value"><span class="badge ${schemaCheck.status || schemaCheck ? 'badge-good' : 'badge-error'}">${schemaCheck.status || schemaCheck ? 'Found' : 'Missing'}</span></span></div>`;
+          }
+        }
+        if (tech.score !== undefined) {
+          html += `<div class="metric"><span class="metric-label">Technical Score:</span><span class="metric-value">${tech.score}/100</span></div>`;
         }
         html += '</div>';
       }
       
       // Core Web Vitals
-      if (results.core_web_vitals) {
+      if (data.core_web_vitals) {
         html += '<div class="section"><h3>⚡ Core Web Vitals</h3>';
-        const cwv = results.core_web_vitals;
+        const cwv = data.core_web_vitals;
+        html += `<div class="metric"><span class="metric-label">LCP:</span><span class="metric-value">${cwv.lcp || 'N/A'}s</span></div>`;
+        html += `<div class="metric"><span class="metric-label">FCP:</span><span class="metric-value">${cwv.fcp || 'N/A'}s</span></div>`;
+        html += `<div class="metric"><span class="metric-label">CLS:</span><span class="metric-value">${cwv.cls || 'N/A'}</span></div>`;
         html += `<div class="metric"><span class="metric-label">Overall Score:</span><span class="metric-value">${cwv.overall_score || 0}/100</span></div>`;
         html += `<div class="metric"><span class="metric-label">Grade:</span><span class="metric-value">${cwv.grade || 'N/A'}</span></div>`;
         html += '</div>';
       }
       
       // CRO
-      if (results.cro) {
+      if (data.cro) {
         html += '<div class="section"><h3>💰 Conversion Rate Optimization</h3>';
-        html += `<div class="metric"><span class="metric-label">Total CTAs:</span><span class="metric-value">${results.cro.cta_analysis.total_ctas || 0}</span></div>`;
-        html += `<div class="metric"><span class="metric-label">Trust Score:</span><span class="metric-value">${results.cro.trust_signals.trust_score || 0}/100</span></div>`;
+        html += `<div class="metric"><span class="metric-label">Total CTAs:</span><span class="metric-value">${data.cro.cta_analysis?.total_ctas || 0}</span></div>`;
+        html += `<div class="metric"><span class="metric-label">Trust Score:</span><span class="metric-value">${data.cro.trust_signals?.trust_score || 0}/100</span></div>`;
         html += '</div>';
       }
       
       // E-E-A-T
-      if (results.eeat) {
+      if (data.eeat) {
         html += '<div class="section"><h3>🎓 E-E-A-T Analysis</h3>';
-        html += `<div class="metric"><span class="metric-label">Overall Score:</span><span class="metric-value">${results.eeat.overall_score || 0}/100</span></div>`;
-        html += `<div class="metric"><span class="metric-label">Grade:</span><span class="metric-value">${results.eeat.overall_grade || 'N/A'}</span></div>`;
+        html += `<div class="metric"><span class="metric-label">Overall Score:</span><span class="metric-value">${data.eeat.overall_score || 0}/100</span></div>`;
+        html += `<div class="metric"><span class="metric-label">Grade:</span><span class="metric-value">${data.eeat.overall_grade || 'N/A'}</span></div>`;
         html += '</div>';
       }
       
       // Local SEO
-      if (results.local_seo) {
+      if (data.local_seo) {
         html += '<div class="section"><h3>📍 Local SEO</h3>';
-        html += `<div class="metric"><span class="metric-label">NAP Consistency:</span><span class="metric-value"><span class="badge ${results.local_seo.nap_consistency.consistent ? 'badge-good' : 'badge-error'}">${results.local_seo.nap_consistency.consistent ? 'Consistent' : 'Inconsistent'}</span></span></div>`;
-        html += `<div class="metric"><span class="metric-label">Overall Score:</span><span class="metric-value">${results.local_seo.overall_score || 0}/100</span></div>`;
+        html += `<div class="metric"><span class="metric-label">NAP Consistency:</span><span class="metric-value"><span class="badge ${data.local_seo.nap_consistency?.consistent ? 'badge-good' : 'badge-error'}">${data.local_seo.nap_consistency?.consistent ? 'Consistent' : 'Inconsistent'}</span></span></div>`;
+        html += `<div class="metric"><span class="metric-label">Overall Score:</span><span class="metric-value">${data.local_seo.overall_score || 0}/100</span></div>`;
         html += '</div>';
       }
       
-      results.innerHTML = html;
+      // Intent
+      if (data.intent) {
+        html += '<div class="section"><h3>🎯 Search Intent</h3>';
+        html += `<div class="metric"><span class="metric-label">Primary Intent:</span><span class="metric-value">${data.intent.primary_intent || 'N/A'}</span></div>`;
+        html += `<div class="metric"><span class="metric-label">Confidence:</span><span class="metric-value">${(data.intent.confidence * 100).toFixed(0) || 0}%</span></div>`;
+        html += '</div>';
+      }
+      
+      console.log('Generated HTML length:', html.length);
+      console.log('First 200 chars of HTML:', html.substring(0, 200));
+      
+      if (html.length === 0) {
+        console.error('HTML is empty!');
+        resultsDiv.innerHTML = '<div class="error">No content generated. Check console for details.</div>';
+        return;
+      }
+      
+      resultsDiv.innerHTML = html;
+      console.log('HTML inserted into results div');
+      console.log('Results div innerHTML length after insert:', resultsDiv.innerHTML.length);
+      
+      // Scroll to results
+      setTimeout(() => {
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     }
   </script>
 </body>
