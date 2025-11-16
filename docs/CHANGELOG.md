@@ -1,7 +1,51 @@
 Changelog - SEOAnalyzePro
 ========================
 
-## Version 1.1.0 (Current) - 2025-11-03
+## Version 1.2.0 (Current) - 2025-11-16
+
+### 🎉 Google Search Console Reports Module
+
+#### Advanced Reporting Features
+- **Comprehensive Analytics Reports**: Generate detailed reports on page performance, CTR, clicks, and impressions
+- **Position Tracking**: Monitor average position changes between date ranges
+- **Performance Analysis**: Identify top and bottom performing pages
+- **Click Analysis**: Track pages with significant click decreases (>25%)
+- **CTR Optimization**: Find pages with highest and lowest click-through rates
+- **Zero Click Detection**: Identify pages with impressions but no clicks
+
+#### Internal Links Analysis
+- **Link Structure Analysis**: Analyze internal linking of top pages
+- **Hub Page Identification**: Find pages with most internal links
+- **Orphan Page Detection**: Identify pages with fewest internal links
+- **Automatic Scraping**: Scrapes pages to count internal links accurately
+
+#### Query-Based Page Search
+- **Exact Match Search**: Find pages that rank for exact query
+- **Contain Match Search**: Find pages where URL contains query
+- **Top/Bottom Results**: Display top 5 and bottom 5 for each category
+- **Performance Metrics**: Complete metrics (clicks, impressions, CTR, position) for each page
+
+#### UI/UX Improvements
+- **Collapsible Sections**: Top queries and pages now collapsible for better readability
+- **Increased Limits**: Query/page limit increased from 50 to 25,000 (GSC API max)
+- **Better Organization**: Reports organized in clear sections
+- **Interactive Interface**: Easy-to-use controls for property and date selection
+
+#### Technical Enhancements
+- **New API Endpoints**: 
+  - `/search-console/reports/generate` - Generate comprehensive reports
+  - `/search-console/reports/internal-links` - Analyze internal links
+  - `/search-console/reports/pages-by-query` - Search pages by query
+- **Enhanced GSC Analyzer**: New methods for page comparison and query-based search
+- **Date Range Comparison**: Compare current period with previous period
+- **Performance Optimization**: Efficient data processing and API usage
+
+#### Documentation
+- **New Guide**: `GSC_REPORTS_GUIDE.md` - Complete guide for reports module
+- **Updated README**: Added GSC Reports to main features
+- **API Documentation**: Complete API endpoint documentation
+
+## Version 1.1.0 - 2025-11-03
 
 ### 🎉 Google Search Console Integration
 

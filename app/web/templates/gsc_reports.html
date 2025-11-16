@@ -308,6 +308,11 @@
         <button onclick="generateInternalLinks()" id="internalLinksBtn">تحلیل Internal Links</button>
       </div>
       
+      <div class="controls" style="margin-top: 16px;">
+        <input type="text" id="queryInput" placeholder="وارد کردن Query..." style="flex: 1; padding: 10px 14px; background: #0d1830; border: 1px solid #1f2a44; border-radius: 6px; color: #e7eaf3; font-size: 14px;">
+        <button onclick="searchPagesByQuery()" id="querySearchBtn">جستجوی صفحات بر اساس Query</button>
+      </div>
+      
       <div id="messageArea"></div>
       <div id="reportsArea"></div>
     {% endif %}
@@ -792,6 +797,209 @@
       if (html) {
         reportsArea.innerHTML = html + '<p style="color: #a0aec0; margin-top: 16px;">تعداد صفحات تحلیل شده: ' + data.total_pages_analyzed + '</p>';
       }
+    }
+    
+    function searchPagesByQuery() {
+      const siteUrl = document.getElementById('propertySelect').value;
+      const days = document.getElementById('daysSelect').value;
+      const query = document.getElementById('queryInput').value.trim();
+      const btn = document.getElementById('querySearchBtn');
+      
+      if (!siteUrl) {
+        showMessage('لطفاً یک Property انتخاب کنید', 'error');
+        return;
+      }
+      
+      if (!query) {
+        showMessage('لطفاً یک Query وارد کنید', 'error');
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.textContent = 'در حال جستجو...';
+      
+      const reportsArea = document.getElementById('reportsArea');
+      reportsArea.innerHTML = '<div class="loading">در حال جستجوی صفحات...</div>';
+      
+      fetch('/search-console/reports/pages-by-query', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_url: siteUrl,
+          query: query,
+          days: parseInt(days)
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        btn.disabled = false;
+        btn.textContent = 'جستجوی صفحات بر اساس Query';
+        
+        if (data.error) {
+          showMessage(data.error, 'error');
+          reportsArea.innerHTML = '';
+          return;
+        }
+        
+        displayPagesByQuery(data);
+      })
+      .catch(error => {
+        btn.disabled = false;
+        btn.textContent = 'جستجوی صفحات بر اساس Query';
+        showMessage('خطا در جستجو: ' + error.message, 'error');
+        reportsArea.innerHTML = '';
+      });
+    }
+    
+    function displayPagesByQuery(data) {
+      const reportsArea = document.getElementById('reportsArea');
+      let html = '';
+      
+      html += `
+        <div class="summary-box">
+          <h4>نتایج جستجو برای Query: "${data.query}"</h4>
+          <div class="summary-item">
+            <span class="summary-label">Exact Match (کل):</span>
+            <span class="summary-value">${data.exact.total} صفحه</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Contain Match (کل):</span>
+            <span class="summary-value">${data.contain.total} صفحه</span>
+          </div>
+        </div>
+      `;
+      
+      // Exact Match - Top 5
+      if (data.exact.top5 && data.exact.top5.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>Exact Match - 5 صفحه اول (بر اساس Clicks)</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>Clicks</th>
+                  <th>Impressions</th>
+                  <th>CTR</th>
+                  <th>Position</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        data.exact.top5.forEach(page => {
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td>${page.clicks.toLocaleString()}</td>
+              <td>${page.impressions.toLocaleString()}</td>
+              <td>${page.ctr}%</td>
+              <td>${page.position}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      // Exact Match - Bottom 5
+      if (data.exact.bottom5 && data.exact.bottom5.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>Exact Match - 5 صفحه آخر (بر اساس Clicks)</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>Clicks</th>
+                  <th>Impressions</th>
+                  <th>CTR</th>
+                  <th>Position</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        data.exact.bottom5.forEach(page => {
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td>${page.clicks.toLocaleString()}</td>
+              <td>${page.impressions.toLocaleString()}</td>
+              <td>${page.ctr}%</td>
+              <td>${page.position}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      // Contain Match - Top 5
+      if (data.contain.top5 && data.contain.top5.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>Contain Match (URL شامل Query) - 5 صفحه اول (بر اساس Clicks)</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>Clicks</th>
+                  <th>Impressions</th>
+                  <th>CTR</th>
+                  <th>Position</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        data.contain.top5.forEach(page => {
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td>${page.clicks.toLocaleString()}</td>
+              <td>${page.impressions.toLocaleString()}</td>
+              <td>${page.ctr}%</td>
+              <td>${page.position}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      // Contain Match - Bottom 5
+      if (data.contain.bottom5 && data.contain.bottom5.length > 0) {
+        html += `
+          <div class="report-section">
+            <h3>Contain Match (URL شامل Query) - 5 صفحه آخر (بر اساس Clicks)</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>صفحه</th>
+                  <th>Clicks</th>
+                  <th>Impressions</th>
+                  <th>CTR</th>
+                  <th>Position</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        data.contain.bottom5.forEach(page => {
+          html += `
+            <tr>
+              <td class="page-url" title="${page.page}">${page.page}</td>
+              <td>${page.clicks.toLocaleString()}</td>
+              <td>${page.impressions.toLocaleString()}</td>
+              <td>${page.ctr}%</td>
+              <td>${page.position}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      if (!html || html === '<div class="summary-box">') {
+        html += '<div class="empty-state"><div class="empty-state-icon">📭</div><p>نتیجه‌ای یافت نشد</p></div>';
+      }
+      
+      reportsArea.innerHTML = html;
     }
   </script>
 </body>

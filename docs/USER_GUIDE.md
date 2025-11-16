@@ -140,6 +140,84 @@ Connect your Google Search Console account to view detailed search analytics, tr
 
 For detailed troubleshooting, see: `docs/SEARCH_CONSOLE_TROUBLESHOOTING.md`
 
+Google Search Console Reports
+------------------------------
+
+### Overview
+The GSC Reports module provides advanced analytics and reporting capabilities for your Search Console data. Generate comprehensive reports, analyze page performance, and track internal links.
+
+### Accessing Reports
+1. **Navigate to Reports:**
+   - Click "📈 گزارشات سرچ کنسول (GSC Reports)" from the dashboard
+   - Or go directly to: `/search-console/reports/`
+
+2. **Prerequisites:**
+   - Must have connected your Google Search Console account
+   - At least one property must be available
+
+### Generating Reports
+
+#### Step 1: Select Property and Date Range
+- Choose your Search Console property from dropdown
+- Select date range: 7, 14, 30, or 90 days
+
+#### Step 2: Generate Analytics Reports
+Click **"تولید گزارشات"** (Generate Reports) to generate:
+- **Position Changes**: Average position change between periods
+- **High Impressions, Low Clicks**: Pages with visibility but low engagement
+- **Zero Click Pages**: Pages appearing in search but never clicked
+- **Click Decreases**: Pages with >25% click drops
+- **Top Performers**: Best and worst performing pages
+- **CTR Analysis**: Highest and lowest click-through rates
+
+### Internal Links Analysis
+
+1. **Select Property and Date Range**
+2. Click **"تحلیل Internal Links"** (Analyze Internal Links)
+3. System will scrape top pages to count internal links
+4. Results show:
+   - **Highest Internal Links**: Hub pages with most links
+   - **Lowest Internal Links**: Pages needing more internal links
+
+**Note**: Analysis may take 1-2 minutes as it scrapes pages
+
+### Query-Based Page Search
+
+1. **Enter Query**: Type your search query in the text field
+2. Click **"جستجوی صفحات بر اساس Query"** (Search Pages by Query)
+3. Results categorized as:
+   - **Exact Match**: Pages ranking for exact query
+   - **Contain Match**: Pages where URL contains query
+4. Each category shows:
+   - **Top 5**: Highest clicks
+   - **Bottom 5**: Lowest clicks
+
+### Report Types Explained
+
+#### High Impressions, Low Clicks
+- **Purpose**: Find pages with high visibility but low engagement
+- **Action**: Optimize titles and meta descriptions
+
+#### Zero Click Pages
+- **Purpose**: Find pages appearing but never clicked
+- **Action**: Rewrite titles, improve descriptions, check content relevance
+
+#### Click Decreases > 25%
+- **Purpose**: Monitor significant traffic drops
+- **Action**: Investigate changes, check competitors, review updates
+
+#### Highest/Lowest CTR
+- **Purpose**: Identify best and worst performing pages
+- **Action**: Learn from successful pages, fix poor performers
+
+### Best Practices
+1. **Regular Monitoring**: Run reports weekly or monthly
+2. **Prioritize Actions**: Focus on zero clicks and significant drops first
+3. **Compare Periods**: Track trends over time
+4. **Internal Links**: Link from high-authority pages to important pages
+
+For complete documentation, see: `docs/GSC_REPORTS_GUIDE.md`
+
 **Color Coding:**
 - 🟢 **Green**: Excellent performance (≤ 1.5s desktop, ≤ 2.5s mobile)
 - 🟡 **Yellow**: Good performance (1.5-3s desktop, 2.5-4s mobile)

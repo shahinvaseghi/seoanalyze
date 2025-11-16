@@ -773,3 +773,90 @@ def get_internal_links_report():
     except Exception as e:
         return jsonify({'error': f'Failed to analyze internal links: {str(e)}'}), 500
 
+
+@search_console_bp.route('/reports/pages-by-query', methods=['POST'])
+@login_required
+def get_pages_by_query():
+    """
+    Get pages that rank for a specific query, categorized by exact and contain match
+    """
+    username = session.get("user")
+    
+    if not storage.has_gsc_connection(username):
+        return jsonify({'error': 'Search Console not connected'}), 401
+    
+    data = request.json or {}
+    site_url = data.get('site_url')
+    query = data.get('query', '').strip()
+    days = int(data.get('days', 30))
+    
+    if not site_url:
+        return jsonify({'error': 'site_url is required'}), 400
+    
+    if not query:
+        return jsonify({'error': 'query is required'}), 400
+    
+    try:
+        # Get user's tokens
+        tokens = storage.get_gsc_tokens(username)
+        oauth_handler = GSCOAuthHandler()
+        
+        def save_tokens_callback(updated_tokens):
+            storage.save_gsc_tokens(username, updated_tokens)
+        
+        credentials, _ = oauth_handler.get_valid_credentials(tokens, save_tokens_callback)
+        analyzer = GSCAnalyzer(credentials)
+        
+        # Get pages that rank for this exact query
+        pages_by_query = analyzer.get_pages_by_query(
+            site_url,
+            query,
+            days=days,
+            limit=25000
+        )
+        
+        # Categorize pages
+        exact_pages = []  # Pages that rank for exact query (from GSC)
+        contain_pages = []  # Pages where URL contains the query
+        
+        query_lower = query.lower()
+        
+        for page_data in pages_by_query:
+            page_url = page_data['page'].lower()
+            
+            # Check if URL contains the query
+            if query_lower in page_url:
+                contain_pages.append(page_data)
+            else:
+                # This is exact match (from GSC filter)
+                exact_pages.append(page_data)
+        
+        # Sort by clicks (descending) for both categories
+        exact_pages.sort(key=lambda x: x['clicks'], reverse=True)
+        contain_pages.sort(key=lambda x: x['clicks'], reverse=True)
+        
+        # Get top 5 and bottom 5 for each category
+        exact_top5 = exact_pages[:5]
+        exact_bottom5 = exact_pages[-5:] if len(exact_pages) >= 5 else exact_pages
+        
+        contain_top5 = contain_pages[:5]
+        contain_bottom5 = contain_pages[-5:] if len(contain_pages) >= 5 else contain_pages
+        
+        return jsonify({
+            'success': True,
+            'query': query,
+            'exact': {
+                'total': len(exact_pages),
+                'top5': exact_top5,
+                'bottom5': exact_bottom5
+            },
+            'contain': {
+                'total': len(contain_pages),
+                'top5': contain_top5,
+                'bottom5': contain_bottom5
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to get pages by query: {str(e)}'}), 500
+

@@ -12,6 +12,8 @@ SEOAnalyzePro is a comprehensive SEO analysis platform designed to provide detai
 - **Dashboard**: Centralized control panel for all features
 - **User Management**: Admin-only user creation and management
 - **Competitors Analysis**: Comprehensive SEO analysis tool
+- **Google Search Console**: Full integration with GSC API for analytics
+- **GSC Reports**: Advanced reporting and analytics module
 
 ### SEO Analysis Capabilities
 - **Basic SEO**: Title, meta description, headings (H1-H4), word count

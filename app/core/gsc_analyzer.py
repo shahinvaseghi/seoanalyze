@@ -352,6 +352,65 @@ class GSCAnalyzer:
             
             return []
     
+    def get_pages_by_query(
+        self,
+        site_url: str,
+        query: str,
+        days: int = 30,
+        limit: int = 25000
+    ) -> List[Dict[str, Any]]:
+        """
+        Get pages that rank for a specific query
+        
+        Args:
+            site_url: Search Console property URL
+            query: Search query to filter by
+            days: Number of days to look back
+            limit: Maximum rows to return
+            
+        Returns:
+            List of pages with metrics for the specified query
+        """
+        end_date = datetime.now().date() - timedelta(days=1)
+        start_date = end_date - timedelta(days=days-1)
+        
+        try:
+            request_body = {
+                'startDate': start_date.isoformat(),
+                'endDate': end_date.isoformat(),
+                'dimensions': ['page', 'query'],
+                'dimensionFilterGroups': [{
+                    'filters': [{
+                        'dimension': 'query',
+                        'operator': 'equals',
+                        'expression': query
+                    }]
+                }],
+                'rowLimit': limit
+            }
+            
+            response = self.service.searchanalytics().query(
+                siteUrl=site_url,
+                body=request_body
+            ).execute()
+            
+            pages = []
+            for row in response.get('rows', []):
+                pages.append({
+                    'page': row['keys'][0],  # page URL
+                    'query': row['keys'][1],  # query (should match)
+                    'impressions': row['impressions'],
+                    'clicks': row['clicks'],
+                    'ctr': round(row['ctr'] * 100, 2),
+                    'position': round(row['position'], 1)
+                })
+            
+            return pages
+            
+        except Exception as e:
+            print(f"❌ Error getting pages by query: {e}")
+            return []
+    
     def get_sitemaps(self, site_url: str) -> List[Dict[str, Any]]:
         """
         Get sitemaps for a property

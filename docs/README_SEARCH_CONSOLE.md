@@ -287,10 +287,61 @@ sudo journalctl -u seoanalyzepro | \
 5. **Notifications**: Alert on significant changes
 6. **Charts**: Visual representation of trends
 
+## GSC Reports Module
+
+### Overview
+Advanced reporting module that provides comprehensive analytics beyond basic GSC dashboard.
+
+### Features
+- **Comprehensive Reports**: 10+ different report types
+- **Internal Links Analysis**: Scrape and analyze internal linking structure
+- **Query-Based Search**: Find pages ranking for specific queries
+- **Period Comparison**: Compare current vs previous period performance
+
+### New Methods in GSCAnalyzer
+
+#### `get_pages_data()`
+Get all pages with metrics for a date range.
+
+#### `get_pages_comparison()`
+Compare pages performance between two date ranges.
+
+#### `get_pages_by_query()`
+Get pages that rank for a specific query.
+
+### New Routes
+
+#### `/search-console/reports/`
+Main reports dashboard page.
+
+#### `/search-console/reports/generate`
+Generate comprehensive analytics reports.
+
+#### `/search-console/reports/internal-links`
+Analyze internal links structure of top pages.
+
+#### `/search-console/reports/pages-by-query`
+Search for pages by specific query.
+
+### Report Types
+1. Average position change
+2. High impressions, low clicks (non-zero)
+3. High impressions, zero clicks
+4. Clicks decreased > 25%
+5. Highest clicks
+6. Lowest impressions and clicks
+7. Highest CTR
+8. Lowest CTR
+9. Zero clicks, low CTR (< 10%)
+10. Clicks with position > 6
+
+For complete documentation, see: `docs/GSC_REPORTS_GUIDE.md`
+
 ## Related Documentation
 
 - Setup Guide: `docs/GOOGLE_SEARCH_CONSOLE_SETUP.md`
 - Troubleshooting: `docs/SEARCH_CONSOLE_TROUBLESHOOTING.md`
 - Admin Setup: `docs/GSC_ADMIN_SETUP.md`
 - User Guide: `docs/USER_GUIDE.md`
+- Reports Guide: `docs/GSC_REPORTS_GUIDE.md`
 

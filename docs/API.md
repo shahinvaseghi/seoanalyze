@@ -29,7 +29,7 @@ Current Endpoints
     {
       "site_url": "https://example.com",
       "days": 7,
-      "limit": 500
+      "limit": 25000
     }
     ```
   - **Response:**
@@ -50,6 +50,80 @@ Current Endpoints
 - `GET /search-console/help` → Help page (Persian & English)
 - `GET /search-console/admin/setup` → Admin OAuth credentials upload page
 - `POST /search-console/admin/upload-credentials` → Upload OAuth credentials (Admin only)
+
+### Google Search Console Reports
+- `GET /search-console/reports/` → GSC Reports dashboard
+- `POST /search-console/reports/generate` → Generate comprehensive analytics reports
+  - **Request Body:**
+    ```json
+    {
+      "site_url": "sc-domain:example.com",
+      "days": 30
+    }
+    ```
+  - **Response:**
+    ```json
+    {
+      "success": true,
+      "period": "2025-10-17 to 2025-11-16",
+      "avg_position_change": -0.5,
+      "reports": {
+        "high_impressions_low_clicks": [...],
+        "high_impressions_zero_clicks": [...],
+        "clicks_decreased_25pct": [...],
+        "highest_clicks": [...],
+        "lowest_impressions_clicks": [...],
+        "highest_ctr": [...],
+        "lowest_ctr": [...],
+        "zero_clicks_low_ctr": [...],
+        "clicks_high_position": [...]
+      }
+    }
+    ```
+- `POST /search-console/reports/internal-links` → Analyze internal links structure
+  - **Request Body:**
+    ```json
+    {
+      "site_url": "sc-domain:example.com",
+      "days": 30,
+      "limit": 50
+    }
+    ```
+  - **Response:**
+    ```json
+    {
+      "success": true,
+      "highest_internal_links": [...],
+      "lowest_internal_links": [...],
+      "total_pages_analyzed": 50
+    }
+    ```
+- `POST /search-console/reports/pages-by-query` → Search pages by specific query
+  - **Request Body:**
+    ```json
+    {
+      "site_url": "sc-domain:example.com",
+      "query": "seo tools",
+      "days": 30
+    }
+    ```
+  - **Response:**
+    ```json
+    {
+      "success": true,
+      "query": "seo tools",
+      "exact": {
+        "total": 15,
+        "top5": [...],
+        "bottom5": [...]
+      },
+      "contain": {
+        "total": 8,
+        "top5": [...],
+        "bottom5": [...]
+      }
+    }
+    ```
 
 Authentication
 --------------
