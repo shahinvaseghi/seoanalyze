@@ -259,6 +259,351 @@
       color: #a0aec0;
       line-height: 1.6;
     }
+    
+    /* Filter and Search Styles */
+    .table-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .table-controls input[type="text"],
+    .table-controls select {
+      padding: 8px 12px;
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 6px;
+      color: #e7eaf3;
+      font-size: 14px;
+    }
+    
+    .table-controls input[type="text"] {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .table-controls button {
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    
+    .export-btn {
+      background: #3b82f6;
+    }
+    
+    .export-btn:hover {
+      background: #2563eb;
+    }
+    
+    /* Pagination Styles */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      padding: 16px;
+    }
+    
+    .pagination button {
+      padding: 8px 12px;
+      min-width: 40px;
+    }
+    
+    .pagination .page-info {
+      color: #a0aec0;
+      padding: 0 12px;
+    }
+    
+    /* Alert Badges */
+    .badge-alert {
+      background: #ef4444;
+      color: white;
+      animation: pulse 2s infinite;
+    }
+    
+    .badge-warning {
+      background: #f59e0b;
+      color: white;
+    }
+    
+    .badge-info {
+      background: #3b82f6;
+      color: white;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    /* Performance Insights */
+    .insights-box {
+      background: #0a1520;
+      border: 1px solid #1f2a44;
+      border-left: 4px solid #10b981;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .insights-box h4 {
+      margin: 0 0 12px 0;
+      color: #10b981;
+    }
+    
+    .insight-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #1f2a44;
+    }
+    
+    .insight-item:last-child {
+      border-bottom: none;
+    }
+    
+    .insight-priority {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    
+    .priority-high {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .priority-medium {
+      background: #f59e0b;
+      color: white;
+    }
+    
+    .priority-low {
+      background: #6b7280;
+      color: white;
+    }
+    
+    /* Date Range Picker */
+    .date-range-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .date-range-controls input[type="date"] {
+      padding: 10px 14px;
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 6px;
+      color: #e7eaf3;
+      font-size: 14px;
+    }
+    
+    .date-range-controls label {
+      color: #a0aec0;
+      font-size: 14px;
+    }
+    
+    /* Chart Container */
+    .chart-container {
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+      height: 400px;
+    }
+    
+    /* Sortable Table Headers */
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+    }
+    
+    th.sortable:hover {
+      background: rgba(139, 92, 246, 0.1);
+    }
+    
+    th.sortable::after {
+      content: ' ↕';
+      opacity: 0.5;
+      font-size: 12px;
+    }
+    
+    th.sortable.asc::after {
+      content: ' ↑';
+      opacity: 1;
+    }
+    
+    th.sortable.desc::after {
+      content: ' ↓';
+      opacity: 1;
+    }
+    
+    /* Historical Reports */
+    .saved-reports {
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .saved-report-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #1f2a44;
+      cursor: pointer;
+    }
+    
+    .saved-report-item:hover {
+      background: rgba(139, 92, 246, 0.1);
+    }
+    
+    .saved-report-item:last-child {
+      border-bottom: none;
+    }
+    
+    /* Collapsible Sections */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      padding: 16px;
+      background: rgba(16, 185, 129, 0.1);
+      border-radius: 6px;
+      margin-bottom: 12px;
+      transition: background 0.2s;
+    }
+    
+    .section-header:hover {
+      background: rgba(16, 185, 129, 0.2);
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #93c5fd;
+      margin: 0;
+    }
+    
+    .toggle-icon {
+      font-size: 20px;
+      color: #a0aec0;
+      transition: transform 0.3s;
+    }
+    
+    .section-header.collapsed .toggle-icon {
+      transform: rotate(-90deg);
+    }
+    
+    .section-content {
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      max-height: 10000px;
+    }
+    
+    .section-content.collapsed {
+      max-height: 0;
+      overflow: hidden;
+    }
+    
+    /* Email Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+    }
+    
+    .modal-content {
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 8px;
+      padding: 24px;
+      margin: 10% auto;
+      max-width: 500px;
+      position: relative;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .modal-header h3 {
+      margin: 0;
+      color: #93c5fd;
+    }
+    
+    .close-modal {
+      background: none;
+      border: none;
+      color: #a0aec0;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .close-modal:hover {
+      color: #e7eaf3;
+    }
+    
+    .modal-body input {
+      width: 100%;
+      padding: 12px;
+      background: #0a1520;
+      border: 1px solid #1f2a44;
+      border-radius: 6px;
+      color: #e7eaf3;
+      font-size: 14px;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+    }
+    
+    .modal-body input:focus {
+      outline: none;
+      border-color: #10b981;
+    }
+    
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+    
+    .modal-footer button {
+      padding: 10px 20px;
+    }
+    
+    .modal-footer button.cancel {
+      background: #4b5563;
+    }
+    
+    .modal-footer button.cancel:hover {
+      background: #6b7280;
+    }
   </style>
 </head>
 <body>
@@ -297,12 +642,26 @@
           {% endfor %}
         </select>
         
-        <select id="daysSelect">
-          <option value="7">آخرین 7 روز</option>
-          <option value="14">آخرین 14 روز</option>
-          <option value="30" selected>آخرین 30 روز</option>
-          <option value="90">آخرین 90 روز</option>
+        <select id="dateRangeType" onchange="toggleDateRangeType()">
+          <option value="preset" selected>بازه از پیش تعریف شده</option>
+          <option value="custom">بازه دلخواه</option>
         </select>
+        
+        <div id="presetDateRange">
+          <select id="daysSelect">
+            <option value="7">آخرین 7 روز</option>
+            <option value="14">آخرین 14 روز</option>
+            <option value="30" selected>آخرین 30 روز</option>
+            <option value="90">آخرین 90 روز</option>
+          </select>
+        </div>
+        
+        <div id="customDateRange" style="display: none;" class="date-range-controls">
+          <label>از تاریخ:</label>
+          <input type="date" id="startDate">
+          <label>تا تاریخ:</label>
+          <input type="date" id="endDate">
+        </div>
         
         <button onclick="generateReports()" id="generateBtn">تولید گزارشات</button>
         <button onclick="generateInternalLinks()" id="internalLinksBtn">تحلیل Internal Links</button>
@@ -314,11 +673,55 @@
       </div>
       
       <div id="messageArea"></div>
+      
+      <!-- Historical Reports Section -->
+      <div id="historyArea"></div>
+      
       <div id="reportsArea"></div>
     {% endif %}
   </div>
   
+  <!-- Email Modal -->
+  <div id="emailModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📧 ارسال گزارش به ایمیل</h3>
+        <button class="close-modal" onclick="closeEmailModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label style="display: block; margin-bottom: 8px; color: #a0aec0;">آدرس ایمیل:</label>
+        <input type="email" id="emailInput" placeholder="example@email.com" required>
+        <div style="color: #a0aec0; font-size: 12px; margin-top: -12px; margin-bottom: 16px;">
+          گزارش به این آدرس ایمیل ارسال خواهد شد
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="cancel" onclick="closeEmailModal()">انصراف</button>
+        <button onclick="sendReportByEmail()">ارسال</button>
+      </div>
+    </div>
+  </div>
+  
   <script>
+    // Load historical reports on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const historyArea = document.getElementById('historyArea');
+      if (historyArea) {
+        const historyHtml = loadReportHistory();
+        if (historyHtml) {
+          historyArea.innerHTML = historyHtml;
+        }
+      }
+    });
+  </script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    // Global state
+    let currentReportsData = null;
+    let currentPage = 1;
+    const itemsPerPage = 999999; // Show all results
+    
     function showMessage(text, type = 'error') {
       const area = document.getElementById('messageArea');
       const className = type === 'error' ? 'error' : 'success';
@@ -328,13 +731,268 @@
       }, 5000);
     }
     
+    function toggleDateRangeType() {
+      const type = document.getElementById('dateRangeType').value;
+      const preset = document.getElementById('presetDateRange');
+      const custom = document.getElementById('customDateRange');
+      
+      if (type === 'preset') {
+        preset.style.display = 'block';
+        custom.style.display = 'none';
+      } else {
+        preset.style.display = 'none';
+        custom.style.display = 'flex';
+        // Set default dates (last 30 days)
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() - 1); // GSC has 1-2 day delay
+        const startDate = new Date(endDate);
+        startDate.setDate(startDate.getDate() - 29);
+        
+        document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+        document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+      }
+    }
+    
+    function getDateRange() {
+      const type = document.getElementById('dateRangeType').value;
+      if (type === 'preset') {
+        const days = parseInt(document.getElementById('daysSelect').value);
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() - 1);
+        const startDate = new Date(endDate);
+        startDate.setDate(startDate.getDate() - (days - 1));
+        return {
+          start: startDate.toISOString().split('T')[0],
+          end: endDate.toISOString().split('T')[0],
+          days: days
+        };
+      } else {
+        return {
+          start: document.getElementById('startDate').value,
+          end: document.getElementById('endDate').value,
+          days: null
+        };
+      }
+    }
+    
+    // Export to CSV
+    function exportToCSV(tableId, filename) {
+      const table = document.querySelector(`#${tableId} table`);
+      if (!table) {
+        showMessage('جدولی برای export یافت نشد', 'error');
+        return;
+      }
+      
+      let csv = [];
+      const rows = table.querySelectorAll('tr');
+      
+      for (let i = 0; i < rows.length; i++) {
+        const row = [];
+        const cols = rows[i].querySelectorAll('td, th');
+        
+        for (let j = 0; j < cols.length; j++) {
+          let data = cols[j].innerText.replace(/"|'/g, '');
+          data = data.replace(/,/g, ';');
+          row.push('"' + data + '"');
+        }
+        
+        csv.push(row.join(','));
+      }
+      
+      const csvContent = csv.join('\n');
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename || 'report.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    
+    // Filter and Search
+    function filterTable(tableId, searchTerm, filterColumn, filterValue) {
+      const table = document.querySelector(`#${tableId} table tbody`);
+      if (!table) return;
+      
+      const rows = table.querySelectorAll('tr');
+      let visibleCount = 0;
+      
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        let show = true;
+        
+        // Search filter
+        if (searchTerm) {
+          const text = row.innerText.toLowerCase();
+          if (!text.includes(searchTerm.toLowerCase())) {
+            show = false;
+          }
+        }
+        
+        // Column filter
+        if (filterColumn !== null && filterValue) {
+          const cellValue = cells[filterColumn]?.innerText || '';
+          if (!cellValue.includes(filterValue)) {
+            show = false;
+          }
+        }
+        
+        row.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
+      });
+      
+      return visibleCount;
+    }
+    
+    // Sortable table
+    function makeSortable(tableId) {
+      const table = document.querySelector(`#${tableId} table`);
+      if (!table) return;
+      
+      const headers = table.querySelectorAll('thead th');
+      headers.forEach((header, index) => {
+        if (header.classList.contains('sortable')) {
+          header.addEventListener('click', () => {
+            sortTable(tableId, index, header);
+          });
+        }
+      });
+    }
+    
+    function sortTable(tableId, columnIndex, header) {
+      const table = document.querySelector(`#${tableId} table tbody`);
+      if (!table) return;
+      
+      const rows = Array.from(table.querySelectorAll('tr'));
+      const isAsc = header.classList.contains('asc');
+      
+      // Remove all sort classes
+      header.parentElement.querySelectorAll('th').forEach(th => {
+        th.classList.remove('asc', 'desc');
+      });
+      
+      // Add sort class
+      header.classList.add(isAsc ? 'desc' : 'asc');
+      
+      // Sort rows
+      rows.sort((a, b) => {
+        const aText = a.querySelectorAll('td')[columnIndex]?.innerText || '';
+        const bText = b.querySelectorAll('td')[columnIndex]?.innerText || '';
+        
+        // Try to parse as number
+        const aNum = parseFloat(aText.replace(/[^\d.-]/g, ''));
+        const bNum = parseFloat(bText.replace(/[^\d.-]/g, ''));
+        
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+          return isAsc ? bNum - aNum : aNum - bNum;
+        }
+        
+        return isAsc ? bText.localeCompare(aText) : aText.localeCompare(bText);
+      });
+      
+      // Re-append sorted rows
+      rows.forEach(row => table.appendChild(row));
+    }
+    
+    // Pagination
+    function paginateTable(tableId, page) {
+      const table = document.querySelector(`#${tableId} table tbody`);
+      if (!table) return;
+      
+      const rows = Array.from(table.querySelectorAll('tr:not([style*="display: none"])'));
+      const totalPages = Math.ceil(rows.length / itemsPerPage);
+      
+      if (page < 1) page = 1;
+      if (page > totalPages) page = totalPages;
+      
+      currentPage = page;
+      
+      const start = (page - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      
+      rows.forEach((row, index) => {
+        if (index >= start && index < end) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      
+      return { currentPage: page, totalPages, totalItems: rows.length };
+    }
+    
+    function createPagination(tableId, pageInfo) {
+      if (pageInfo.totalPages <= 1) return '';
+      
+      let html = '<div class="pagination">';
+      html += `<button onclick="paginateTable('${tableId}', ${pageInfo.currentPage - 1})" ${pageInfo.currentPage === 1 ? 'disabled' : ''}>قبلی</button>`;
+      html += `<span class="page-info">صفحه ${pageInfo.currentPage} از ${pageInfo.totalPages} (${pageInfo.totalItems} نتیجه)</span>`;
+      html += `<button onclick="paginateTable('${tableId}', ${pageInfo.currentPage + 1})" ${pageInfo.currentPage === pageInfo.totalPages ? 'disabled' : ''}>بعدی</button>`;
+      html += '</div>';
+      
+      return html;
+    }
+    
+    // Performance Insights Generator
+    function generateInsights(reports) {
+      const insights = [];
+      
+      // High priority: Zero clicks with high impressions
+      if (reports.high_impressions_zero_clicks && reports.high_impressions_zero_clicks.length > 0) {
+        insights.push({
+          priority: 'high',
+          message: `${reports.high_impressions_zero_clicks.length} صفحه با Impression بالا ولی 0 Click دارن - نیاز به بهبود Title و Meta Description`,
+          action: 'بهبود Title و Meta Description برای افزایش CTR'
+        });
+      }
+      
+      // High priority: Significant click drops
+      if (reports.clicks_decreased_25pct && reports.clicks_decreased_25pct.length > 0) {
+        insights.push({
+          priority: 'high',
+          message: `${reports.clicks_decreased_25pct.length} صفحه با کاهش بیش از 25% در Clicks`,
+          action: 'بررسی تغییرات اخیر، رقبا، و الگوریتم گوگل'
+        });
+      }
+      
+      // Medium priority: Low CTR
+      if (reports.lowest_ctr && reports.lowest_ctr.length > 0) {
+        const avgCTR = reports.lowest_ctr.reduce((sum, p) => sum + p.ctr, 0) / reports.lowest_ctr.length;
+        if (avgCTR < 2) {
+          insights.push({
+            priority: 'medium',
+            message: `CTR میانگین ${avgCTR.toFixed(2)}% - نیاز به بهبود`,
+            action: 'بهینه‌سازی Title و Meta Description برای جذاب‌تر شدن'
+          });
+        }
+      }
+      
+      // Low priority: High position but clicks
+      if (reports.clicks_high_position && reports.clicks_high_position.length > 0) {
+        insights.push({
+          priority: 'low',
+          message: `${reports.clicks_high_position.length} صفحه با Position بالای 6 ولی Click دارن - پتانسیل بهبود`,
+          action: 'بهبود On-page SEO و ساخت Backlink برای بهبود Position'
+        });
+      }
+      
+      return insights;
+    }
+    
     function generateReports() {
       const siteUrl = document.getElementById('propertySelect').value;
-      const days = document.getElementById('daysSelect').value;
+      const dateRange = getDateRange();
       const btn = document.getElementById('generateBtn');
       
       if (!siteUrl) {
         showMessage('لطفاً یک Property انتخاب کنید', 'error');
+        return;
+      }
+      
+      if (dateRange.start && dateRange.end && new Date(dateRange.start) > new Date(dateRange.end)) {
+        showMessage('تاریخ شروع باید قبل از تاریخ پایان باشد', 'error');
         return;
       }
       
@@ -344,15 +1002,23 @@
       const reportsArea = document.getElementById('reportsArea');
       reportsArea.innerHTML = '<div class="loading">در حال بارگذاری داده‌ها...</div>';
       
+      const requestBody = {
+        site_url: siteUrl
+      };
+      
+      if (dateRange.days) {
+        requestBody.days = dateRange.days;
+      } else {
+        requestBody.start_date = dateRange.start;
+        requestBody.end_date = dateRange.end;
+      }
+      
       fetch('/search-console/reports/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          site_url: siteUrl,
-          days: parseInt(days)
-        })
+        body: JSON.stringify(requestBody)
       })
       .then(response => response.json())
       .then(data => {
@@ -365,7 +1031,9 @@
           return;
         }
         
+        currentReportsData = data;
         displayReports(data);
+        saveReportToHistory(data);
       })
       .catch(error => {
         btn.disabled = false;
@@ -418,14 +1086,89 @@
       });
     }
     
+    // Helper function to create table with controls
+    function createTableSection(sectionId, title, headers, data, getRowHtml, showExport = true, showFilter = true) {
+      if (!data || data.length === 0) return '';
+      
+      let html = `<div class="report-section" id="${sectionId}">`;
+      
+      // Collapsible header
+      html += `
+        <div class="section-header" onclick="toggleSection('${sectionId}')">
+          <h3 class="section-title">${title} <span style="color: #a0aec0; font-size: 14px; font-weight: normal;">(${data.length} نتیجه)</span></h3>
+          <span class="toggle-icon">▼</span>
+        </div>
+      `;
+      
+      // Collapsible content
+      html += `<div class="section-content" id="${sectionId}_content">`;
+      
+      if (showFilter || showExport) {
+        html += `<div class="table-controls">`;
+        if (showFilter) {
+          html += `<input type="text" id="${sectionId}_search" placeholder="جستجو..." onkeyup="filterTable('${sectionId}', this.value, null, null)">`;
+        }
+        if (showExport) {
+          html += `<button class="export-btn" onclick="exportToCSV('${sectionId}', '${title.replace(/[^a-z0-9]/gi, '_')}.csv')">📥 Export CSV</button>`;
+        }
+        html += `</div>`;
+      }
+      
+      html += `<table>`;
+      html += `<thead><tr>`;
+      headers.forEach((header, index) => {
+        html += `<th class="sortable" onclick="sortTable('${sectionId}', ${index}, this)">${header}</th>`;
+      });
+      html += `</tr></thead>`;
+      html += `<tbody>`;
+      
+      data.forEach((item, index) => {
+        html += getRowHtml(item, index);
+      });
+      
+      html += `</tbody></table>`;
+      html += `</div>`; // Close section-content
+      html += `</div>`; // Close report-section
+      
+      return html;
+    }
+    
+    // Toggle section collapse/expand
+    function toggleSection(sectionId) {
+      const header = document.querySelector(`#${sectionId} .section-header`);
+      const content = document.getElementById(`${sectionId}_content`);
+      
+      if (header && content) {
+        header.classList.toggle('collapsed');
+        content.classList.toggle('collapsed');
+      }
+    }
+    
+    // Helper to get alert badge
+    function getAlertBadge(page) {
+      if (page.clicks === 0 && page.impressions > 100) {
+        return '<span class="badge badge-alert">⚠️ نیاز به توجه</span>';
+      }
+      if (page.ctr < 1 && page.impressions > 50) {
+        return '<span class="badge badge-warning">⚠️ CTR پایین</span>';
+      }
+      if (page.position > 10 && page.clicks > 0) {
+        return '<span class="badge badge-info">ℹ️ پتانسیل بهبود</span>';
+      }
+      return '';
+    }
+    
     function displayReports(data) {
       const reportsArea = document.getElementById('reportsArea');
       let html = '';
       
-      // Summary
+      // Summary with chart
       html += `
         <div class="summary-box">
-          <h4>خلاصه گزارشات</h4>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h4 style="margin: 0;">خلاصه گزارشات</h4>
+            <button onclick="openEmailModal()" style="background: #3b82f6; padding: 8px 16px; font-size: 14px;">📧 ارسال به ایمیل</button>
+          </div>
           <div class="summary-item">
             <span class="summary-label">بازه زمانی:</span>
             <span class="summary-value">${data.period}</span>
@@ -445,289 +1188,431 @@
         </div>
       `;
       
+      // Performance Insights - collapsible
+      const insights = generateInsights(data.reports);
+      if (insights.length > 0) {
+        html += `
+          <div class="report-section">
+            <div class="section-header" onclick="toggleSection('insights_section')">
+              <h3 class="section-title">💡 پیشنهادات و Insights</h3>
+              <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content" id="insights_section_content">
+              <div class="insights-box" style="margin-top: 0;">
+        `;
+        insights.forEach(insight => {
+          html += `<div class="insight-item">`;
+          html += `<span>${insight.message}</span>`;
+          html += `<span class="insight-priority priority-${insight.priority}">${insight.priority === 'high' ? 'اولویت بالا' : insight.priority === 'medium' ? 'اولویت متوسط' : 'اولویت پایین'}</span>`;
+          html += `<div style="color: #a0aec0; font-size: 12px; margin-top: 4px;">→ ${insight.action}</div>`;
+          html += `</div>`;
+        });
+        html += `
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Charts - collapsible
+      if (data.reports && data.reports.highest_ctr && data.reports.highest_ctr.length > 0) {
+        html += `
+          <div class="report-section">
+            <div class="section-header" onclick="toggleSection('charts_section')">
+              <h3 class="section-title">📊 نمودارها و Visualizations</h3>
+              <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content" id="charts_section_content">
+              ${createCharts(data)}
+            </div>
+          </div>
+        `;
+      }
+      
       const reports = data.reports;
       
       // 1. High impressions, low clicks
       if (reports.high_impressions_low_clicks && reports.high_impressions_low_clicks.length > 0) {
-        html += `
-          <div class="report-section">
-            <h3>5 صفحه با بیشترین Impression و کمترین Click (غیر صفر)</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>صفحه</th>
-                  <th>Impressions</th>
-                  <th>Clicks</th>
-                  <th>CTR</th>
-                  <th>Position</th>
-                </tr>
-              </thead>
-              <tbody>
-        `;
-        reports.high_impressions_low_clicks.forEach(page => {
-          html += `
-            <tr>
-              <td class="page-url" title="${page.page}">${page.page}</td>
-              <td>${page.impressions.toLocaleString()}</td>
-              <td>${page.clicks.toLocaleString()}</td>
-              <td>${page.ctr}%</td>
-              <td>${page.position}</td>
-            </tr>
-          `;
-        });
-        html += `</tbody></table></div>`;
+        html += createTableSection(
+          'high_imp_low_clicks',
+          '5 صفحه با بیشترین Impression و کمترین Click (غیر صفر)',
+          ['صفحه', 'Impressions', 'Clicks', 'CTR', 'Position', ''],
+          reports.high_impressions_low_clicks,
+          (page, index) => {
+            const badge = getAlertBadge(page);
+            return `
+              <tr>
+                <td class="page-url" title="${page.page}">${index + 1}. ${page.page}</td>
+                <td>${page.impressions.toLocaleString()}</td>
+                <td>${page.clicks.toLocaleString()}</td>
+                <td>${page.ctr}%</td>
+                <td>${page.position}</td>
+                <td>${badge}</td>
+              </tr>
+            `;
+          }
+        );
       }
       
       // 2. High impressions, zero clicks
       if (reports.high_impressions_zero_clicks && reports.high_impressions_zero_clicks.length > 0) {
-        html += `
-          <div class="report-section">
-            <h3>5 صفحه با بیشترین Impression و 0 Click</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>صفحه</th>
-                  <th>Impressions</th>
-                  <th>Clicks</th>
-                  <th>CTR</th>
-                  <th>Position</th>
-                </tr>
-              </thead>
-              <tbody>
-        `;
-        reports.high_impressions_zero_clicks.forEach(page => {
-          html += `
-            <tr>
-              <td class="page-url" title="${page.page}">${page.page}</td>
-              <td>${page.impressions.toLocaleString()}</td>
-              <td>${page.clicks.toLocaleString()}</td>
-              <td>${page.ctr}%</td>
-              <td>${page.position}</td>
-            </tr>
-          `;
-        });
-        html += `</tbody></table></div>`;
+        html += createTableSection(
+          'high_imp_zero_clicks',
+          '5 صفحه با بیشترین Impression و 0 Click',
+          ['صفحه', 'Impressions', 'Clicks', 'CTR', 'Position', ''],
+          reports.high_impressions_zero_clicks,
+          (page, index) => {
+            const badge = getAlertBadge(page);
+            return `
+              <tr>
+                <td class="page-url" title="${page.page}">${index + 1}. ${page.page}</td>
+                <td>${page.impressions.toLocaleString()}</td>
+                <td>${page.clicks.toLocaleString()}</td>
+                <td>${page.ctr}%</td>
+                <td>${page.position}</td>
+                <td>${badge}</td>
+              </tr>
+            `;
+          }
+        );
       }
       
       // 3. Clicks decreased > 25%
       if (reports.clicks_decreased_25pct && reports.clicks_decreased_25pct.length > 0) {
-        html += `
-          <div class="report-section">
-            <h3>5 صفحه با کاهش بیش از 25% در Clicks</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>صفحه</th>
-                  <th>Clicks قبلی</th>
-                  <th>Clicks فعلی</th>
-                  <th>تغییر</th>
-                  <th>Position</th>
-                </tr>
-              </thead>
-              <tbody>
-        `;
-        reports.clicks_decreased_25pct.forEach(page => {
-          const changePercent = page.clicks_change_percent.toFixed(1);
-          html += `
-            <tr>
-              <td class="page-url" title="${page.page}">${page.page}</td>
-              <td>${page.previous_clicks ? page.previous_clicks.toLocaleString() : 0}</td>
-              <td>${page.current_clicks ? page.current_clicks.toLocaleString() : 0}</td>
-              <td><span class="badge badge-negative">${changePercent}%</span></td>
-              <td>${page.current_position || page.position || '-'}</td>
-            </tr>
-          `;
-        });
-        html += `</tbody></table></div>`;
+        html += createTableSection(
+          'clicks_decreased',
+          '5 صفحه با کاهش بیش از 25% در Clicks',
+          ['صفحه', 'Clicks قبلی', 'Clicks فعلی', 'تغییر', 'Position', ''],
+          reports.clicks_decreased_25pct,
+          (page, index) => {
+            const changePercent = page.clicks_change_percent.toFixed(1);
+            return `
+              <tr>
+                <td class="page-url" title="${page.page}">${index + 1}. ${page.page}</td>
+                <td>${page.previous_clicks ? page.previous_clicks.toLocaleString() : 0}</td>
+                <td>${page.current_clicks ? page.current_clicks.toLocaleString() : 0}</td>
+                <td><span class="badge badge-negative">${changePercent}%</span></td>
+                <td>${page.current_position || page.position || '-'}</td>
+                <td><span class="badge badge-alert">⚠️ نیاز به بررسی</span></td>
+              </tr>
+            `;
+          }
+        );
       }
       
       // 4. Highest clicks
       if (reports.highest_clicks && reports.highest_clicks.length > 0) {
-        html += `
-          <div class="report-section">
-            <h3>5 صفحه با بیشترین Click</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>صفحه</th>
-                  <th>Clicks</th>
-                  <th>Impressions</th>
-                  <th>CTR</th>
-                  <th>Position</th>
-                </tr>
-              </thead>
-              <tbody>
-        `;
-        reports.highest_clicks.forEach(page => {
-          html += `
-            <tr>
-              <td class="page-url" title="${page.page}">${page.page}</td>
-              <td>${page.clicks.toLocaleString()}</td>
-              <td>${page.impressions.toLocaleString()}</td>
-              <td>${page.ctr}%</td>
-              <td>${page.position}</td>
-            </tr>
-          `;
-        });
-        html += `</tbody></table></div>`;
+        html += createTableSection(
+          'highest_clicks',
+          '5 صفحه با بیشترین Click',
+          ['صفحه', 'Clicks', 'Impressions', 'CTR', 'Position', ''],
+          reports.highest_clicks,
+          (page, index) => {
+            return `
+              <tr>
+                <td class="page-url" title="${page.page}">${index + 1}. ${page.page}</td>
+                <td>${page.clicks.toLocaleString()}</td>
+                <td>${page.impressions.toLocaleString()}</td>
+                <td><span class="badge badge-positive">${page.ctr}%</span></td>
+                <td>${page.position}</td>
+                <td><span class="badge badge-positive">✅ بهترین عملکرد</span></td>
+              </tr>
+            `;
+          }
+        );
       }
       
       // 5. Lowest impressions and clicks
       if (reports.lowest_impressions_clicks && reports.lowest_impressions_clicks.length > 0) {
-        html += `
-          <div class="report-section">
-            <h3>5 صفحه با کمترین Impression و Click (غیر صفر)</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>صفحه</th>
-                  <th>Impressions</th>
-                  <th>Clicks</th>
-                  <th>CTR</th>
-                  <th>Position</th>
-                </tr>
-              </thead>
-              <tbody>
-        `;
-        reports.lowest_impressions_clicks.forEach(page => {
-          html += `
-            <tr>
-              <td class="page-url" title="${page.page}">${page.page}</td>
-              <td>${page.impressions.toLocaleString()}</td>
-              <td>${page.clicks.toLocaleString()}</td>
-              <td>${page.ctr}%</td>
-              <td>${page.position}</td>
-            </tr>
-          `;
-        });
-        html += `</tbody></table></div>`;
+        html += createTableSection(
+          'lowest_imp_clicks',
+          '5 صفحه با کمترین Impression و Click (غیر صفر)',
+          ['صفحه', 'Impressions', 'Clicks', 'CTR', 'Position', ''],
+          reports.lowest_impressions_clicks,
+          (page, index) => {
+            return `
+              <tr>
+                <td class="page-url" title="${page.page}">${index + 1}. ${page.page}</td>
+                <td>${page.impressions.toLocaleString()}</td>
+                <td>${page.clicks.toLocaleString()}</td>
+                <td>${page.ctr}%</td>
+                <td>${page.position}</td>
+                <td>${getAlertBadge(page)}</td>
+              </tr>
+            `;
+          }
+        );
       }
       
       // 6. Highest CTR
       if (reports.highest_ctr && reports.highest_ctr.length > 0) {
-        html += `
-          <div class="report-section">
-            <h3>5 صفحه با بیشترین CTR</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>صفحه</th>
-                  <th>CTR</th>
-                  <th>Clicks</th>
-                  <th>Impressions</th>
-                  <th>Position</th>
-                </tr>
-              </thead>
-              <tbody>
-        `;
-        reports.highest_ctr.forEach(page => {
-          html += `
-            <tr>
-              <td class="page-url" title="${page.page}">${page.page}</td>
-              <td><span class="badge badge-positive">${page.ctr}%</span></td>
-              <td>${page.clicks.toLocaleString()}</td>
-              <td>${page.impressions.toLocaleString()}</td>
-              <td>${page.position}</td>
-            </tr>
-          `;
-        });
-        html += `</tbody></table></div>`;
+        html += createTableSection(
+          'highest_ctr',
+          '5 صفحه با بیشترین CTR',
+          ['صفحه', 'CTR', 'Clicks', 'Impressions', 'Position', ''],
+          reports.highest_ctr,
+          (page, index) => {
+            return `
+              <tr>
+                <td class="page-url" title="${page.page}">${index + 1}. ${page.page}</td>
+                <td><span class="badge badge-positive">${page.ctr}%</span></td>
+                <td>${page.clicks.toLocaleString()}</td>
+                <td>${page.impressions.toLocaleString()}</td>
+                <td>${page.position}</td>
+                <td><span class="badge badge-positive">✅ بهترین CTR</span></td>
+              </tr>
+            `;
+          }
+        );
       }
       
       // 7. Lowest CTR
       if (reports.lowest_ctr && reports.lowest_ctr.length > 0) {
-        html += `
-          <div class="report-section">
-            <h3>5 صفحه با کمترین CTR</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>صفحه</th>
-                  <th>CTR</th>
-                  <th>Clicks</th>
-                  <th>Impressions</th>
-                  <th>Position</th>
-                </tr>
-              </thead>
-              <tbody>
-        `;
-        reports.lowest_ctr.forEach(page => {
-          html += `
-            <tr>
-              <td class="page-url" title="${page.page}">${page.page}</td>
-              <td><span class="badge badge-negative">${page.ctr}%</span></td>
-              <td>${page.clicks.toLocaleString()}</td>
-              <td>${page.impressions.toLocaleString()}</td>
-              <td>${page.position}</td>
-            </tr>
-          `;
-        });
-        html += `</tbody></table></div>`;
+        html += createTableSection(
+          'lowest_ctr',
+          '5 صفحه با کمترین CTR',
+          ['صفحه', 'CTR', 'Clicks', 'Impressions', 'Position', ''],
+          reports.lowest_ctr,
+          (page, index) => {
+            return `
+              <tr>
+                <td class="page-url" title="${page.page}">${index + 1}. ${page.page}</td>
+                <td><span class="badge badge-negative">${page.ctr}%</span></td>
+                <td>${page.clicks.toLocaleString()}</td>
+                <td>${page.impressions.toLocaleString()}</td>
+                <td>${page.position}</td>
+                <td><span class="badge badge-warning">⚠️ نیاز به بهبود</span></td>
+              </tr>
+            `;
+          }
+        );
       }
       
       // 8. Zero clicks, low CTR
       if (reports.zero_clicks_low_ctr && reports.zero_clicks_low_ctr.length > 0) {
-        html += `
-          <div class="report-section">
-            <h3>صفحاتی با 0 Click و CTR زیر 10%</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>صفحه</th>
-                  <th>Impressions</th>
-                  <th>Clicks</th>
-                  <th>CTR</th>
-                  <th>Position</th>
-                </tr>
-              </thead>
-              <tbody>
-        `;
-        reports.zero_clicks_low_ctr.slice(0, 20).forEach(page => {
-          html += `
-            <tr>
-              <td class="page-url" title="${page.page}">${page.page}</td>
-              <td>${page.impressions.toLocaleString()}</td>
-              <td>${page.clicks.toLocaleString()}</td>
-              <td>${page.ctr}%</td>
-              <td>${page.position}</td>
-            </tr>
-          `;
-        });
-        html += `</tbody></table></div>`;
+        html += createTableSection(
+          'zero_clicks_low_ctr',
+          'صفحاتی با 0 Click و CTR زیر 10%',
+          ['صفحه', 'Impressions', 'Clicks', 'CTR', 'Position', ''],
+          reports.zero_clicks_low_ctr,
+          (page, index) => {
+            return `
+              <tr>
+                <td class="page-url" title="${page.page}">${index + 1}. ${page.page}</td>
+                <td>${page.impressions.toLocaleString()}</td>
+                <td>${page.clicks.toLocaleString()}</td>
+                <td>${page.ctr}%</td>
+                <td>${page.position}</td>
+                <td><span class="badge badge-alert">⚠️ نیاز به توجه فوری</span></td>
+              </tr>
+            `;
+          }
+        );
       }
       
       // 9. Clicks with position > 6
       if (reports.clicks_high_position && reports.clicks_high_position.length > 0) {
-        html += `
-          <div class="report-section">
-            <h3>صفحاتی با Click و Position بالای 6</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>صفحه</th>
-                  <th>Position</th>
-                  <th>Clicks</th>
-                  <th>Impressions</th>
-                  <th>CTR</th>
-                </tr>
-              </thead>
-              <tbody>
-        `;
-        reports.clicks_high_position.slice(0, 20).forEach(page => {
-          html += `
-            <tr>
-              <td class="page-url" title="${page.page}">${page.page}</td>
-              <td>${page.position}</td>
-              <td>${page.clicks.toLocaleString()}</td>
-              <td>${page.impressions.toLocaleString()}</td>
-              <td>${page.ctr}%</td>
-            </tr>
-          `;
-        });
-        html += `</tbody></table></div>`;
+        html += createTableSection(
+          'clicks_high_position',
+          'صفحاتی با Click و Position بالای 6',
+          ['صفحه', 'Position', 'Clicks', 'Impressions', 'CTR', ''],
+          reports.clicks_high_position,
+          (page, index) => {
+            return `
+              <tr>
+                <td class="page-url" title="${page.page}">${index + 1}. ${page.page}</td>
+                <td>${page.position}</td>
+                <td>${page.clicks.toLocaleString()}</td>
+                <td>${page.impressions.toLocaleString()}</td>
+                <td>${page.ctr}%</td>
+                <td><span class="badge badge-info">ℹ️ پتانسیل بهبود Position</span></td>
+              </tr>
+            `;
+          }
+        );
       }
       
       reportsArea.innerHTML = html;
+      
+      // Initialize sortable tables
+      setTimeout(() => {
+        ['high_imp_low_clicks', 'high_imp_zero_clicks', 'clicks_decreased', 'highest_clicks', 
+         'lowest_imp_clicks', 'highest_ctr', 'lowest_ctr', 'zero_clicks_low_ctr', 'clicks_high_position'].forEach(id => {
+          makeSortable(id);
+        });
+      }, 100);
+    }
+    
+    // Create charts
+    function createCharts(data) {
+      if (!data.reports) return '';
+      
+      let html = '<div class="chart-container">';
+      html += '<canvas id="ctrChart"></canvas>';
+      html += '</div>';
+      
+      // Chart will be rendered after DOM is ready
+      setTimeout(() => {
+        const ctx = document.getElementById('ctrChart');
+        if (ctx && data.reports.highest_ctr && data.reports.highest_ctr.length > 0) {
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: data.reports.highest_ctr.slice(0, 10).map(p => p.page.substring(0, 30)),
+              datasets: [{
+                label: 'CTR %',
+                data: data.reports.highest_ctr.slice(0, 10).map(p => p.ctr),
+                backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                borderColor: 'rgba(16, 185, 129, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                title: { display: true, text: 'Top 10 Pages by CTR', color: '#e7eaf3' }
+              },
+              scales: {
+                y: { beginAtZero: true, ticks: { color: '#a0aec0' }, grid: { color: '#1f2a44' } },
+                x: { ticks: { color: '#a0aec0', maxRotation: 45, minRotation: 45 }, grid: { color: '#1f2a44' } }
+              }
+            }
+          });
+        }
+      }, 200);
+      
+      return html;
+    }
+    
+    // Historical Reports
+    function saveReportToHistory(data) {
+      try {
+        const history = JSON.parse(localStorage.getItem('gsc_reports_history') || '[]');
+        const report = {
+          id: Date.now(),
+          timestamp: new Date().toISOString(),
+          period: data.period,
+          property: document.getElementById('propertySelect').value,
+          summary: {
+            avg_position_change: data.avg_position_change,
+            total_reports: Object.keys(data.reports).length
+          }
+        };
+        history.unshift(report);
+        if (history.length > 20) history.pop(); // Keep last 20
+        localStorage.setItem('gsc_reports_history', JSON.stringify(history));
+      } catch (e) {
+        console.error('Error saving report history:', e);
+      }
+    }
+    
+    function loadReportHistory() {
+      try {
+        const history = JSON.parse(localStorage.getItem('gsc_reports_history') || '[]');
+        if (history.length === 0) return '';
+        
+        let html = '<div class="saved-reports">';
+        html += '<h3>گزارشات ذخیره شده</h3>';
+        history.forEach(report => {
+          html += `
+            <div class="saved-report-item" onclick="loadHistoricalReport(${report.id})">
+              <div>
+                <strong>${report.property}</strong>
+                <div style="color: #a0aec0; font-size: 12px; margin-top: 4px;">
+                  ${report.period} - ${new Date(report.timestamp).toLocaleString('fa-IR')}
+                </div>
+              </div>
+              <div style="color: #10b981;">
+                تغییر Position: ${report.summary.avg_position_change > 0 ? '+' : ''}${report.summary.avg_position_change}
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+        return html;
+      } catch (e) {
+        return '';
+      }
+    }
+    
+    function loadHistoricalReport(reportId) {
+      // This would load a saved report - for now just show message
+      showMessage('گزارشات تاریخی در حال توسعه است', 'info');
+    }
+    
+    // Email Modal Functions
+    function openEmailModal() {
+      if (!currentReportsData) {
+        showMessage('ابتدا یک گزارش تولید کنید', 'error');
+        return;
+      }
+      document.getElementById('emailModal').style.display = 'block';
+      document.getElementById('emailInput').focus();
+    }
+    
+    function closeEmailModal() {
+      document.getElementById('emailModal').style.display = 'none';
+      document.getElementById('emailInput').value = '';
+    }
+    
+    function sendReportByEmail() {
+      const email = document.getElementById('emailInput').value.trim();
+      
+      if (!email) {
+        showMessage('لطفاً آدرس ایمیل را وارد کنید', 'error');
+        return;
+      }
+      
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showMessage('لطفاً یک آدرس ایمیل معتبر وارد کنید', 'error');
+        return;
+      }
+      
+      // Show loading
+      const sendBtn = event.target;
+      const originalText = sendBtn.textContent;
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'در حال ارسال...';
+      
+      fetch('/search-console/reports/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          report_data: currentReportsData
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        sendBtn.disabled = false;
+        sendBtn.textContent = originalText;
+        
+        if (data.error) {
+          showMessage(data.error, 'error');
+        } else {
+          showMessage(data.message || 'گزارش با موفقیت ارسال شد', 'success');
+          closeEmailModal();
+        }
+      })
+      .catch(error => {
+        sendBtn.disabled = false;
+        sendBtn.textContent = originalText;
+        showMessage('خطا در ارسال ایمیل: ' + error.message, 'error');
+      });
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('emailModal');
+      if (event.target === modal) {
+        closeEmailModal();
+      }
     }
     
     function displayInternalLinks(data) {

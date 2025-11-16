@@ -124,6 +124,60 @@ Current Endpoints
       }
     }
     ```
+- `POST /search-console/reports/email` → Send GSC report via email
+  - **Request Body:**
+    ```json
+    {
+      "email": "user@example.com",
+      "report_data": {...},
+      "property_name": "sc-domain:example.com"
+    }
+    ```
+  - **Response:**
+    ```json
+    {
+      "success": true,
+      "message": "گزارش با موفقیت به user@example.com ارسال شد"
+    }
+    ```
+
+### SMTP Admin Configuration (Admin Only)
+- `GET /search-console/admin/smtp` → SMTP settings page (Admin only)
+- `POST /search-console/admin/smtp/save` → Save SMTP configuration (Admin only)
+  - **Request Body:**
+    ```json
+    {
+      "enabled": true,
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "use_tls": true,
+      "username": "your-email@gmail.com",
+      "password": "your-app-password",
+      "from_email": "your-email@gmail.com",
+      "from_name": "SEO Analyze Pro"
+    }
+    ```
+  - **Response:**
+    ```json
+    {
+      "success": true,
+      "message": "تنظیمات SMTP با موفقیت ذخیره شد"
+    }
+    ```
+- `POST /search-console/admin/smtp/test` → Test SMTP configuration (Admin only)
+  - **Request Body:**
+    ```json
+    {
+      "test_email": "test@example.com"
+    }
+    ```
+  - **Response:**
+    ```json
+    {
+      "success": true,
+      "message": "ایمیل تست با موفقیت به test@example.com ارسال شد"
+    }
+    ```
 
 Authentication
 --------------

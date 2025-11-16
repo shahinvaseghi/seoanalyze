@@ -499,7 +499,6 @@ def generate_reports():
     
     data = request.json or {}
     site_url = data.get('site_url')
-    days = int(data.get('days', 30))
     
     if not site_url:
         return jsonify({'error': 'site_url is required'}), 400
@@ -515,10 +514,19 @@ def generate_reports():
         credentials, _ = oauth_handler.get_valid_credentials(tokens, save_tokens_callback)
         analyzer = GSCAnalyzer(credentials)
         
-        # Calculate date ranges
+        # Calculate date ranges - support both preset days and custom date range
         from datetime import datetime, timedelta
-        end_date = datetime.now().date() - timedelta(days=1)  # GSC has 1-2 day delay
-        start_date = end_date - timedelta(days=days-1)
+        
+        if 'start_date' in data and 'end_date' in data:
+            # Custom date range
+            start_date = datetime.strptime(data['start_date'], '%Y-%m-%d').date()
+            end_date = datetime.strptime(data['end_date'], '%Y-%m-%d').date()
+            days = (end_date - start_date).days + 1
+        else:
+            # Preset days
+            days = int(data.get('days', 30))
+            end_date = datetime.now().date() - timedelta(days=1)  # GSC has 1-2 day delay
+            start_date = end_date - timedelta(days=days-1)
         
         # Previous period for comparison
         previous_end = start_date - timedelta(days=1)
@@ -859,4 +867,197 @@ def get_pages_by_query():
         
     except Exception as e:
         return jsonify({'error': f'Failed to get pages by query: {str(e)}'}), 500
+
+
+@search_console_bp.route('/admin/smtp', methods=['GET'])
+@login_required
+@admin_required
+def smtp_settings():
+    """Admin page for SMTP configuration"""
+    config_path = Path(__file__).parent.parent.parent / 'configs' / 'smtp_config.json'
+    
+    config = {}
+    if config_path.exists():
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+        except:
+            pass
+    
+    # Hide password in display
+    if 'password' in config:
+        config['password'] = '***' if config.get('password') else ''
+    
+    return render_template('gsc_smtp_settings.html', config=config)
+
+
+@search_console_bp.route('/admin/smtp/save', methods=['POST'])
+@login_required
+@admin_required
+def save_smtp_settings():
+    """Save SMTP configuration (Admin only)"""
+    data = request.json or {}
+    
+    config_path = Path(__file__).parent.parent.parent / 'configs' / 'smtp_config.json'
+    config_dir = config_path.parent
+    config_dir.mkdir(exist_ok=True)
+    
+    # Load existing config to preserve password if not changed
+    existing_config = {}
+    if config_path.exists():
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                existing_config = json.load(f)
+        except:
+            pass
+    
+    # Build new config
+    new_config = {
+        'enabled': data.get('enabled', False),
+        'smtp_server': data.get('smtp_server', ''),
+        'smtp_port': int(data.get('smtp_port', 587)),
+        'use_tls': data.get('use_tls', True),
+        'username': data.get('username', ''),
+        'password': data.get('password') if data.get('password') and data.get('password') != '***' else existing_config.get('password', ''),
+        'from_email': data.get('from_email', ''),
+        'from_name': data.get('from_name', 'SEO Analyze Pro')
+    }
+    
+    try:
+        with open(config_path, 'w', encoding='utf-8') as f:
+            json.dump(new_config, f, indent=2, ensure_ascii=False)
+        
+        # Set secure permissions
+        os.chmod(config_path, 0o600)
+        
+        return jsonify({
+            'success': True,
+            'message': 'تنظیمات SMTP با موفقیت ذخیره شد'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'خطا در ذخیره تنظیمات: {str(e)}'
+        }), 500
+
+
+@search_console_bp.route('/admin/smtp/test', methods=['POST'])
+@login_required
+@admin_required
+def test_smtp_settings():
+    """Test SMTP configuration (Admin only)"""
+    data = request.json or {}
+    test_email = data.get('test_email')
+    
+    if not test_email:
+        return jsonify({'error': 'test_email is required'}), 400
+    
+    try:
+        from app.core.email_sender import EmailSender
+        
+        email_sender = EmailSender()
+        
+        if not email_sender.is_enabled():
+            return jsonify({
+                'success': False,
+                'error': 'SMTP is not enabled. Please enable it first.'
+            }), 400
+        
+        # Create test report data
+        test_report = {
+            'period': 'Test Period',
+            'avg_position_change': 0,
+            'previous_period': 'N/A',
+            'current_period': 'N/A',
+            'reports': {}
+        }
+        
+        success, message = email_sender.send_report_email(
+            to_email=test_email,
+            report_data=test_report,
+            property_name='Test Property'
+        )
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': f'ایمیل تست با موفقیت به {test_email} ارسال شد'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': message
+            }), 500
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'خطا در ارسال ایمیل تست: {str(e)}'
+        }), 500
+
+
+@search_console_bp.route('/reports/email', methods=['POST'])
+@login_required
+def email_report():
+    """
+    Send GSC report via email
+    Uses admin-configured SMTP settings
+    """
+    username = session.get("user")
+    
+    if not storage.has_gsc_connection(username):
+        return jsonify({'error': 'Search Console not connected'}), 401
+    
+    data = request.json or {}
+    report_data = data.get('report_data')
+    email = data.get('email')
+    
+    if not report_data:
+        return jsonify({'error': 'report_data is required'}), 400
+    
+    if not email:
+        return jsonify({'error': 'email is required'}), 400
+    
+    try:
+        from app.core.email_sender import EmailSender
+        
+        # Check if SMTP is configured
+        email_sender = EmailSender()
+        if not email_sender.is_enabled():
+            return jsonify({
+                'success': False,
+                'error': 'ارسال ایمیل فعال نیست. لطفاً با مدیر سیستم تماس بگیرید.'
+            }), 400
+        
+        # Get property name from report or request
+        property_name = data.get('property_name', report_data.get('site_url', 'Unknown Property'))
+        
+        # Send email using admin-configured SMTP
+        success, message = email_sender.send_report_email(
+            to_email=email,
+            report_data=report_data,
+            property_name=property_name
+        )
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': f'گزارش با موفقیت به {email} ارسال شد'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': message
+            }), 500
+            
+    except ImportError:
+        return jsonify({
+            'success': False,
+            'error': 'Email module not found'
+        }), 500
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'خطا در ارسال ایمیل: {str(e)}'
+        }), 500
 

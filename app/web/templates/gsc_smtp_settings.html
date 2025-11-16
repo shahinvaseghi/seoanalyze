@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تنظیمات SMTP - Admin</title>
+  <style>
+    body {
+      font-family: 'Vazirmatn', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+      background: #07111f;
+      color: #e7eaf3;
+      margin: 0;
+      padding: 0;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: #0d1830;
+      border-bottom: 1px solid #1f2a44;
+    }
+    
+    .brand {
+      font-weight: 700;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 24px;
+    }
+    
+    .card {
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 12px;
+      padding: 40px;
+      margin-bottom: 24px;
+    }
+    
+    h1 {
+      font-size: 32px;
+      margin: 0 0 16px 0;
+      color: #10b981;
+    }
+    
+    .subtitle {
+      color: #a0aec0;
+      margin-bottom: 32px;
+      font-size: 16px;
+    }
+    
+    .form-group {
+      margin-bottom: 24px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #93c5fd;
+      font-weight: 600;
+    }
+    
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 16px;
+      background: #0a1520;
+      border: 1px solid #1f2a44;
+      border-radius: 6px;
+      color: #e7eaf3;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #10b981;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    
+    .help-text {
+      color: #a0aec0;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+    
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: #10b981;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #059669;
+    }
+    
+    .btn-secondary {
+      background: #3b82f6;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #2563eb;
+    }
+    
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+    
+    button:disabled {
+      background: #4b5563;
+      cursor: not-allowed;
+    }
+    
+    .message {
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      display: none;
+    }
+    
+    .message.success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid #10b981;
+      color: #10b981;
+    }
+    
+    .message.error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid #ef4444;
+      color: #ef4444;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    
+    .status-badge.enabled {
+      background: #10b981;
+      color: white;
+    }
+    
+    .status-badge.disabled {
+      background: #6b7280;
+      color: white;
+    }
+    
+    a {
+      color: #93c5fd;
+      text-decoration: none;
+    }
+    
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">SEO Tools</div>
+    <nav>
+      <span>Signed in as Admin</span>
+      &nbsp; | &nbsp;
+      <a href="/dashboard">Dashboard</a> &nbsp; | &nbsp;
+      <a href="/search-console/admin/setup">GSC Setup</a> &nbsp; | &nbsp;
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+  
+  <div class="container">
+    <div class="card">
+      <h1>📧 تنظیمات SMTP Server</h1>
+      <p class="subtitle">تنظیمات ایمیل سرور برای ارسال گزارشات GSC</p>
+      
+      <div id="messageArea"></div>
+      
+      <div>
+        <span class="status-badge {{ 'enabled' if config.get('enabled') else 'disabled' }}">
+          {{ '✅ فعال' if config.get('enabled') else '❌ غیرفعال' }}
+        </span>
+      </div>
+      
+      <form id="smtpForm">
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="enabled" name="enabled" {{ 'checked' if config.get('enabled') else '' }}>
+            <label for="enabled">فعال کردن ارسال ایمیل</label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="smtp_server">SMTP Server *</label>
+          <input type="text" id="smtp_server" name="smtp_server" value="{{ config.get('smtp_server', 'smtp.gmail.com') }}" required>
+          <div class="help-text">مثال: smtp.gmail.com, smtp-mail.outlook.com</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="smtp_port">SMTP Port *</label>
+          <input type="number" id="smtp_port" name="smtp_port" value="{{ config.get('smtp_port', 587) }}" required>
+          <div class="help-text">معمولاً 587 برای TLS یا 465 برای SSL</div>
+        </div>
+        
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="use_tls" name="use_tls" {{ 'checked' if config.get('use_tls', True) else '' }}>
+            <label for="use_tls">استفاده از TLS</label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="username">Username/Email *</label>
+          <input type="email" id="username" name="username" value="{{ config.get('username', '') }}" required>
+          <div class="help-text">آدرس ایمیل یا username برای SMTP</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password *</label>
+          <input type="password" id="password" name="password" value="{{ config.get('password', '') }}" placeholder="{{ '***' if config.get('password') else 'وارد کنید...' }}" required>
+          <div class="help-text">برای Gmail از App Password استفاده کنید (نه password عادی)</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="from_email">From Email *</label>
+          <input type="email" id="from_email" name="from_email" value="{{ config.get('from_email', '') }}" required>
+          <div class="help-text">آدرس ایمیل فرستنده (معمولاً همان username)</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="from_name">From Name</label>
+          <input type="text" id="from_name" name="from_name" value="{{ config.get('from_name', 'SEO Analyze Pro') }}">
+          <div class="help-text">نام نمایشی فرستنده</div>
+        </div>
+        
+        <div class="button-group">
+          <button type="button" class="btn-primary" onclick="saveSettings()">💾 ذخیره تنظیمات</button>
+          <button type="button" class="btn-secondary" onclick="testSettings()">🧪 تست ارسال ایمیل</button>
+        </div>
+      </form>
+    </div>
+    
+    <div class="card">
+      <h2 style="color: #93c5fd; margin-top: 0;">راهنمای تنظیمات</h2>
+      <h3 style="color: #10b981;">Gmail:</h3>
+      <ul style="color: #a0aec0; line-height: 1.8;">
+        <li>SMTP Server: <code>smtp.gmail.com</code></li>
+        <li>Port: <code>587</code></li>
+        <li>TLS: فعال</li>
+        <li>Username: آدرس Gmail شما</li>
+        <li>Password: <strong>App Password</strong> (نه password عادی)</li>
+        <li>برای ساخت App Password: Google Account > Security > App Passwords</li>
+      </ul>
+      
+      <h3 style="color: #10b981; margin-top: 24px;">Outlook/Hotmail:</h3>
+      <ul style="color: #a0aec0; line-height: 1.8;">
+        <li>SMTP Server: <code>smtp-mail.outlook.com</code></li>
+        <li>Port: <code>587</code></li>
+        <li>TLS: فعال</li>
+      </ul>
+    </div>
+  </div>
+  
+  <script>
+    function showMessage(text, type = 'success') {
+      const area = document.getElementById('messageArea');
+      area.className = `message ${type}`;
+      area.textContent = text;
+      area.style.display = 'block';
+      setTimeout(() => {
+        area.style.display = 'none';
+      }, 5000);
+    }
+    
+    function saveSettings() {
+      const form = document.getElementById('smtpForm');
+      const formData = new FormData(form);
+      
+      const data = {
+        enabled: document.getElementById('enabled').checked,
+        smtp_server: formData.get('smtp_server'),
+        smtp_port: parseInt(formData.get('smtp_port')),
+        use_tls: document.getElementById('use_tls').checked,
+        username: formData.get('username'),
+        password: formData.get('password'),
+        from_email: formData.get('from_email'),
+        from_name: formData.get('from_name') || 'SEO Analyze Pro'
+      };
+      
+      fetch('/search-console/admin/smtp/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showMessage(data.message, 'success');
+          // Update status badge
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          showMessage(data.error || 'خطا در ذخیره تنظیمات', 'error');
+        }
+      })
+      .catch(error => {
+        showMessage('خطا در ذخیره تنظیمات: ' + error.message, 'error');
+      });
+    }
+    
+    function testSettings() {
+      const testEmail = prompt('لطفاً آدرس ایمیل تست را وارد کنید:');
+      if (!testEmail) return;
+      
+      if (!testEmail.includes('@')) {
+        showMessage('لطفاً یک آدرس ایمیل معتبر وارد کنید', 'error');
+        return;
+      }
+      
+      const btn = event.target;
+      btn.disabled = true;
+      btn.textContent = 'در حال ارسال...';
+      
+      fetch('/search-console/admin/smtp/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ test_email: testEmail })
+      })
+      .then(response => response.json())
+      .then(data => {
+        btn.disabled = false;
+        btn.textContent = '🧪 تست ارسال ایمیل';
+        
+        if (data.success) {
+          showMessage(data.message, 'success');
+        } else {
+          showMessage(data.error || 'خطا در ارسال ایمیل تست', 'error');
+        }
+      })
+      .catch(error => {
+        btn.disabled = false;
+        btn.textContent = '🧪 تست ارسال ایمیل';
+        showMessage('خطا در ارسال ایمیل تست: ' + error.message, 'error');
+      });
+    }
+  </script>
+</body>
+</html>
+

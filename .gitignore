@@ -2,6 +2,7 @@
 venv/
 configs/api_keys.json
 configs/google_oauth_client.json
+configs/smtp_config.json
 app/users.json
 __pycache__/
 *.pyc

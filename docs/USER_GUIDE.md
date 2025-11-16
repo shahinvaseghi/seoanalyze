@@ -216,6 +216,34 @@ Click **"تولید گزارشات"** (Generate Reports) to generate:
 3. **Compare Periods**: Track trends over time
 4. **Internal Links**: Link from high-authority pages to important pages
 
+### Advanced Features
+
+#### Export to CSV
+- Click "📥 Export CSV" button on any report table
+- Download complete data for analysis in Excel/Google Sheets
+- UTF-8 encoding supports Persian/Arabic characters
+
+#### Filter and Search
+- Use search box above tables to find specific pages
+- Real-time filtering as you type
+- Searches across all columns
+
+#### Custom Date Range
+- Select "بازه دلخواه" (Custom Range) option
+- Choose any start and end date
+- Compare any two periods
+
+#### Email Reports
+- Click "📧 ارسال به ایمیل" after generating reports
+- Enter recipient email address
+- Receive beautiful HTML email with report summary
+- **Note**: Admin must configure SMTP first
+
+#### Performance Insights
+- Automatic recommendations based on your data
+- Priority levels help focus on important issues
+- Actionable suggestions for improvement
+
 For complete documentation, see: `docs/GSC_REPORTS_GUIDE.md`
 
 **Color Coding:**

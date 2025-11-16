@@ -1,7 +1,55 @@
 Changelog - SEOAnalyzePro
 ========================
 
-## Version 1.2.0 (Current) - 2025-11-16
+## Version 1.3.0 (Current) - 2025-11-17
+
+### 🎉 Enhanced GSC Reports Module with Advanced Features
+
+#### New Features
+- **Export to CSV**: Export any report table to CSV format with UTF-8 encoding
+- **Filter and Search**: Real-time search and filtering in all report tables
+- **Custom Date Range**: Select custom date ranges (not just preset 7/14/30/90 days)
+- **Sortable Tables**: Click column headers to sort data
+- **Pagination**: Handle large result sets efficiently (disabled by default - shows all)
+- **Alert Badges**: Color-coded badges for priority pages (red/yellow/blue/green)
+- **Performance Insights**: Automated recommendations with priority levels
+- **Historical Tracking**: Save and view report history in browser
+- **Charts/Visualization**: Interactive charts using Chart.js
+- **Email Reports**: Send reports via email with HTML formatting
+- **Collapsible Sections**: All report sections can be collapsed/expanded
+- **SMTP Admin Panel**: Admin-only SMTP configuration interface
+
+#### SMTP Email System
+- **Admin-Only Configuration**: Only admins can configure SMTP settings
+- **Centralized Email Sending**: All emails sent using admin-configured SMTP
+- **Email Templates**: Beautiful HTML email templates with report summaries
+- **Test Functionality**: Test SMTP configuration before using
+- **Multiple Provider Support**: Gmail, Outlook, SendGrid, Mailgun, etc.
+- **Security**: Secure password storage and file permissions
+
+#### UI/UX Improvements
+- **Modern Modal Dialogs**: Email input modal with validation
+- **Real-time Feedback**: Loading states and success/error messages
+- **Responsive Design**: Works perfectly on all screen sizes
+- **Dark Theme**: Consistent dark theme throughout
+- **Interactive Elements**: Smooth animations and transitions
+
+#### Technical Enhancements
+- **New API Endpoints**:
+  - `/search-console/admin/smtp` - SMTP settings page (Admin only)
+  - `/search-console/admin/smtp/save` - Save SMTP config (Admin only)
+  - `/search-console/admin/smtp/test` - Test SMTP (Admin only)
+  - `/search-console/reports/email` - Send report email (All users)
+- **New Core Module**: `app/core/email_sender.py` - Email sending functionality
+- **Enhanced Templates**: New `gsc_smtp_settings.html` for admin panel
+- **Improved Error Handling**: Better error messages and validation
+
+#### Documentation
+- **New Guide**: `SMTP_SETUP.md` - Complete SMTP configuration guide
+- **Updated Guides**: All existing guides updated with new features
+- **API Documentation**: Complete API endpoint documentation
+
+## Version 1.2.0 - 2025-11-16
 
 ### 🎉 Google Search Console Reports Module
 

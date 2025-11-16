@@ -60,6 +60,14 @@
       <br>
       <span style="color: #a0aec0; font-size: 0.85em; margin-right: 24px;">نصب OAuth credentials - Upload OAuth credentials</span>
     </p>
+    {% if is_admin %}
+    <p>
+      <a href="/search-console/admin/smtp" style="color: #3b82f6; font-weight: 600;">📧 تنظیمات SMTP Server</a>
+      <span style="background: #3b82f6; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-left: 8px;">ADMIN</span>
+      <br>
+      <span style="color: #a0aec0; font-size: 0.85em; margin-right: 24px;">تنظیمات ایمیل سرور برای ارسال گزارشات - SMTP Server Configuration</span>
+    </p>
+    {% endif %}
   </div>
 </body>
 </html>

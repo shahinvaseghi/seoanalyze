@@ -39,11 +39,15 @@ The GSC Reports module provides advanced analytics and reporting capabilities fo
 ### Step 1: Select Property and Date Range
 
 1. **Select Property**: Choose the Search Console property you want to analyze
-2. **Select Date Range**: Choose from:
+2. **Select Date Range Type**: 
+   - **Preset Range**: Choose from 7, 14, 30, or 90 days
+   - **Custom Range**: Select custom start and end dates using date picker
+3. **Date Range Options**:
    - Last 7 days
    - Last 14 days
    - Last 30 days (default)
    - Last 90 days
+   - **Custom dates**: Any date range you specify
 
 ### Step 2: Generate Reports
 
@@ -411,11 +415,108 @@ POST /search-console/reports/pages-by-query
 - **Date Alignment**: Automatically adjusts for GSC data delay
 - **Aggregation**: Uses aggregated data for accurate totals
 
+## Advanced Features
+
+### Export to CSV
+- **Purpose**: Export any report table to CSV format for analysis in Excel/Google Sheets
+- **How to Use**: Click the "📥 Export CSV" button above any report table
+- **Features**:
+  - UTF-8 encoding for Persian/Arabic characters
+  - Includes all columns and data
+  - Ready to open in Excel or Google Sheets
+
+### Filter and Search
+- **Purpose**: Quickly find specific pages in large report tables
+- **How to Use**: Type in the search box above any table
+- **Features**:
+  - Real-time filtering as you type
+  - Searches across all columns
+  - Case-insensitive search
+
+### Sortable Tables
+- **Purpose**: Sort data by any column for better analysis
+- **How to Use**: Click on any column header to sort
+- **Features**:
+  - Click once for ascending order
+  - Click again for descending order
+  - Visual indicators show sort direction
+
+### Collapsible Sections
+- **Purpose**: Organize reports and reduce clutter
+- **How to Use**: Click on section headers to expand/collapse
+- **Features**:
+  - All sections collapsible
+  - Smooth animations
+  - Saves screen space
+
+### Performance Insights
+- **Purpose**: Get automated recommendations based on your data
+- **Features**:
+  - Priority levels: High, Medium, Low
+  - Actionable recommendations
+  - Automatic detection of issues
+
+### Charts and Visualization
+- **Purpose**: Visual representation of data trends
+- **Features**:
+  - Interactive bar charts
+  - Top 10 pages by CTR
+  - Responsive design
+
+### Email Reports
+- **Purpose**: Send reports directly to email
+- **How to Use**:
+  1. Generate a report
+  2. Click "📧 ارسال به ایمیل" button
+  3. Enter recipient email
+  4. Click "ارسال"
+- **Features**:
+  - Beautiful HTML email format
+  - Includes report summary and key metrics
+  - Plain text fallback
+- **Note**: SMTP must be configured by admin first
+
+### Historical Tracking
+- **Purpose**: Save and view report history
+- **Features**:
+  - Automatically saves reports to browser
+  - View previous reports
+  - Compare different periods
+- **Storage**: Uses browser localStorage (client-side)
+
+## SMTP Configuration (Admin Only)
+
+### Setting Up SMTP
+1. **Access Admin Panel**: Navigate to Dashboard > "📧 تنظیمات SMTP Server" (Admin only)
+2. **Configure Settings**:
+   - Enable email sending
+   - Enter SMTP server details
+   - Set username and password
+   - Configure from email and name
+3. **Test Configuration**: Use "🧪 تست ارسال ایمیل" button
+4. **Save Settings**: Click "💾 ذخیره تنظیمات"
+
+### Supported Providers
+- **Gmail**: Requires App Password (not regular password)
+- **Outlook/Hotmail**: Standard SMTP settings
+- **SendGrid**: Use API key as password
+- **Mailgun**: Use SMTP credentials
+- **Any SMTP Server**: Standard SMTP configuration
+
+### Security
+- Only admins can configure SMTP
+- Password is hidden in display
+- Secure file permissions (600)
+- All emails sent from admin-configured account
+
+For detailed SMTP setup instructions, see: `docs/SMTP_SETUP.md`
+
 ## Related Documentation
 
 - **Setup Guide**: `docs/GOOGLE_SEARCH_CONSOLE_SETUP.md`
 - **Troubleshooting**: `docs/SEARCH_CONSOLE_TROUBLESHOOTING.md`
 - **Admin Setup**: `docs/GSC_ADMIN_SETUP.md`
+- **SMTP Setup**: `docs/SMTP_SETUP.md`
 - **Technical Docs**: `docs/README_SEARCH_CONSOLE.md`
 
 ## Support
