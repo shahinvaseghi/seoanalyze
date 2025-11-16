@@ -1,0 +1,53 @@
+{
+  "own_website_url": "https://iranbeauty.net/eyebrow-micro-implant/",
+  "competitor_urls": [
+    "https://clinicpaamchal.com/eyebrow-transplant-microfit-nanograft/"
+  ],
+  "total_gaps_found": 3962,
+  "total_opportunity_value": 355150,
+  "avg_difficulty": 2.0,
+  "avg_relevance": 7.534073700151438,
+  "processing_time_seconds": 2.6316816806793213,
+  "analysis_date": "2025-10-25T11:05:16.715544",
+  "analysis_version": "2.0",
+  "quick_wins_count": 0,
+  "high_priority_count": 0,
+  "recommendations": [
+    {
+      "title": "Build Top-of-Funnel Content",
+      "priority": "medium",
+      "description": "Found 3653 informational keywords for awareness stage.",
+      "action": "Create comprehensive guides and how-to content",
+      "keywords": [
+        "کاشت ابرو کلینیک",
+        "ابرو سعادت آباد",
+        "سعادت آباد",
+        "کلینیک",
+        "کلینیک تخصصی",
+        "کلینیک تخصصی پوست",
+        "کلینیک تخصصی پوست مو",
+        "کلینیک پامچال",
+        "کلینیک تخصصی پوست مو پامچال",
+        "کاشت ابرو کلینیک پامچال"
+      ]
+    },
+    {
+      "title": "Capture Transactional Intent",
+      "priority": "high",
+      "description": "48 transactional keywords found - direct revenue potential.",
+      "action": "Create service/product pages with strong CTAs",
+      "keywords": [
+        "قیمت کاشت ابرو",
+        "قیمت کاشت ابرو میکروگرافت",
+        "چقدر قیمت کاشت ابرو",
+        "قیمت کاشت ابرو نانوگرافت",
+        "قیمت کاشت ابرو میکروگرافت نانوگرافت",
+        "نانوگرافت چقدر قیمت کاشت ابرو",
+        "چقدر قیمت کاشت ابرو نانوگرافت",
+        "قیمت کاشت ابرو نانوگرافت میکروگرافت",
+        "تهران قیمت کاشت ابرو",
+        "قیمت کاشت ابرو تهران"
+      ]
+    }
+  ]
+}

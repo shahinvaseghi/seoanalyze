@@ -1,0 +1,452 @@
+"""
+Google Search Console Integration Routes
+OAuth flow and data display for Search Console
+"""
+
+from __future__ import annotations
+
+from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for, flash
+from functools import wraps
+from datetime import datetime, timedelta
+from pathlib import Path
+import secrets
+import json
+import os
+import subprocess
+
+from app.services.storage import UserStorage
+from app.services.gsc_oauth import GSCOAuthHandler
+from app.core.gsc_analyzer import GSCAnalyzer
+
+search_console_bp = Blueprint('search_console', __name__, url_prefix='/search-console')
+
+storage = UserStorage()
+
+
+def login_required(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if not session.get("user"):
+            return redirect(url_for("auth.login"))
+        return view(*args, **kwargs)
+    return wrapped
+
+
+def admin_required(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if not session.get("user"):
+            return redirect(url_for("auth.login"))
+        
+        username = session.get("user")
+        if not storage.is_admin(username):
+            return jsonify({'error': 'Admin access required'}), 403
+        
+        return view(*args, **kwargs)
+    return wrapped
+
+
+@search_console_bp.route('/')
+@login_required
+def index():
+    """
+    Main Search Console page
+    Shows connection status and analytics if connected
+    """
+    username = session.get("user")
+    
+    # Check if user has connected Search Console
+    has_connection = storage.has_gsc_connection(username)
+    
+    if not has_connection:
+        # Show connection page
+        return render_template('search_console_connect.html', username=username)
+    
+    # Get user's tokens and properties
+    tokens = storage.get_gsc_tokens(username)
+    
+    # Safety check
+    if not tokens:
+        print(f"⚠️ WARNING: has_connection returned True but tokens is None for user {username}")
+        return render_template('search_console_connect.html', username=username)
+    
+    properties = tokens.get('properties', [])
+    
+    # Show analytics dashboard
+    return render_template('search_console_dashboard.html', 
+                         username=username,
+                         properties=properties,
+                         connected=True)
+
+
+@search_console_bp.route('/help')
+@login_required
+def help_page():
+    """
+    Help page with complete setup guide in Persian and English
+    """
+    username = session.get("user")
+    return render_template('search_console_help.html', username=username)
+
+
+@search_console_bp.route('/connect')
+@login_required
+def connect():
+    """
+    Initiate OAuth flow to connect Search Console
+    """
+    username = session.get("user")
+    
+    # Prevent multiple simultaneous OAuth flows for the same user
+    if 'oauth_state' in session:
+        existing_username = session.get('oauth_username')
+        if existing_username == username:
+            print(f"⚠️ OAuth flow already in progress for user {username}")
+            flash("OAuth flow already in progress. Please wait or try again in a moment.", "warning")
+            return redirect(url_for('search_console.index'))
+    
+    try:
+        oauth_handler = GSCOAuthHandler()
+        
+        # Generate state token for security
+        state = secrets.token_urlsafe(32)
+        session['oauth_state'] = state
+        session['oauth_username'] = username
+        session.permanent = True  # Ensure session persists
+        
+        # Create authorization URL
+        redirect_uri = url_for('search_console.oauth_callback', _external=True)
+        print(f"🔗 Generated redirect_uri: {redirect_uri}")
+        print(f"🔗 Generated state for user {username}: {state[:20]}...")
+        authorization_url, returned_state = oauth_handler.create_authorization_url(redirect_uri, state)
+        
+        # Verify that the returned state matches what we sent
+        if returned_state != state:
+            print(f"⚠️ WARNING: State mismatch in create_authorization_url! Sent: {state[:20]}..., Returned: {returned_state[:20] if returned_state else None}...")
+            # Use the returned state (should match if implementation is correct)
+            session['oauth_state'] = returned_state
+        
+        print(f"🔗 Generated authorization_url: {authorization_url[:200]}...")
+        print(f"🔗 Final session state: {session.get('oauth_state')[:20] if session.get('oauth_state') else None}...")
+        
+        # Redirect user to Google OAuth consent page
+        return redirect(authorization_url)
+        
+    except FileNotFoundError as e:
+        flash(str(e), "error")
+        return redirect(url_for('search_console.index'))
+    except Exception as e:
+        flash(f"Error initiating OAuth: {str(e)}", "error")
+        return redirect(url_for('search_console.index'))
+
+
+@search_console_bp.route('/oauth2callback')
+def oauth_callback():
+    """
+    OAuth callback - handle authorization code from Google
+    Note: NO @login_required decorator here because Google redirects here and session may be lost
+    """
+    print(f"🔔 OAuth callback called!")
+    print(f"🔔 Request URL: {request.url}")
+    print(f"🔔 Request args: {dict(request.args)}")
+    session_state = session.get('oauth_state')
+    request_state = request.args.get('state')
+    print(f"🔔 Session state: {session_state[:30] + '...' if session_state and len(session_state) > 30 else session_state}")
+    print(f"🔔 Request state: {request_state[:30] + '...' if request_state and len(request_state) > 30 else request_state}")
+    print(f"🔔 Session oauth_username: {session.get('oauth_username')}")
+    print(f"🔔 Session user: {session.get('user')}")
+    print(f"🔔 Full session keys: {list(session.keys())}")
+    print(f"🔔 Session permanent: {session.permanent}")
+    
+    # Get username from session (might be lost, use oauth_username as backup)
+    username = session.get('oauth_username')
+    if not username:
+        print(f"❌ No username in session! Redirecting to login.")
+        flash("Session expired. Please try connecting again.", "error")
+        return redirect(url_for('auth.login'))
+    
+    # Verify state to prevent CSRF
+    state_from_session = session.get('oauth_state')
+    state_from_request = request.args.get('state')
+    
+    if not state_from_session or state_from_session != state_from_request:
+        print(f"❌ State mismatch!")
+        print(f"   Session state (length {len(state_from_session) if state_from_session else 0}): {state_from_session[:50] + '...' if state_from_session and len(state_from_session) > 50 else state_from_session}")
+        print(f"   Request state (length {len(state_from_request) if state_from_request else 0}): {state_from_request[:50] + '...' if state_from_request and len(state_from_request) > 50 else state_from_request}")
+        print(f"   States match: {state_from_session == state_from_request}")
+        print(f"   Session ID: {session.get('_id', 'N/A')}")
+        flash("Invalid OAuth state. This may happen if you clicked Connect multiple times or if your session expired. Please try connecting again.", "error")
+        
+        # Clear the OAuth state to allow retry
+        session.pop('oauth_state', None)
+        session.pop('oauth_username', None)
+        
+        return redirect(url_for('search_console.index'))
+    
+    # Get authorization code
+    code = request.args.get('code')
+    error = request.args.get('error')
+    
+    if error:
+        flash(f"OAuth error: {error}", "error")
+        return redirect(url_for('search_console.index'))
+    
+    if not code:
+        flash("No authorization code received", "error")
+        return redirect(url_for('search_console.index'))
+    
+    try:
+        oauth_handler = GSCOAuthHandler()
+        
+        # Exchange code for tokens
+        redirect_uri = url_for('search_console.oauth_callback', _external=True)
+        print(f"🔗 Using redirect_uri for token exchange: {redirect_uri}")
+        tokens = oauth_handler.exchange_code_for_tokens(code, redirect_uri)
+        
+        # Debug: Check if refresh_token is present
+        if not tokens.get('refresh_token'):
+            print(f"⚠️ WARNING: No refresh_token received for user {username}")
+            flash("Authentication successful, but no refresh token received. Please try again.", "warning")
+        else:
+            print(f"✅ Refresh token received for user {username}")
+        
+        # Save tokens to user storage
+        storage.save_gsc_tokens(username, tokens)
+        print(f"✅ Tokens saved for user {username}")
+        
+        # Get user's Search Console properties
+        try:
+            def save_tokens_callback(updated_tokens):
+                storage.save_gsc_tokens(username, updated_tokens)
+            
+            credentials, _ = oauth_handler.get_valid_credentials(tokens, save_tokens_callback)
+            analyzer = GSCAnalyzer(credentials)
+            properties = analyzer.list_properties()
+            
+            # Save properties list
+            property_urls = [p['url'] if isinstance(p, dict) else p for p in properties]
+            storage.save_gsc_properties(username, property_urls)
+            
+            flash(f"Successfully connected! Found {len(property_urls)} properties.", "success")
+            
+        except Exception as prop_error:
+            print(f"⚠️ Could not fetch properties: {prop_error}")
+            flash("Connected, but could not fetch properties. You can still use the service.", "warning")
+        
+        # Clear OAuth session data
+        session.pop('oauth_state', None)
+        session.pop('oauth_username', None)
+        
+        return redirect(url_for('search_console.index'))
+        
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"❌ OAuth callback error: {str(e)}")
+        print(f"Full traceback:\n{error_trace}")
+        flash(f"Error completing OAuth: {str(e)}", "error")
+        return redirect(url_for('search_console.index'))
+
+
+@search_console_bp.route('/disconnect', methods=['POST'])
+@login_required
+def disconnect():
+    """
+    Disconnect Search Console for current user
+    """
+    username = session.get("user")
+    
+    try:
+        storage.disconnect_gsc(username)
+        flash("Search Console disconnected successfully", "success")
+    except Exception as e:
+        flash(f"Error disconnecting: {str(e)}", "error")
+    
+    return redirect(url_for('search_console.index'))
+
+
+@search_console_bp.route('/api/analytics', methods=['POST'])
+@login_required
+def get_analytics():
+    """
+    API endpoint to get Search Console analytics data
+    """
+    username = session.get("user")
+    
+    # Check if connected
+    if not storage.has_gsc_connection(username):
+        return jsonify({'error': 'Search Console not connected'}), 401
+    
+    # Get request parameters
+    data = request.json or {}
+    site_url = data.get('site_url')
+    days = int(data.get('days', 7))
+    limit = int(data.get('limit', 50))
+    
+    if not site_url:
+        return jsonify({'error': 'site_url is required'}), 400
+    
+    try:
+        # Get user's tokens
+        tokens = storage.get_gsc_tokens(username)
+        
+        # Create analyzer with token refresh callback
+        oauth_handler = GSCOAuthHandler()
+        
+        def save_tokens_callback(updated_tokens):
+            storage.save_gsc_tokens(username, updated_tokens)
+        
+        credentials, _ = oauth_handler.get_valid_credentials(tokens, save_tokens_callback)
+        analyzer = GSCAnalyzer(credentials)
+        
+        # Get analytics data
+        top_queries = analyzer.get_top_queries(site_url, days, limit)
+        top_pages = analyzer.get_top_pages(site_url, days, limit)
+        summary = analyzer.get_performance_summary(site_url, days)
+        
+        return jsonify({
+            'success': True,
+            'summary': summary,
+            'top_queries': top_queries,
+            'top_pages': top_pages,
+            'period': f'{days} days'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to fetch analytics: {str(e)}'}), 500
+
+
+@search_console_bp.route('/api/properties')
+@login_required
+def get_properties():
+    """
+    API endpoint to get user's Search Console properties
+    """
+    username = session.get("user")
+    
+    if not storage.has_gsc_connection(username):
+        return jsonify({'connected': False, 'properties': []})
+    
+    try:
+        tokens = storage.get_gsc_tokens(username)
+        properties = tokens.get('properties', [])
+        
+        return jsonify({
+            'connected': True,
+            'properties': properties,
+            'count': len(properties)
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@search_console_bp.route('/admin/setup')
+@login_required
+def admin_setup():
+    """
+    Setup page for uploading OAuth credentials
+    (Available to all users in MVP)
+    """
+    username = session.get("user")
+    
+    # Check if credentials file exists
+    config_dir = Path(__file__).parent.parent.parent / 'configs'
+    credentials_file = config_dir / 'google_oauth_client.json'
+    has_credentials = credentials_file.exists()
+    
+    return render_template('gsc_admin_setup.html', 
+                         username=username,
+                         has_credentials=has_credentials)
+
+
+@search_console_bp.route('/admin/upload-credentials', methods=['POST'])
+@login_required
+def upload_credentials():
+    """
+    API endpoint to upload OAuth credentials file and restart service
+    (Available to all users in MVP)
+    """
+    try:
+        # Check if file was uploaded
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file uploaded'}), 400
+        
+        file = request.files['file']
+        
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        # Validate file extension
+        if not file.filename.endswith('.json'):
+            return jsonify({'error': 'Only JSON files are allowed'}), 400
+        
+        # Read and validate JSON
+        try:
+            file_content = file.read()
+            json_data = json.loads(file_content)
+            
+            # Validate structure (should have 'web' key with OAuth credentials)
+            if 'web' not in json_data:
+                return jsonify({'error': 'Invalid OAuth credentials file structure. Missing "web" key.'}), 400
+            
+            required_keys = ['client_id', 'client_secret', 'redirect_uris', 'auth_uri', 'token_uri']
+            web_data = json_data['web']
+            
+            missing_keys = [key for key in required_keys if key not in web_data]
+            if missing_keys:
+                return jsonify({
+                    'error': f'Invalid OAuth credentials. Missing keys: {", ".join(missing_keys)}'
+                }), 400
+            
+        except json.JSONDecodeError:
+            return jsonify({'error': 'Invalid JSON file'}), 400
+        
+        # Save file to configs directory
+        config_dir = Path(__file__).parent.parent.parent / 'configs'
+        config_dir.mkdir(exist_ok=True)
+        
+        credentials_file = config_dir / 'google_oauth_client.json'
+        
+        with open(credentials_file, 'w') as f:
+            f.write(file_content.decode('utf-8'))
+        
+        # Set file permissions to 600 (read/write for owner only)
+        os.chmod(credentials_file, 0o600)
+        
+        # Restart service
+        try:
+            result = subprocess.run(
+                ['sudo', 'systemctl', 'restart', 'seoanalyzepro'],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            
+            if result.returncode == 0:
+                return jsonify({
+                    'success': True,
+                    'message': 'فایل با موفقیت آپلود شد و سرویس راه‌اندازی مجدد شد'
+                })
+            else:
+                # File saved but service restart failed
+                return jsonify({
+                    'success': True,
+                    'message': 'فایل ذخیره شد اما خطا در restart سرویس. لطفاً دستی restart کنید.',
+                    'restart_error': result.stderr
+                })
+                
+        except subprocess.TimeoutExpired:
+            return jsonify({
+                'success': True,
+                'message': 'فایل ذخیره شد. Restart سرویس timeout شد. لطفاً دستی restart کنید.'
+            })
+        except Exception as restart_error:
+            return jsonify({
+                'success': True,
+                'message': f'فایل ذخیره شد اما خطا در restart: {str(restart_error)}'
+            })
+        
+    except Exception as e:
+        return jsonify({'error': f'خطا در آپلود: {str(e)}'}), 500
+

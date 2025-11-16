@@ -1,0 +1,7 @@
+# Ignore venv and local configs
+venv/
+configs/api_keys.json
+configs/google_oauth_client.json
+app/users.json
+__pycache__/
+*.pyc

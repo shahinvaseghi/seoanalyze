@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ 'Create' if mode == 'create' else 'Edit' }} User</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#0b1220;color:#e7eaf3;margin:0;display:flex;align-items:center;justify-content:center;height:100vh}
+    .card{background:#111a2b;border:1px solid #1f2a44;border-radius:10px;padding:24px;width:420px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    h1{font-size:20px;margin:0 0 16px}
+    label{display:block;font-size:13px;margin:12px 0 6px;color:#a9b3c7}
+    input,select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #2a3552;background:#0b1220;color:#e7eaf3}
+    .row{display:flex;gap:12px}
+    .row>div{flex:1}
+    .actions{display:flex;justify-content:space-between;margin-top:16px}
+    .btn{padding:10px 12px;border:none;border-radius:8px;color:#fff;font-weight:600;cursor:pointer}
+    .primary{background:#4f46e5}
+    .secondary{background:#334155}
+  </style>
+</head>
+<body>
+  <form class="card" method="post">
+    <h1>{{ 'Create' if mode == 'create' else 'Edit' }} User</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div>{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <label>Username</label>
+    <input name="username" type="text" value="{{ user.username }}" {% if mode == 'edit' %}readonly{% endif %} required />
+    <div class="row">
+      <div>
+        <label>Password {% if mode == 'edit' %}(leave blank to keep){% endif %}</label>
+        <input name="password" type="password" />
+      </div>
+      <div>
+        <label>Role</label>
+        <select name="role">
+          <option value="user" {% if user.role == 'user' %}selected{% endif %}>user</option>
+          <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>admin</option>
+        </select>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn secondary" href="/users">Back</a>
+      <button class="btn primary" type="submit">Save</button>
+    </div>
+  </form>
+</body>
+</html>
+
+

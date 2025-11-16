@@ -1,0 +1,36 @@
+{
+  "own_website_url": "https://clinicpaamchal.com/hair-mesothrapy/",
+  "competitor_urls": [
+    "https://drfakhteh.com/services/mesotherapy/",
+    "https://www.dr-sahar-parsa.com/blog/hair-mesotherapy-before-after/"
+  ],
+  "total_gaps_found": 656,
+  "total_opportunity_value": 83350,
+  "avg_difficulty": 2.0,
+  "avg_relevance": 4.496951219512195,
+  "processing_time_seconds": 4.601087808609009,
+  "analysis_date": "2025-10-27T18:41:37.783145",
+  "analysis_version": "2.0",
+  "quick_wins_count": 0,
+  "high_priority_count": 0,
+  "recommendations": [
+    {
+      "title": "Build Top-of-Funnel Content",
+      "priority": "medium",
+      "description": "Found 621 informational keywords for awareness stage.",
+      "action": "Create comprehensive guides and how-to content",
+      "keywords": [
+        "مراجعه",
+        "نمایید",
+        "کنند",
+        "خود",
+        "توانید",
+        "هزینه مزوتراپی صورت",
+        "صفحه مزوتراپی مو کلینیک",
+        "مزوتراپی مو کلینیک مراجعه",
+        "کاملا",
+        "مرکز مزوتراپی مو صورت"
+      ]
+    }
+  ]
+}

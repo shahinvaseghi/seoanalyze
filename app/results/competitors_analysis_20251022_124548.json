@@ -1,0 +1,562 @@
+{
+  "timestamp": "20251022_124548",
+  "competitors": [
+    "https://tosinso.com/courses/mikrotik"
+  ],
+  "keywords": [
+    "اموزش میکروتیک"
+  ],
+  "results": [
+    {
+      "url": "https://tosinso.com/courses/mikrotik",
+      "status_code": 200,
+      "title": "مجموعه دوره آموزش میکروتیک (Mikrotik) - مقدماتی تا پیشرفته",
+      "meta_description": "مجموعه بهترین دوره های آموزش روتربردهای میکروتیک (Mikrotik/MTCNA/MTCRE/MTCWE/MTCUME) مقدماتی تا پیشرفته با ارائه گواهینامه و فیلم رایگان",
+      "meta_keywords": "No meta keywords",
+      "h1_tags": [
+        "مجموعه دوره آموزش میکروتیک (Mikrotik) - مقدماتی تا پیشرفته"
+      ],
+      "h1_count": 1,
+      "h2_tags": [
+        "میکروتیک چیست و چرا یادگیری آن مهم است؟",
+        "میکروتیک در توسینسو: آمار و ارقام",
+        "مشتریان توسینسو",
+        "با اساتید برجسته حوزه میکروتیک آشنا شوید",
+        "تجربه متخصصان و دانشجویان میکروتیک",
+        "سوالات متداول در حوزه میکروتیک"
+      ],
+      "h2_count": 6,
+      "h3_tags": [
+        "مشاوره تخصصی رایگان در حوزه میکروتیک",
+        "درباره توسینسو",
+        "لینک‌های سریع",
+        "دوره‌های آموزشی",
+        "تماس با ما",
+        "عضویت در خبرنامه",
+        "نمادها و نشان‌ها"
+      ],
+      "h3_count": 7,
+      "h4_tags": [],
+      "h4_count": 0,
+      "word_count": 986,
+      "images_count": 28,
+      "images_without_alt": 2,
+      "images_detailed": {
+        "images": [
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/22beec5f-6333-40cd-b432-862ecb5b330b?width=64&height=64",
+            "alt": "",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": false,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": ""
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/images/logo-small_w45.webp",
+            "alt": "Tosinso",
+            "title": "",
+            "type": "WebP",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": ""
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/images/categories/mikrotik_w550.webp",
+            "alt": "مجموعه دوره آموزش میکروتیک (Mikrotik) - مقدماتی تا پیشرفته",
+            "title": "",
+            "type": "WebP",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": ""
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/483ecea2-48dd-48d0-b119-eff4df31217e",
+            "alt": "لوگوی جهاد دانشگاهی",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/2dd92acd-6d25-44b4-92a9-bb7929ae8859",
+            "alt": "لوگوی دانشگاه علوم پزشکی ایران",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/25af8951-0a79-4674-89ff-138088c4f124",
+            "alt": "لوگوی بانک سامان",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/578d6718-35c7-43fb-b2ee-81003e4d73e3",
+            "alt": "لوگوی شرکت سامان دارو",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/7ad86cb7-2576-4f24-8a37-67be1d5b056b",
+            "alt": "لوگوی ایرانسل",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/108a6f4c-fa82-4e3d-9b9e-e0d47ee08349",
+            "alt": "لوگوی شرکت کامتل نمایندگی پاناسونیک در ایران",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/62575924-a453-4705-8c14-7556844be82f",
+            "alt": "لوگوی شرکت توسعه فناوری اطلاعات دریایی",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/f19fd4a2-7e3f-48cd-abdd-860e6ca79353",
+            "alt": "لوگوی شرکت فرودگاه ها و ناوبری هوایی ایران",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/74a6e9b3-4abc-4f1b-be4d-0f4e353c1e0f",
+            "alt": "لوگوی سازمان آتش نشانی و خدمات ایمنی",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/e7602003-bd38-48d9-842b-dd688431bb62",
+            "alt": "لوگوی سازمان ثبت اسناد کشور",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/425211e0-5c43-4383-8e94-69afc9dc6c63",
+            "alt": "لوگوی امداد خودرو سایپا",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/aab446dc-12c5-4f16-975d-cde44fec42c6",
+            "alt": "لوگوی شرکت سیمان بجنورد",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/a4f4d053-796e-4f5b-ab0e-5f6fc428e29c",
+            "alt": "لوگوی ارتش جمهوری اسلامی ایران",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/c6366dc4-fb32-43dd-a72a-74746d99675e",
+            "alt": "لوگوی فرماندهی انتظامی جمهوری اسلامی ایران",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/8ee6ed24-660f-4649-8b63-b469307c5b50",
+            "alt": "لوگوی شرکت ملی حفاری ایران",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/b0bcdf86-d43d-47ce-b3b2-28f76758621d",
+            "alt": "لوگوی شرکت ملی نفت ایران",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/1463151f-ac74-47f6-93af-6e6e987dc89e",
+            "alt": "لوگوی شرکت توزیع نیروی برق منطقه ای ایلام",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/6f93366e-dffb-4509-acdd-7744a96445e9",
+            "alt": "لوگوی شرکت توزیع نیروی برق منطقه ای خوزستان",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/0ec5ae47-4427-4108-8143-15fae498e97e?width=120&height=120",
+            "alt": "محمد جواد صبری",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/633fa681-f511-4f0e-bb62-ed12df3194aa?width=120&height=120",
+            "alt": "پوریا تعبدی",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/images/avatar-man.webp",
+            "alt": "جواد عابدی نیا",
+            "title": "",
+            "type": "WebP",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/a1556471-7112-47c6-b890-a506c1792f5f?width=50&height=50",
+            "alt": "آواتار دانشجو",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/images/avatar-man.webp",
+            "alt": "آواتار دانشجو",
+            "title": "",
+            "type": "WebP",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          },
+          {
+            "src": "https://tosinso.com/courses/mikrotik/files/get/a1556471-7112-47c6-b890-a506c1792f5f?width=50&height=50",
+            "alt": "آواتار دانشجو",
+            "title": "",
+            "type": "Unknown",
+            "has_alt": true,
+            "is_linked": false,
+            "link_url": null,
+            "link_type": null,
+            "width": "",
+            "height": "",
+            "loading": "lazy"
+          }
+        ],
+        "videos": [],
+        "total_images": 28,
+        "total_videos": 0,
+        "images_with_alt": 26,
+        "images_without_alt": 1,
+        "linked_images": 0,
+        "image_types": {
+          "JPEG": 0,
+          "PNG": 0,
+          "GIF": 0,
+          "SVG": 0,
+          "WebP": 4,
+          "Other": 23
+        }
+      },
+      "internal_links": 19,
+      "internal_links_details": [
+        {
+          "anchor": "مشاهده دوره‌ها",
+          "url": "https://tosinso.com/courses"
+        },
+        {
+          "anchor": "شبکه های کامپیوتری",
+          "url": "https://tosinso.com/courses/network"
+        },
+        {
+          "anchor": "مجازی سازی",
+          "url": "https://tosinso.com/courses/virtualization"
+        },
+        {
+          "anchor": "مایکروسافت",
+          "url": "https://tosinso.com/courses/microsoft"
+        },
+        {
+          "anchor": "هک و امنیت شبکه",
+          "url": "https://tosinso.com/courses/security"
+        },
+        {
+          "anchor": "لینوکس و دواپس",
+          "url": "https://tosinso.com/courses/linux"
+        },
+        {
+          "anchor": "میکروتیک",
+          "url": "https://tosinso.com/courses/mikrotik"
+        },
+        {
+          "anchor": "برنامه نویسی",
+          "url": "https://tosinso.com/courses/programming"
+        },
+        {
+          "anchor": "سیسکو",
+          "url": "https://tosinso.com/courses/cisco"
+        },
+        {
+          "anchor": "فایروال",
+          "url": "https://tosinso.com/courses/firewall"
+        }
+      ],
+      "external_links": 0,
+      "external_links_details": [],
+      "has_schema": false,
+      "page_load_size": 57.9189453125,
+      "keywords_found": {
+        "لوگوی": 72,
+        "میکروتیک": 57,
+        "شرکت": 36,
+        "مجموعه": 29,
+        "آموزش": 29,
+        "mikrotik": 29,
+        "مقدماتی": 29,
+        "پیشرفته": 29,
+        "ایران": 28,
+        "آواتار": 12,
+        "دانشجو": 12,
+        "رایگان": 11,
+        "توسینسو": 10,
+        "بهترین": 8,
+        "روتربردهای": 8,
+        "mtcna": 8,
+        "mtcre": 8,
+        "mtcwe": 8,
+        "mtcume": 8,
+        "ارائه": 8,
+        "گواهینامه": 8,
+        "سامان": 8,
+        "سازمان": 8,
+        "جمهوری": 8,
+        "اسلامی": 8
+      },
+      "content_structure": {
+        "paragraphs": 21,
+        "lists": 3,
+        "tables": 0,
+        "videos": 0,
+        "forms": 1
+      },
+      "logo_url": "https://tosinso.com/images/logo_w200.webp",
+      "featured_image": null,
+      "address": {
+        "street": null,
+        "locality": null,
+        "country": null,
+        "full_address": null
+      },
+      "google_maps_url": null,
+      "detected_page_type": "Course",
+      "suggested_schema": {
+        "@context": "https://schema.org",
+        "@type": "Course",
+        "name": "مجموعه دوره آموزش میکروتیک (Mikrotik) - مقدماتی تا پیشرفته",
+        "description": "مجموعه بهترین دوره های آموزش روتربردهای میکروتیک (Mikrotik/MTCNA/MTCRE/MTCWE/MTCUME) مقدماتی تا پیشرفته با ارائه گواهینامه و فیلم رایگان",
+        "url": "https://tosinso.com/courses/mikrotik",
+        "provider": {
+          "@type": "Organization",
+          "name": "Tosinso",
+          "url": "https://tosinso.com",
+          "logo": "https://tosinso.com/images/logo_w200.webp"
+        }
+      },
+      "keyword_tracking": {
+        "total_words": 986,
+        "keywords": [
+          {
+            "keyword": "اموزش میکروتیک",
+            "count": 0,
+            "density": 0.0,
+            "status": "missing"
+          }
+        ]
+      },
+      "page_speed": {
+        "desktop": {
+          "load_time": 0.32,
+          "size_kb": 57.98,
+          "status_code": 200
+        },
+        "mobile": {
+          "load_time": 0.31,
+          "size_kb": 57.81,
+          "status_code": 200
+        },
+        "average_load_time": 0.31,
+        "performance_rating": "عالی",
+        "performance_score": 95
+      },
+      "mobile_ux": {
+        "mobile_friendly": true,
+        "responsive_design": true,
+        "ui_quality": "عالی",
+        "ux_score": 80,
+        "issues": [
+          "⚠️ منوی Navigation مشخص نیست"
+        ],
+        "good_points": [
+          "✅ Viewport meta tag موجود است",
+          "✅ طراحی Responsive دارد",
+          "✅ 30 دکمه/لینک دارد",
+          "✅ 92% تصاویر Alt Text دارند",
+          "✅ 1 فرم با 1 فیلد",
+          "✅ 21 پاراگراف محتوا"
+        ]
+      }
+    }
+  ]
+}

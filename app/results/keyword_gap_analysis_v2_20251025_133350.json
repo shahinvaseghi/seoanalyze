@@ -1,0 +1,36 @@
+{
+  "own_website_url": "https://clinicpaamchal.com/",
+  "competitor_urls": [
+    "https://saadatabad-clinic.ir/",
+    "https://clinicsaadatabad.com/"
+  ],
+  "total_gaps_found": 60,
+  "total_opportunity_value": 6850,
+  "avg_difficulty": 2.0,
+  "avg_relevance": 0.0,
+  "processing_time_seconds": 4.047233819961548,
+  "analysis_date": "2025-10-25T13:33:50.419471",
+  "analysis_version": "2.0",
+  "quick_wins_count": 0,
+  "high_priority_count": 0,
+  "recommendations": [
+    {
+      "title": "Build Top-of-Funnel Content",
+      "priority": "medium",
+      "description": "Found 60 informational keywords for awareness stage.",
+      "action": "Create comprehensive guides and how-to content",
+      "keywords": [
+        "hb",
+        "zc",
+        "sv",
+        "kz",
+        "fc",
+        "cp",
+        "rc",
+        "ml",
+        "ti",
+        "ej"
+      ]
+    }
+  ]
+}

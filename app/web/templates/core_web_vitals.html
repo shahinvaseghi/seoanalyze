@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Core Web Vitals Analysis</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#07111f;color:#e7eaf3;margin:0}
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#0d1830;border-bottom:1px solid #1f2a44}
+    .brand{font-weight:700}
+    .container{padding:24px;max-width:800px;margin:0 auto}
+    a{color:#93c5fd;text-decoration:none}
+    a:hover{text-decoration:underline}
+    .form-section{background:#111a2b;border:1px solid #1f2a44;border-radius:10px;padding:24px;margin-bottom:24px}
+    .form-section h3{color:#f59e0b;margin-top:0;margin-bottom:16px;font-size:18px}
+    .form-group{margin-bottom:16px}
+    label{display:block;font-size:14px;margin-bottom:6px;color:#a9b3c7;font-weight:500}
+    input,select,textarea{width:100%;padding:12px;border-radius:8px;border:1px solid #2a3552;background:#0b1220;color:#e7eaf3;font-size:14px;box-sizing:border-box}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:#f59e0b;box-shadow:0 0 0 2px rgba(245,158,11,0.2)}
+    .btn{background:#f59e0b;color:#000;border:none;padding:12px 24px;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px;transition:background 0.2s}
+    .btn:hover{background:#d97706}
+    .btn:disabled{background:#4a5568;cursor:not-allowed}
+    .flash{background:#fca5a5;color:#000;padding:12px;border-radius:8px;margin-bottom:16px;font-size:14px}
+    .info-box{background:#1e3a8a;border:1px solid #3b82f6;border-radius:8px;padding:16px;margin-bottom:16px}
+    .info-box h4{color:#93c5fd;margin-top:0;margin-bottom:8px}
+    .info-box p{margin:0;font-size:14px;color:#cbd5e1}
+    .analysis-types{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:16px}
+    .analysis-type{background:#0b1220;border:1px solid #2a3552;border-radius:8px;padding:16px;cursor:pointer;transition:border-color 0.2s}
+    .analysis-type:hover{border-color:#f59e0b}
+    .analysis-type.selected{border-color:#f59e0b;background:#1a1a2e}
+    .analysis-type input[type="radio"]{display:none}
+    .analysis-type h4{color:#f59e0b;margin-top:0;margin-bottom:8px}
+    .analysis-type p{margin:0;font-size:13px;color:#a9b3c7}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">⚡ Core Web Vitals Analysis</div>
+    <nav>
+      <a href="/dashboard">Dashboard</a>
+      &nbsp;|&nbsp;
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+  
+  <div class="container">
+    <h2>Core Web Vitals Performance Analysis</h2>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <div class="info-box">
+      <h4>📊 What are Core Web Vitals?</h4>
+      <p>Core Web Vitals are a set of specific factors that Google considers important in a webpage's overall user experience. Our analysis measures:</p>
+      <ul style="margin:8px 0;padding-left:20px;color:#cbd5e1">
+        <li><strong>LCP (Largest Contentful Paint)</strong> - Loading performance</li>
+        <li><strong>FID (First Input Delay)</strong> - Interactivity</li>
+        <li><strong>CLS (Cumulative Layout Shift)</strong> - Visual stability</li>
+      </ul>
+    </div>
+    
+    <form method="POST" class="analysis-form">
+      <div class="form-section">
+        <h3>🌐 Website Information</h3>
+        
+        <div class="form-group">
+          <label for="website_url">Website URL *</label>
+          <input 
+            type="url" 
+            id="website_url" 
+            name="website_url" 
+            placeholder="https://example.com" 
+            required
+            value="{{ request.form.get('website_url', '') }}"
+          >
+          <small style="color:#a9b3c7;font-size:12px;margin-top:4px;display:block">
+            Enter the complete URL of the website you want to analyze
+          </small>
+        </div>
+      </div>
+      
+      <div class="form-section">
+        <h3>🔍 Complete Core Web Vitals Analysis</h3>
+        <div class="info-box">
+          <h4>📊 What you'll get:</h4>
+          <ul style="margin:8px 0;padding-left:20px;color:#cbd5e1">
+            <li>✅ <strong>Device-specific metrics</strong> - Mobile, Desktop, Tablet performance</li>
+            <li>✅ <strong>Lighthouse-style audit</strong> - Performance, Accessibility, Best Practices, SEO scores</li>
+            <li>✅ <strong>Detailed performance metrics</strong> - LCP, INP, CLS, FCP, TTFB, TTI</li>
+            <li>✅ <strong>Priority actions</strong> - Immediate, short-term, and long-term improvements</li>
+            <li>✅ <strong>Implementation guides</strong> - Step-by-step optimization instructions</li>
+            <li>✅ <strong>Optimization opportunities</strong> - Performance improvement suggestions</li>
+            <li>✅ <strong>Technical diagnostics</strong> - Deep analysis of website issues</li>
+          </ul>
+        </div>
+        
+        <input type="hidden" name="analysis_type" value="comprehensive">
+      </div>
+      
+      <div style="text-align:center;margin-top:32px">
+        <button type="submit" class="btn" id="analyzeBtn">
+          ⚡ Start Core Web Vitals Analysis
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Handle form submission
+    document.querySelector('.analysis-form').addEventListener('submit', function() {
+      const btn = document.getElementById('analyzeBtn');
+      btn.disabled = true;
+      btn.textContent = '⚡ Analyzing... Please wait';
+    });
+  </script>
+</body>
+</html>

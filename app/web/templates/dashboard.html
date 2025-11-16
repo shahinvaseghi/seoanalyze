@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#07111f;color:#e7eaf3;margin:0}
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#0d1830;border-bottom:1px solid #1f2a44}
+    .brand{font-weight:700}
+    .container{padding:24px}
+    a{color:#93c5fd;text-decoration:none}
+    a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">SEO Tools</div>
+    <nav>
+      <span>Signed in as {{ username }}</span>
+      &nbsp; | &nbsp;
+      {% if is_admin %}
+        <a href="/users">Users</a> &nbsp; | &nbsp;
+      {% endif %}
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+  <div class="container">
+    <h2>Welcome</h2>
+    <p>This is a minimal dashboard. Next steps: add analysis pages.</p>
+    <p>
+      <a href="/competitors/">Competitors Analysis</a>
+    </p>
+    <p>
+      <a href="/keyword-gap-v2/" style="color: #10b981; font-weight: 600;">🚀 Keyword Gap Analysis v2.0 (Enhanced)</a>
+      <span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-left: 8px;">NEW</span>
+    </p>
+    <p>
+      <a href="/core-web-vitals/" style="color: #f59e0b; font-weight: 600;">⚡ Core Web Vitals Analysis</a>
+      <span style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-left: 8px;">NEW</span>
+    </p>
+    <p>
+      <a href="/technical-seo/" style="color: #3b82f6; font-weight: 600;">🔧 Technical SEO Audit</a>
+      <span style="background: #3b82f6; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-left: 8px;">NEW</span>
+    </p>
+    <p>
+      <a href="/search-console/" style="color: #8b5cf6; font-weight: 600;">📊 Google Search Console</a>
+      <span style="background: #8b5cf6; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-left: 8px;">NEW</span>
+      <br>
+      <span style="color: #a0aec0; font-size: 0.85em; margin-right: 24px;">اتصال حساب کاربری شما به Search Console - Connect your GSC account</span>
+    </p>
+    <p>
+      <a href="/search-console/admin/setup" style="color: #f59e0b; font-weight: 600;">⚙️ GSC Setup (Upload OAuth)</a>
+      <br>
+      <span style="color: #a0aec0; font-size: 0.85em; margin-right: 24px;">نصب OAuth credentials - Upload OAuth credentials</span>
+    </p>
+  </div>
+</body>
+</html>
+
+

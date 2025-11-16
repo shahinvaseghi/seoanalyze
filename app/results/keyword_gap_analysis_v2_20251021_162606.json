@@ -1,0 +1,55 @@
+{
+  "own_website_url": "https://clinicpaamchal.com/blog/best-hair-clinics-west-tehran/",
+  "competitor_urls": [
+    "https://vipkasht.com/hair-transplant-centers-west-of-tehran/",
+    "https://clinicoranus.com/the-best-installment-hair-transplant-center-in-west-tehran/",
+    "https://www.hrthair.com/News/%D8%A8%D9%87%D8%AA%D8%B1%DB%8C%D9%86-%DA%A9%D9%84%DB%8C%D9%86%DB%8C%DA%A9-%DA%A9%D8%A7%D8%B4%D8%AA-%D9%85%D9%88-%D8%AF%D8%B1%D8%BA%D8%B1%D8%A8-%D8%AA%D9%87%D8%B1%D8%A7%D9%86"
+  ],
+  "total_gaps_found": 1743,
+  "total_opportunity_value": 165000,
+  "avg_difficulty": 2.0,
+  "avg_relevance": 2.719449225473322,
+  "processing_time_seconds": 5.324936628341675,
+  "analysis_date": "2025-10-21T16:26:06.750936",
+  "analysis_version": "2.0",
+  "quick_wins_count": 0,
+  "high_priority_count": 0,
+  "recommendations": [
+    {
+      "title": "Build Top-of-Funnel Content",
+      "priority": "medium",
+      "description": "Found 1531 informational keywords for awareness stage.",
+      "action": "Create comprehensive guides and how-to content",
+      "keywords": [
+        "کاشت موی",
+        "بدون",
+        "موی",
+        "مشاوره",
+        "رایگان",
+        "ریزش",
+        "سر",
+        "وجود",
+        "امکان",
+        "کاشت مو درغرب"
+      ]
+    },
+    {
+      "title": "Capture Transactional Intent",
+      "priority": "high",
+      "description": "28 transactional keywords found - direct revenue potential.",
+      "action": "Create service/product pages with strong CTAs",
+      "keywords": [
+        "قیمت کاشت مو",
+        "قیمت کاشت مو جنت",
+        "قیمت کاشت مو جنت آباد",
+        "قیمت",
+        "قیمت مناسب",
+        "تهران قیمت",
+        "غرب تهران قیمت",
+        "تهران قیمت مناسب",
+        "قیمت مناسب کلینیک",
+        "اقساطی غرب تهران قیمت"
+      ]
+    }
+  ]
+}

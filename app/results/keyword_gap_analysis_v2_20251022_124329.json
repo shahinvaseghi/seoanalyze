@@ -1,0 +1,54 @@
+{
+  "own_website_url": "https://clinicpaamchal.com/laser/",
+  "competitor_urls": [
+    "https://pezeshkbama.com/the-best-laser-hair-removal-clinic-in-saadat-abad/",
+    "https://zibato.net/laser-clinic-sadatabad/",
+    "https://jaraha.com/the-best-laser-hair-removal-clinic-in-saadat-abad/"
+  ],
+  "total_gaps_found": 728,
+  "total_opportunity_value": 97600,
+  "avg_difficulty": 2.0,
+  "avg_relevance": 2.2664835164835164,
+  "processing_time_seconds": 5.5142130851745605,
+  "analysis_date": "2025-10-22T12:43:29.059670",
+  "analysis_version": "2.0",
+  "quick_wins_count": 0,
+  "high_priority_count": 0,
+  "recommendations": [
+    {
+      "title": "Build Top-of-Funnel Content",
+      "priority": "medium",
+      "description": "Found 665 informational keywords for awareness stage.",
+      "action": "Create comprehensive guides and how-to content",
+      "keywords": [
+        "لیزر سعادت آباد معرفی",
+        "لیزر سعادت آباد معرفی مرکز",
+        "کلینیک لیزر سعادت آباد معرفی",
+        "لیزر سعادت آباد مقاله",
+        "مرکز لیزر سعادت آباد معرفی",
+        "سعادت آباد معرفی مرکز لیزر",
+        "مراکز لیزر سعادت آباد",
+        "rg",
+        "fz",
+        "rc"
+      ]
+    },
+    {
+      "title": "Capture Transactional Intent",
+      "priority": "high",
+      "description": "9 transactional keywords found - direct revenue potential.",
+      "action": "Create service/product pages with strong CTAs",
+      "keywords": [
+        "خرید",
+        "راهنمای خرید",
+        "خرید بهترین",
+        "راهنمای خرید بهترین",
+        "خرید بهترین صابون",
+        "راهنمای خرید بهترین صابون",
+        "خرید بهترین صابون لیفت",
+        "راهنمای خرید بهترین صابون لیفت",
+        "خرید بهترین صابون لیفت کلاژن"
+      ]
+    }
+  ]
+}

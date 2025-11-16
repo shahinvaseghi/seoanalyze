@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Technical SEO Audit</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#07111f;color:#e7eaf3;margin:0}
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#0d1830;border-bottom:1px solid #1f2a44}
+    .brand{font-weight:700}
+    .container{padding:24px;max-width:1200px;margin:0 auto}
+    a{color:#93c5fd;text-decoration:none}
+    a:hover{text-decoration:underline}
+    .input-group{margin:20px 0}
+    .input-group label{display:block;margin-bottom:8px;font-weight:500}
+    .input-group input{width:100%;max-width:600px;padding:10px;border:1px solid #1f2a44;border-radius:6px;background:#0d1830;color:#e7eaf3;font-size:14px}
+    .btn{background:#3b82f6;color:#fff;border:none;border-radius:6px;padding:10px 20px;cursor:pointer;font-size:14px;font-weight:500}
+    .btn:hover{background:#2563eb}
+    .btn:disabled{opacity:0.6;cursor:not-allowed}
+    #out{margin-top:24px;min-height:200px}
+    
+    /* Collapsible Box Styles */
+    .collapsible {
+      background-color: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 8px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+    
+    .collapsible-header {
+      background-color: #1f2a44;
+      padding: 15px 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      color: #e7eaf3;
+      border-bottom: 1px solid #1f2a44;
+      transition: background-color 0.3s ease;
+    }
+    
+    .collapsible-header:hover {
+      background-color: #293548;
+    }
+    
+    .collapsible-toggle {
+      font-size: 18px;
+      transition: transform 0.3s ease;
+    }
+    
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background-color: #0d1830;
+    }
+    
+    .collapsible-content.expanded {
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
+    .collapsible-content-inner {
+      padding: 20px;
+    }
+    
+    .collapsible-item {
+      padding: 10px;
+      margin: 8px 0;
+      background-color: #1f2a44;
+      border-left: 4px solid #3b82f6;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-all;
+      color: #e7eaf3;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">SEO Tools</div>
+    <nav>
+      <a href="/dashboard">Dashboard</a> &nbsp; | &nbsp;
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+  <div class="container">
+    <h2>🔧 Technical SEO Audit</h2>
+    <p>Comprehensive technical SEO analysis with 10+ checks</p>
+    
+    <div class="input-group">
+      <label for="url">Website URL:</label>
+      <input id="url" type="text" placeholder="https://example.com" />
+    </div>
+    
+    <button class="btn" id="runBtn">Run Audit</button>
+    
+    <div id="out"></div>
+  </div>
+  
+  <script>
+    /**
+     * Create collapsible box for detailed lists
+     */
+    function createCollapsibleBox(title, content, icon = '📋') {
+      const id = 'collapsible_' + Math.random().toString(36).substr(2, 9);
+      return `
+        <div class="collapsible">
+          <div class="collapsible-header" onclick="toggleCollapsible('${id}')">
+            <span>${icon} ${title}</span>
+            <span class="collapsible-toggle" id="toggle_${id}">▼</span>
+          </div>
+          <div class="collapsible-content" id="content_${id}">
+            <div class="collapsible-content-inner">
+              ${content}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    /**
+     * Toggle collapsible box
+     */
+    function toggleCollapsible(id) {
+      let content, toggle;
+      
+      if (id.startsWith('content_')) {
+        content = document.getElementById(id);
+        toggle = document.getElementById(id.replace('content_', 'toggle_'));
+      } else {
+        content = document.getElementById('content_' + id);
+        toggle = document.getElementById('toggle_' + id);
+      }
+      
+      // Handle simple display toggle for specific IDs
+      if (id === 'images-without-alt' || id === 'open-graph-tags') {
+        const element = document.getElementById(id);
+        const icon = document.getElementById(id + '-icon');
+        
+        if (element.style.display === 'none') {
+          element.style.display = 'block';
+          icon.innerHTML = '▲';
+        } else {
+          element.style.display = 'none';
+          icon.innerHTML = '▼';
+        }
+        return;
+      }
+      
+      if (content && toggle) {
+        if (content.classList.contains('expanded')) {
+          content.classList.remove('expanded');
+          toggle.textContent = '▼';
+          toggle.style.transform = 'rotate(0deg)';
+        } else {
+          content.classList.add('expanded');
+          toggle.textContent = '▲';
+          toggle.style.transform = 'rotate(180deg)';
+        }
+      }
+    }
+
+    function formatTechnicalResults(data) {
+      if (data.error) {
+        return `<div style="background: #dc2626; border: 1px solid #991b1b; color: #fff; padding: 20px; border-radius: 8px; text-align: center; margin-top: 20px;">
+          <h4 style="margin: 0 0 10px 0;">❌ Error in Technical SEO Audit</h4>
+          <p style="margin: 0;">${data.error}</p>
+        </div>`;
+      }
+
+      let html = '<div style="max-width: 100%; margin-top: 24px;">';
+      
+      // Header with score
+      const score = data.score || 0;
+      const grade = data.grade || 'N/A';
+      let scoreColor = '#dc2626';
+      let scoreBg = '#7f1d1d';
+      let scoreIcon = '❌';
+      let scoreText = 'Needs Improvement';
+      
+      if (score >= 90) {
+        scoreColor = '#22c55e';
+        scoreBg = '#14532d';
+        scoreIcon = '🌟';
+        scoreText = 'Excellent';
+      } else if (score >= 80) {
+        scoreColor = '#22c55e';
+        scoreBg = '#14532d';
+        scoreIcon = '✅';
+        scoreText = 'Good';
+      } else if (score >= 70) {
+        scoreColor = '#eab308';
+        scoreBg = '#713f12';
+        scoreIcon = '👍';
+        scoreText = 'Acceptable';
+      } else if (score >= 60) {
+        scoreColor = '#eab308';
+        scoreBg = '#713f12';
+        scoreIcon = '⚠️';
+        scoreText = 'Average';
+      }
+      
+      html += `<div style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
+        <h2 style="margin: 0 0 15px 0; font-size: 28px; font-weight: 700;">🔧 Technical SEO Audit Results</h2>
+        <div style="background: ${scoreBg}; color: ${scoreColor}; padding: 15px 25px; border-radius: 25px; display: inline-block; margin: 10px;">
+          <div style="font-size: 36px; font-weight: bold; margin-bottom: 5px;">${score}/100</div>
+          <div style="font-size: 16px; font-weight: 600;">${scoreIcon} ${scoreText} (Grade ${grade})</div>
+        </div>
+        <div style="margin-top: 15px; opacity: 0.9; font-size: 14px;">📅 ${data.timestamp}</div>
+      </div>`;
+      
+      // Summary cards
+      const passedCount = data.passed ? data.passed.length : 0;
+      const failedCount = data.failed ? data.failed.length : 0;
+      const warningsCount = data.warnings ? data.warnings.length : 0;
+      
+      html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
+        <div style="background: #14532d; border: 1px solid #166534; padding: 20px; border-radius: 10px; text-align: center;">
+          <div style="font-size: 32px; margin-bottom: 8px;">✅</div>
+          <div style="font-size: 24px; font-weight: bold; color: #22c55e;">${passedCount}</div>
+          <div style="color: #86efac; font-weight: 600;">Passed</div>
+        </div>
+        <div style="background: #7f1d1d; border: 1px solid #991b1b; padding: 20px; border-radius: 10px; text-align: center;">
+          <div style="font-size: 32px; margin-bottom: 8px;">❌</div>
+          <div style="font-size: 24px; font-weight: bold; color: #ef4444;">${failedCount}</div>
+          <div style="color: #fca5a5; font-weight: 600;">Failed</div>
+        </div>
+        <div style="background: #713f12; border: 1px solid #854d0e; padding: 20px; border-radius: 10px; text-align: center;">
+          <div style="font-size: 32px; margin-bottom: 8px;">⚠️</div>
+          <div style="font-size: 24px; font-weight: bold; color: #eab308;">${warningsCount}</div>
+          <div style="color: #fde047; font-weight: 600;">Warnings</div>
+        </div>
+      </div>`;
+      
+      // Failed checks (Priority)
+      if (data.failed && Array.isArray(data.failed) && data.failed.length > 0) {
+        html += `<div style="margin-bottom: 25px;">
+          <h3 style="color: #ef4444; margin-bottom: 15px; font-size: 20px; font-weight: 600;">🔴 High Priority Issues</h3>
+          <div style="background: #0d1830; border: 1px solid #1f2a44; border-radius: 10px; overflow: hidden;">`;
+        
+        data.failed.forEach((check, index) => {
+          html += `<div style="padding: 20px; border-bottom: ${index < data.failed.length - 1 ? '1px solid #1f2a44' : 'none'};">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+              <div style="background: #dc2626; color: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; min-width: 60px; text-align: center;">HIGH</div>
+              <div style="flex: 1;">
+                <h4 style="margin: 0 0 8px 0; color: #ef4444; font-size: 16px; font-weight: 600;">${check.name}</h4>
+                <p style="margin: 0; color: #9ca3af; line-height: 1.5;">${check.message}</p>
+              </div>
+            </div>
+          </div>`;
+        });
+        
+        html += `</div></div>`;
+      }
+      
+      // Warnings
+      if (data.warnings && Array.isArray(data.warnings) && data.warnings.length > 0) {
+        html += `<div style="margin-bottom: 25px;">
+          <h3 style="color: #eab308; margin-bottom: 15px; font-size: 20px; font-weight: 600;">⚠️ Medium Priority Issues</h3>
+          <div style="background: #0d1830; border: 1px solid #1f2a44; border-radius: 10px; overflow: hidden;">`;
+        
+        data.warnings.forEach((check, index) => {
+          html += `<div style="padding: 20px; border-bottom: ${index < data.warnings.length - 1 ? '1px solid #1f2a44' : 'none'};">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+              <div style="background: #ca8a04; color: white; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; min-width: 60px; text-align: center;">MEDIUM</div>
+              <div style="flex: 1;">
+                <h4 style="margin: 0 0 8px 0; color: #eab308; font-size: 16px; font-weight: 600;">${check.name}</h4>
+                <p style="margin: 0; color: #9ca3af; line-height: 1.5;">${check.message}</p>
+              </div>
+            </div>
+          </div>`;
+        });
+        
+        html += `</div></div>`;
+      }
+      
+      // Detailed information boxes
+      if (data.checks) {
+        // Images without alt text
+        const imagesAltCheck = data.checks.images_alt;
+        if (imagesAltCheck && imagesAltCheck.missing_alt_list && imagesAltCheck.missing_alt_list.length > 0) {
+          html += `<div style="margin-bottom: 25px;">
+            <div style="background: #0d1830; border: 1px solid #1f2a44; border-radius: 10px; overflow: hidden;">
+              <div style="background: #dc2626; color: white; padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="toggleCollapsible('images-without-alt')">
+                <h4 style="margin: 0; font-size: 16px; font-weight: 600;">🖼️ Images Without Alt Text (${imagesAltCheck.missing_alt_list.length} images)</h4>
+                <span id="images-without-alt-icon" style="font-size: 18px;">▼</span>
+              </div>
+              <div id="images-without-alt" style="display: none; padding: 20px; background: #0d1830;">
+                <div style="margin-bottom: 15px; color: #9ca3af; font-size: 14px;">
+                  💡 These images need alt text for search engines and accessibility.
+                </div>
+                <div style="display: grid; gap: 10px;">`;
+          
+          imagesAltCheck.missing_alt_list.forEach((img, i) => {
+            const classList = Array.isArray(img.class) ? img.class.join(' ') : '';
+            html += `<div style="background: #1f2a44; border: 1px solid #293548; border-radius: 8px; padding: 15px;">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <span style="background: #dc2626; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">${i + 1}</span>
+                <span style="font-size: 12px; color: #9ca3af; word-break: break-all;">${img.src}</span>
+              </div>
+              ${img.title ? `<div style="font-size: 13px; color: #e7eaf3; margin-top: 5px;"><strong>Title:</strong> ${img.title}</div>` : ''}
+              ${classList ? `<div style="font-size: 13px; color: #e7eaf3; margin-top: 5px;"><strong>Classes:</strong> ${classList}</div>` : ''}
+            </div>`;
+          });
+          
+          html += `</div></div></div></div>`;
+        }
+        
+        // Open Graph tags
+        const ogCheck = data.checks.open_graph;
+        if (ogCheck && ogCheck.tags_list && ogCheck.tags_list.length > 0) {
+          html += `<div style="margin-bottom: 25px;">
+            <div style="background: #0d1830; border: 1px solid #1f2a44; border-radius: 10px; overflow: hidden;">
+              <div style="background: #3b82f6; color: white; padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="toggleCollapsible('open-graph-tags')">
+                <h4 style="margin: 0; font-size: 16px; font-weight: 600;">📱 Open Graph Tags (${ogCheck.tags_list.length} tags)</h4>
+                <span id="open-graph-tags-icon" style="font-size: 18px;">▼</span>
+              </div>
+              <div id="open-graph-tags" style="display: none; padding: 20px; background: #0d1830;">
+                <div style="margin-bottom: 15px; color: #9ca3af; font-size: 14px;">
+                  💡 These tags optimize content display on social media.
+                </div>
+                <div style="display: grid; gap: 10px;">`;
+          
+          ogCheck.tags_list.forEach((tag, i) => {
+            html += `<div style="background: #1f2a44; border: 1px solid #293548; border-radius: 8px; padding: 15px;">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <span style="background: #3b82f6; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">${i + 1}</span>
+                <span style="font-size: 12px; color: #e7eaf3; font-weight: 600;">${tag.property}</span>
+              </div>
+              <div style="font-size: 13px; color: #9ca3af; word-break: break-all; line-height: 1.4;">${tag.content}</div>
+            </div>`;
+          });
+          
+          html += `</div></div></div></div>`;
+        }
+      }
+      
+      // Passed checks
+      if (data.passed && Array.isArray(data.passed) && data.passed.length > 0) {
+        html += `<div style="margin-bottom: 25px;">
+          <h3 style="color: #22c55e; margin-bottom: 15px; font-size: 20px; font-weight: 600;">✅ Passed Checks</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">`;
+        
+        data.passed.forEach(check => {
+          html += `<div style="background: #14532d; border: 1px solid #166534; padding: 15px; border-radius: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+              <span style="background: #22c55e; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">PASSED</span>
+              <h4 style="margin: 0; color: #22c55e; font-size: 14px; font-weight: 600;">${check.name}</h4>
+            </div>
+            <p style="margin: 0; color: #86efac; font-size: 13px; line-height: 1.4;">${check.message}</p>
+          </div>`;
+        });
+        
+        html += `</div></div>`;
+      }
+      
+      // Priority actions
+      if (data.priority_actions && Array.isArray(data.priority_actions) && data.priority_actions.length > 0) {
+        html += `<div style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white; padding: 25px; border-radius: 12px; margin-top: 20px;">
+          <h3 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 600;">🎯 Priority Actions</h3>
+          <div style="display: grid; gap: 15px;">`;
+        
+        data.priority_actions.forEach((action, i) => {
+          html += `<div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; border-left: 4px solid rgba(255,255,255,0.3);">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+              <span style="background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">${i + 1}</span>
+              <span style="background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">${action.importance}</span>
+              <h4 style="margin: 0; font-size: 16px; font-weight: 600;">${action.check}</h4>
+            </div>
+            <p style="margin: 0; opacity: 0.9; line-height: 1.4;">💡 ${action.message}</p>
+          </div>`;
+        });
+        
+        html += `</div></div>`;
+      }
+      
+      html += '</div>';
+      return html;
+    }
+
+    const out = document.getElementById('out');
+    document.getElementById('runBtn').onclick = async () => {
+      const url = document.getElementById('url').value.trim();
+      if (!url) {
+        alert('Please enter a URL');
+        return;
+      }
+      
+      const runBtn = document.getElementById('runBtn');
+      runBtn.disabled = true;
+      runBtn.textContent = 'Running Audit...';
+      
+      try {
+        const response = await fetch('/api/analyze/technical', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({url})
+        });
+        const j = await response.json();
+        out.innerHTML = formatTechnicalResults(j.results || j);
+      } catch (error) {
+        out.innerHTML = `<div style="background: #dc2626; border: 1px solid #991b1b; color: #fff; padding: 20px; border-radius: 8px; text-align: center; margin-top: 20px;">
+          <h4 style="margin: 0 0 10px 0;">❌ Connection Error</h4>
+          <p style="margin: 0;">${error.message}</p>
+        </div>`;
+      } finally {
+        runBtn.disabled = false;
+        runBtn.textContent = 'Run Audit';
+      }
+    };
+  </script>
+</body>
+</html>
+

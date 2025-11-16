@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Keyword Gap Analysis Results</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #0b1220; color: #e7eaf3; margin: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1, h2 { color: #e7eaf3; }
+    .section { background: #111a2b; border: 1px solid #1f2a44; border-radius: 10px; padding: 20px; margin: 20px 0; }
+    nav a { color: #93c5fd; text-decoration: none; margin: 0 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Keyword Gap Analysis Results</h1>
+      <nav>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/keyword-gap/">New Analysis</a>
+        <a href="/logout">Logout</a>
+      </nav>
+    </header>
+    
+    <div class="section">
+      <h2>Analysis Results</h2>
+      <p><strong>Status:</strong> Analysis completed successfully!</p>
+      <p><strong>Filename:</strong> {{ filename if filename else 'Unknown' }}</p>
+      
+      {% if result %}
+        <p><strong>Your Website:</strong> {{ result.own_website if result.own_website else 'Unknown' }}</p>
+        <p><strong>Gap Keywords:</strong> {{ result.gap_keywords|length if result.gap_keywords else 0 }}</p>
+        <p><strong>Recommendations:</strong> {{ result.recommendations|length if result.recommendations else 0 }}</p>
+        
+        <h3>Gap Keywords (All {{ result.gap_keywords|length if result.gap_keywords else 0 }})</h3>
+        {% if result.gap_keywords and result.gap_keywords|length > 0 %}
+          <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 15px; max-height: 400px; overflow-y: auto; margin: 20px 0;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+              {% for keyword in result.gap_keywords %}
+              <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 15px;">
+                <div style="font-weight: bold; color: #4f46e5; margin-bottom: 5px;">
+                  {{ keyword.keyword if keyword.keyword else 'Unknown' }}
+                  <span style="display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; margin-left: 8px; background: #ef4444; color: white;">
+                    {{ keyword.difficulty if keyword.difficulty else 'medium' }}
+                  </span>
+                </div>
+                <div style="font-size: 0.9em; color: #a9b3c7; margin-bottom: 5px;">
+                  Source: {{ keyword.source if keyword.source else 'unknown' }} | Frequency: {{ keyword.frequency if keyword.frequency else 0 }}
+                </div>
+                <div style="font-size: 0.9em; color: #e7eaf3; font-style: italic;">
+                  {{ (keyword.context[:100] if keyword.context else 'No context available') }}{% if keyword.context and keyword.context|length > 100 %}...{% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% else %}
+          <p>No gap keywords found.</p>
+        {% endif %}
+        
+        <h3>Recommendations</h3>
+        {% if result.recommendations and result.recommendations|length > 0 %}
+          {% for rec in result.recommendations %}
+          <div style="background: #1e293b; border-left: 4px solid #4f46e5; padding: 15px; margin: 15px 0; border-radius: 0 8px 8px 0;">
+            <h4 style="margin: 0 0 10px; color: #4f46e5;">
+              {{ rec.title if rec.title else 'Recommendation' }}
+              <span style="display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; margin-left: 8px; background: #ef4444; color: white;">
+                {{ rec.priority if rec.priority else 'high' }}
+              </span>
+            </h4>
+            <p>{{ rec.description if rec.description else 'No description available.' }}</p>
+            <p><strong>Action:</strong> {{ rec.action if rec.action else 'No action specified.' }}</p>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p>No recommendations found.</p>
+        {% endif %}
+        
+        <h3>Your Current Keywords (All {{ result.own_keywords|length if result.own_keywords else 0 }})</h3>
+        {% if result.own_keywords and result.own_keywords|length > 0 %}
+          <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 15px; max-height: 400px; overflow-y: auto; margin: 20px 0;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+              {% for key, keyword in result.own_keywords.items() %}
+              <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 15px;">
+                <div style="font-weight: bold; color: #10b981; margin-bottom: 5px;">
+                  {{ keyword.keyword if keyword.keyword else 'Unknown' }}
+                  <span style="display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; margin-left: 8px; background: #10b981; color: white;">
+                    {{ keyword.difficulty if keyword.difficulty else 'medium' }}
+                  </span>
+                </div>
+                <div style="font-size: 0.9em; color: #a9b3c7; margin-bottom: 5px;">
+                  Source: {{ keyword.source if keyword.source else 'unknown' }} | Frequency: {{ keyword.frequency if keyword.frequency else 0 }}
+                </div>
+                <div style="font-size: 0.9em; color: #e7eaf3; font-style: italic;">
+                  {{ (keyword.context[:100] if keyword.context else 'No context available') }}{% if keyword.context and keyword.context|length > 100 %}...{% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% else %}
+          <p>No keywords found for your website.</p>
+        {% endif %}
+        
+        <h3>Competitor Keywords (All {{ result.competitor_keywords|length if result.competitor_keywords else 0 }})</h3>
+        {% if result.competitor_keywords and result.competitor_keywords|length > 0 %}
+          <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 15px; max-height: 400px; overflow-y: auto; margin: 20px 0;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+              {% for key, keyword in result.competitor_keywords.items() %}
+              <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 15px;">
+                <div style="font-weight: bold; color: #f59e0b; margin-bottom: 5px;">
+                  {{ keyword.keyword if keyword.keyword else 'Unknown' }}
+                  <span style="display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; margin-left: 8px; background: #f59e0b; color: white;">
+                    {{ keyword.difficulty if keyword.difficulty else 'medium' }}
+                  </span>
+                </div>
+                <div style="font-size: 0.9em; color: #a9b3c7; margin-bottom: 5px;">
+                  Source: {{ keyword.source if keyword.source else 'unknown' }} | Frequency: {{ keyword.frequency if keyword.frequency else 0 }}
+                </div>
+                <div style="font-size: 0.9em; color: #e7eaf3; font-style: italic;">
+                  {{ (keyword.context[:100] if keyword.context else 'No context available') }}{% if keyword.context and keyword.context|length > 100 %}...{% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% else %}
+          <p>No competitor keywords found.</p>
+        {% endif %}
+        
+      {% else %}
+        <p>No result data available.</p>
+      {% endif %}
+    </div>
+    
+    <div class="section">
+      <h2>Next Steps</h2>
+      <a href="/keyword-gap/" style="display: inline-block; padding: 10px 20px; background: #4f46e5; color: white; text-decoration: none; border-radius: 8px;">New Analysis</a>
+      <a href="/dashboard" style="display: inline-block; padding: 10px 20px; background: #334155; color: white; text-decoration: none; border-radius: 8px; margin-left: 10px;">Back to Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Competitors Analysis</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#0b1220;color:#e7eaf3;margin:0}
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#0d1830;border-bottom:1px solid #1f2a44}
+    .container{padding:24px;max-width:960px;margin:0 auto}
+    h2{margin:0 0 12px}
+    .section{background:#111a2b;border:1px solid #1f2a44;border-radius:10px;padding:16px;margin:16px 0}
+    label{display:block;font-size:13px;margin:6px 0;color:#a9b3c7}
+    input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #2a3552;background:#0b1220;color:#e7eaf3}
+    .row{display:flex;gap:12px;align-items:center;margin:8px 0}
+    .btn{padding:8px 10px;border:none;border-radius:8px;color:#fff;background:#4f46e5;cursor:pointer}
+    .btn.secondary{background:#334155}
+    .btn.danger{background:#b91c1c}
+    .actions{display:flex;gap:12px;margin-top:12px}
+    a{color:#93c5fd;text-decoration:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div>Competitors Analysis</div>
+           <nav>
+             <a href="/dashboard">Dashboard</a>
+             &nbsp;|&nbsp;
+             <a href="/keyword-gap/">Keyword Gap</a>
+             &nbsp;|&nbsp;
+             <a href="/logout">Logout</a>
+           </nav>
+  </header>
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="background:{% if category == 'error' %}#b91c1c{% elif category == 'success' %}#059669{% else %}#4f46e5{% endif %};color:white;padding:12px;border-radius:8px;margin:16px 0">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <form method="post" id="form">
+      <div class="section" id="competitors-section">
+        <h2>Competitors</h2>
+        <div id="competitors-list">
+          <div class="row">
+            <input name="competitors[]" placeholder="https://competitor.example.com" required>
+            <button type="button" class="btn danger" onclick="this.parentElement.remove()">Remove</button>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" onclick="addCompetitor()">+ Add competitor</button>
+        </div>
+      </div>
+
+      <div class="section" id="keywords-section">
+        <h2>Keywords (Optional)</h2>
+        <div id="keywords-list">
+          <div class="row">
+            <input name="keywords[]" placeholder="keyword">
+            <button type="button" class="btn danger" onclick="this.parentElement.remove()">Remove</button>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" onclick="addKeyword()">+ Add keyword</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn" id="analyze-btn">Analyze</button>
+        <a class="btn secondary" href="/dashboard">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function createRow(name, placeholder){
+      const row = document.createElement('div');
+      row.className = 'row';
+      const input = document.createElement('input');
+      input.name = name;
+      input.placeholder = placeholder;
+      input.required = name === 'competitors[]';
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'btn danger';
+      remove.textContent = 'Remove';
+      remove.onclick = () => row.remove();
+      row.appendChild(input);
+      row.appendChild(remove);
+      return row;
+    }
+    function addCompetitor(){
+      document.getElementById('competitors-list').appendChild(createRow('competitors[]','https://competitor.example'));
+    }
+    function addKeyword(){
+      document.getElementById('keywords-list').appendChild(createRow('keywords[]','keyword'));
+    }
+    
+    // Add event listener for form submission
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('form');
+      const btn = document.getElementById('analyze-btn');
+      
+      form.addEventListener('submit', function(e) {
+        // Check if at least one competitor URL is filled
+        const competitorInputs = form.querySelectorAll('input[name="competitors[]"]');
+        let hasValidInput = false;
+        
+        for (let input of competitorInputs) {
+          if (input.value.trim()) {
+            hasValidInput = true;
+            break;
+          }
+        }
+        
+        if (!hasValidInput) {
+          e.preventDefault();
+          alert('Please enter at least one competitor URL');
+          return;
+        }
+        
+        btn.disabled = true;
+        btn.innerHTML = 'Analyzing...';
+        btn.style.opacity = '0.7';
+        // Let the form submit normally
+      });
+    });
+    
+    // Form is already initialized with one row each in HTML
+  </script>
+</body>
+</html>
+
+

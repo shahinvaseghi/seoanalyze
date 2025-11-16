@@ -1,0 +1,31 @@
+{
+  "target_url": "https://tosinso.com",
+  "keywords": [
+    {
+      "keyword": "اموزش میکروتیک",
+      "target_url": "https://tosinso.com",
+      "target_domain": "tosinso.com",
+      "found": false,
+      "position": null,
+      "total_results_checked": 0,
+      "timestamp": "2025-11-04T11:51:02.534689",
+      "language": "fa",
+      "country": "ir"
+    }
+  ],
+  "statistics": {
+    "total_keywords": 1,
+    "found_count": 0,
+    "not_found_count": 1,
+    "top10_count": 0,
+    "top20_count": 0,
+    "top50_count": 0,
+    "avg_position": null
+  },
+  "settings": {
+    "num_results": 50,
+    "language": "fa",
+    "country": "ir"
+  },
+  "timestamp": "2025-11-04T11:51:02.535093"
+}

@@ -1,0 +1,54 @@
+{
+  "own_website_url": "https://reyhanorganics.ir/product/black-seed-oil/",
+  "competitor_urls": [
+    "https://sobhanorganic.ir/product/%D8%B1%D9%88%D8%BA%D9%86-%D8%B3%DB%8C%D8%A7%D9%87%D8%AF%D8%A7%D9%86%D9%87-2/",
+    "https://zimalab.co/single-oil/black-seed-oil/"
+  ],
+  "total_gaps_found": 386,
+  "total_opportunity_value": 39400,
+  "avg_difficulty": 2.0,
+  "avg_relevance": 14.430051813471502,
+  "processing_time_seconds": 8.051414489746094,
+  "analysis_date": "2025-10-24T12:09:46.482605",
+  "analysis_version": "2.0",
+  "quick_wins_count": 0,
+  "high_priority_count": 0,
+  "recommendations": [
+    {
+      "title": "Build Top-of-Funnel Content",
+      "priority": "medium",
+      "description": "Found 331 informational keywords for awareness stage.",
+      "action": "Create comprehensive guides and how-to content",
+      "keywords": [
+        "خواص روغن سیاهدانه",
+        "روغن درمانی",
+        "روغن سیاهدانه",
+        "خواص روغن سیاه دانه مو",
+        "خواص روغن سیاه دانه کاهش",
+        "کنید",
+        "سیاهدانه",
+        "سیاه دانه درمان",
+        "سیاه دانه درمان سرگیجه",
+        "سیاه دانه درمان سرگیجه درد"
+      ]
+    },
+    {
+      "title": "Capture Transactional Intent",
+      "priority": "high",
+      "description": "46 transactional keywords found - direct revenue potential.",
+      "action": "Create service/product pages with strong CTAs",
+      "keywords": [
+        "تومان خرید روغن",
+        "خرید روغن بنفشه",
+        "تومان خرید روغن بنفشه",
+        "خرید روغن بنفشه پایه",
+        "روغن سیاه دانه خرید",
+        "خرید روغن سیاهدانه",
+        "خرید روغن سیاهدانه طبیعی",
+        "خرید روغن سیاهدانه طبیعی اصل",
+        "روغن سیاهدانه طبیعی اصل قیمت",
+        "خرید آنلاین اینترنتی روغن"
+      ]
+    }
+  ]
+}

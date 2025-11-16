@@ -1,0 +1,185 @@
+{
+  "url": "https://clinicpaamchal.com/",
+  "timestamp": "2025-11-02T01:55:21.260640",
+  "checks": {
+    "https": {
+      "status": true,
+      "importance": "HIGH",
+      "message": "HTTPS enabled"
+    },
+    "title": {
+      "exists": true,
+      "length": 58,
+      "optimal": true,
+      "importance": "HIGH",
+      "message": "Title tag optimal"
+    },
+    "meta_description": {
+      "exists": true,
+      "length": 148,
+      "optimal": false,
+      "importance": "HIGH",
+      "message": "⚠️ Description length is 148 (optimal: 150-160)"
+    },
+    "h1": {
+      "count": 2,
+      "optimal": false,
+      "importance": "HIGH",
+      "message": "⚠️ Found 2 H1 tags (should be 1)"
+    },
+    "images_alt": {
+      "total_images": 96,
+      "missing_alt": 6,
+      "missing_alt_list": [
+        {
+          "src": "https://clinicpaamchal.com/wp-content/uploads/2024/04/logo-pamchal.webp",
+          "title": "",
+          "class": [
+            "attachment-full",
+            "size-full",
+            "wp-image-13751"
+          ]
+        },
+        {
+          "src": "https://clinicpaamchal.com/wp-content/uploads/2025/10/دستگاه-لیزر-سایناشور-2025.webp",
+          "title": "",
+          "class": [
+            "attachment-full",
+            "size-full",
+            "wp-image-17117"
+          ]
+        },
+        {
+          "src": "https://clinicpaamchal.com/wp-content/uploads/2025/10/دستگاه-اندولیفت-Eufoton.webp",
+          "title": "",
+          "class": [
+            "attachment-full",
+            "size-full",
+            "wp-image-17118"
+          ]
+        },
+        {
+          "src": "https://clinicpaamchal.com/wp-content/uploads/2025/10/دستگاه-لیزر-Co2-فرکشنال.webp",
+          "title": "",
+          "class": [
+            "attachment-full",
+            "size-full",
+            "wp-image-17120"
+          ]
+        },
+        {
+          "src": "https://clinicpaamchal.com/wp-content/uploads/2025/10/دستگاه-لیزر-کیوسوئیچ-Q-Switch.webp",
+          "title": "",
+          "class": [
+            "attachment-full",
+            "size-full",
+            "wp-image-17119"
+          ]
+        },
+        {
+          "src": "https://clinicpaamchal.com/wp-content/uploads/2025/02/whatsapp_512px-300x300.png",
+          "title": "",
+          "class": [
+            "e-contact-buttons__profile-image-el"
+          ]
+        }
+      ],
+      "importance": "MEDIUM",
+      "message": "⚠️ 6 images missing alt text"
+    },
+    "canonical": {
+      "exists": false,
+      "importance": "MEDIUM",
+      "message": "⚠️ Add canonical tag"
+    },
+    "robots_meta": {
+      "exists": true,
+      "content": "follow, index, max-snippet:1, max-video-preview:1, max-image-preview:large",
+      "importance": "MEDIUM",
+      "message": "Robots meta: follow, index, max-snippet:1, max-video-preview:1, max-image-preview:large"
+    },
+    "open_graph": {
+      "count": 13,
+      "tags_list": [
+        {
+          "property": "og:locale",
+          "content": "fa_IR"
+        },
+        {
+          "property": "og:type",
+          "content": "website"
+        },
+        {
+          "property": "og:title",
+          "content": "کلینیک پوست و مو و زیبایی و لیزر سعادت آباد تهران | پامچال"
+        },
+        {
+          "property": "og:description",
+          "content": "مجهزترین کلینیک پوست و مو تهران (سعادت آباد) کلینیک تخصصی پوست، مو و لیزر پامچال سعادت آباد تهران | 3 پزشک متخصص | 1 پزشک عمومی | دستگاه لیزر 2025 🏥"
+        },
+        {
+          "property": "og:site_name",
+          "content": "کلینیک زیبایی و پوست و مو پامچال"
+        },
+        {
+          "property": "og:updated_time",
+          "content": "2025-11-01T21:25:08+03:30"
+        },
+        {
+          "property": "og:image",
+          "content": "https://clinicpaamchal.com/wp-content/uploads/2024/04/1714122261035-min-1024x683.jpg"
+        },
+        {
+          "property": "og:image:secure_url",
+          "content": "https://clinicpaamchal.com/wp-content/uploads/2024/04/1714122261035-min-1024x683.jpg"
+        },
+        {
+          "property": "og:image:width",
+          "content": "800"
+        },
+        {
+          "property": "og:image:height",
+          "content": "534"
+        },
+        {
+          "property": "og:image:alt",
+          "content": "کلینیک پوست و مو تهران (سعادت آباد) کلینیک پوست و مو پامچال"
+        },
+        {
+          "property": "og:image:type",
+          "content": "image/jpeg"
+        },
+        {
+          "property": "og:video",
+          "content": "https://clinicpaamchal.com/wp-content/uploads/2025/09/معرفی-سایناشور.mp4"
+        }
+      ],
+      "importance": "LOW",
+      "message": "Found 13 Open Graph tags"
+    },
+    "schema_markup": {
+      "exists": true,
+      "count": 3,
+      "importance": "HIGH",
+      "message": "Found 3 Schema markup(s)"
+    },
+    "mobile_viewport": {
+      "exists": true,
+      "importance": "HIGH",
+      "message": "Mobile viewport configured"
+    }
+  },
+  "score": {
+    "score": 68.0,
+    "grade": "C",
+    "total_points": 25,
+    "earned_points": 17
+  },
+  "priority_actions": [
+    {
+      "check": "h1",
+      "importance": "HIGH",
+      "message": "⚠️ Found 2 H1 tags (should be 1)"
+    }
+  ]
+}

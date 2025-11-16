@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connect Google Search Console</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+      background: #07111f;
+      color: #e7eaf3;
+      margin: 0;
+      padding: 0;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: #0d1830;
+      border-bottom: 1px solid #1f2a44;
+    }
+    
+    .brand {
+      font-weight: 700;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 24px;
+    }
+    
+    .card {
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 8px;
+      padding: 32px;
+      text-align: center;
+    }
+    
+    .icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    
+    h1 {
+      margin: 0 0 16px 0;
+      font-size: 28px;
+    }
+    
+    p {
+      color: #a0aec0;
+      line-height: 1.6;
+      margin: 0 0 24px 0;
+    }
+    
+    .btn-connect {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 14px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn-connect:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+      text-decoration: none;
+      color: white;
+    }
+    
+    .features {
+      text-align: left;
+      margin-top: 32px;
+      padding-top: 32px;
+      border-top: 1px solid #1f2a44;
+    }
+    
+    .feature {
+      margin: 16px 0;
+      padding-left: 24px;
+      position: relative;
+    }
+    
+    .feature::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #10b981;
+      font-weight: bold;
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-top: 24px;
+      color: #93c5fd;
+      text-decoration: none;
+    }
+    
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">SEO Tools</div>
+    <nav>
+      <span>Signed in as {{ username }}</span>
+      &nbsp; | &nbsp;
+      <a href="/dashboard" style="color: #93c5fd; text-decoration: none;">Dashboard</a> &nbsp; | &nbsp;
+      <a href="/logout" style="color: #93c5fd; text-decoration: none;">Logout</a>
+    </nav>
+  </header>
+  
+  <div class="container">
+    <div class="card">
+      <div class="icon">📊</div>
+      <h1>Google Search Console Integration</h1>
+      <p>
+        Connect your Google Search Console account to access detailed search analytics, 
+        monitor your site's performance in Google Search, and analyze your traffic data.
+      </p>
+      
+      <a href="/search-console/connect" class="btn-connect">
+        Connect Google Search Console
+      </a>
+      
+      <p style="margin-top: 20px; color: #a0aec0;">
+        <a href="/search-console/help" style="color: #8b5cf6; text-decoration: none; font-weight: 600;">
+          📚 راهنمای کامل اتصال (فارسی و English) / Complete Setup Guide
+        </a>
+      </p>
+      
+      <div class="features">
+        <div class="feature">View search queries and click-through rates</div>
+        <div class="feature">Monitor your top performing pages</div>
+        <div class="feature">Track impressions and average position</div>
+        <div class="feature">Analyze performance trends over time</div>
+        <div class="feature">Access data from all your verified properties</div>
+      </div>
+      
+      <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>
+

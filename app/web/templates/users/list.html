@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Users</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#07111f;color:#e7eaf3;margin:0}
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#0d1830;border-bottom:1px solid #1f2a44}
+    .container{padding:24px}
+    table{width:100%;border-collapse:collapse;margin-top:16px}
+    th,td{border-bottom:1px solid #1f2a44;padding:10px;text-align:left}
+    a, .btn{color:#93c5fd;text-decoration:none}
+    .btn{display:inline-block;margin:8px 0}
+    .danger{color:#fca5a5}
+  </style>
+</head>
+<body>
+  <header>
+    <div>Users</div>
+    <nav>
+      <a href="/dashboard">Dashboard</a>
+      &nbsp;|&nbsp;
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+  <div class="container">
+    <a class="btn" href="/users/create">+ Create User</a>
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for uname, info in users.items() %}
+          <tr>
+            <td>{{ uname }}</td>
+            <td>{{ info.role }}</td>
+            <td>
+              <a href="/users/{{ uname }}/edit">Edit</a>
+              &nbsp;|&nbsp;
+              <form style="display:inline" method="post" action="/users/{{ uname }}/delete" onsubmit="return confirm('Delete user {{ uname }}?');">
+                <button class="danger" type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
+
+

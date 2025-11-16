@@ -1,0 +1,35 @@
+{
+  "own_website_url": "https://clinicpaamchal.com/blog/best-hair-clinics-west-tehran/",
+  "competitor_urls": [
+    "https://vipkasht.com/hair-transplant-centers-west-of-tehran/"
+  ],
+  "total_gaps_found": 1168,
+  "total_opportunity_value": 111300,
+  "avg_difficulty": 2.0,
+  "avg_relevance": 2.5385273972602738,
+  "processing_time_seconds": 2.738924503326416,
+  "analysis_date": "2025-10-21T16:18:57.073924",
+  "analysis_version": "2.0",
+  "quick_wins_count": 0,
+  "high_priority_count": 0,
+  "recommendations": [
+    {
+      "title": "Build Top-of-Funnel Content",
+      "priority": "medium",
+      "description": "Found 1075 informational keywords for awareness stage.",
+      "action": "Create comprehensive guides and how-to content",
+      "keywords": [
+        "کاشت موی",
+        "کاشت موی موفق",
+        "لیست مراکز کاشت مو",
+        "تجهیزات کاشت مو",
+        "هیرویت کاشت مو",
+        "قرص هیرویت کاشت مو",
+        "دروغ کاشت مو",
+        "دروغ کاشت مو کلینیک",
+        "دستگاه کاشت مو",
+        "کاشت مو پیشرفته"
+      ]
+    }
+  ]
+}

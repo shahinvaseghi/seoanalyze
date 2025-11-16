@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Competitors Analysis Results</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#07111f;color:#e7eaf3;margin:0}
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#0d1830;border-bottom:1px solid #1f2a44}
+    .container{padding:24px;max-width:1200px;margin:0 auto}
+    .result-card{background:#111a2b;border:1px solid #1f2a44;border-radius:10px;padding:20px;margin:16px 0}
+    .metric{display:flex;justify-content:space-between;margin:8px 0;padding:8px;background:#0b1220;border-radius:6px}
+    .metric-label{color:#a9b3c7;font-size:14px}
+    .metric-value{color:#e7eaf3;font-weight:600}
+    .url{color:#93c5fd;word-break:break-all}
+    .title{color:#fbbf24;font-size:18px;margin-bottom:12px}
+    .section{margin:16px 0}
+    .section h3{color:#a9b3c7;font-size:16px;margin:12px 0 8px}
+    .tags{display:block;margin:8px 0}
+    .tag{background:#1f2a44;padding:8px 12px;border-radius:4px;font-size:13px;margin:4px 0;display:block;line-height:1.4}
+    a{color:#93c5fd;text-decoration:none}
+    .btn{padding:8px 16px;background:#4f46e5;border:none;border-radius:6px;color:#fff;cursor:pointer;margin:8px 4px}
+    .btn:hover{background:#4338ca}
+  </style>
+  <script>
+    function toggleSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      const arrow = document.getElementById(sectionId + '-arrow');
+      
+      if (section.style.display === 'none') {
+        section.style.display = 'block';
+        arrow.textContent = '▲';
+      } else {
+        section.style.display = 'none';
+        arrow.textContent = '▼';
+      }
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <div>Competitors Analysis Results</div>
+    <nav>
+      <a href="/competitors/">New Analysis</a>
+      &nbsp;|&nbsp;
+      <a href="/dashboard">Dashboard</a>
+      &nbsp;|&nbsp;
+      <a href="/keyword-gap/">Keyword Gap</a>
+    </nav>
+  </header>
+  <div class="container">
+    <h2>Analysis Summary</h2>
+    <div class="result-card">
+      <div class="metric">
+        <span class="metric-label">Competitors Analyzed:</span>
+        <span class="metric-value">{{ competitors|length }}</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Keywords Tracked:</span>
+        <span class="metric-value">{{ keywords|length }}</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Results File:</span>
+        <span class="metric-value">{{ filename }}</span>
+      </div>
+    </div>
+
+    {% for result in results %}
+    <div class="result-card">
+      <div class="title">{{ result.title or 'No Title' }}</div>
+      <div class="url">{{ result.url }}</div>
+      
+      <div class="section">
+        <h3>Basic SEO</h3>
+        <div class="metric">
+          <span class="metric-label">Meta Description:</span>
+          <span class="metric-value">{{ result.meta_description[:50] + '...' if result.meta_description and result.meta_description|length > 50 else result.meta_description or 'None' }}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Word Count:</span>
+          <span class="metric-value">{{ result.word_count or 0 }}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">H1 Count:</span>
+          <span class="metric-value">{{ result.h1_count or 0 }}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">H2 Count:</span>
+          <span class="metric-value">{{ result.h2_count or 0 }}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">H3 Count:</span>
+          <span class="metric-value">{{ result.h3_count or 0 }}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">H4 Count:</span>
+          <span class="metric-value">{{ result.h4_count or 0 }}</span>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Images & Links</h3>
+        <div class="metric">
+          <span class="metric-label">Total Images:</span>
+          <span class="metric-value">{{ result.images_count or 0 }}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Images without Alt:</span>
+          <span class="metric-value">{{ result.images_without_alt or 0 }}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Internal Links:</span>
+          <span class="metric-value">{{ result.internal_links or 0 }}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">External Links:</span>
+          <span class="metric-value">{{ result.external_links or 0 }}</span>
+        </div>
+      </div>
+
+      {% if result.internal_links_details %}
+      <div class="section">
+        <h3 onclick="toggleSection('internal-links-{{ loop.index }}')" style="cursor:pointer;user-select:none">
+          Internal Links Details ({{ result.internal_links_details|length }}) <span id="internal-links-{{ loop.index }}-arrow">▼</span>
+        </h3>
+        <div id="internal-links-{{ loop.index }}" style="display:none">
+          {% for link in result.internal_links_details[:10] %}
+          <div style="background:#0b1220;padding:8px;border-radius:6px;margin:4px 0">
+            <div style="color:#93c5fd;font-size:11px;word-break:break-all">{{ link.url }}</div>
+            <div style="color:#a9b3c7;font-size:10px;margin-top:2px">{{ link.text or 'No text' }}</div>
+          </div>
+          {% endfor %}
+          {% if result.internal_links_details|length > 10 %}
+          <div style="color:#a9b3c7;font-size:11px;text-align:center;margin:8px 0">
+            +{{ result.internal_links_details|length - 10 }} more links
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if result.external_links_details %}
+      <div class="section">
+        <h3 onclick="toggleSection('external-links-{{ loop.index }}')" style="cursor:pointer;user-select:none">
+          External Links Details ({{ result.external_links_details|length }}) <span id="external-links-{{ loop.index }}-arrow">▼</span>
+        </h3>
+        <div id="external-links-{{ loop.index }}" style="display:none">
+          {% for link in result.external_links_details[:10] %}
+          <div style="background:#0b1220;padding:8px;border-radius:6px;margin:4px 0">
+            <div style="color:#93c5fd;font-size:11px;word-break:break-all">{{ link.url }}</div>
+            <div style="color:#a9b3c7;font-size:10px;margin-top:2px">{{ link.text or 'No text' }}</div>
+          </div>
+          {% endfor %}
+          {% if result.external_links_details|length > 10 %}
+          <div style="color:#a9b3c7;font-size:11px;text-align:center;margin:8px 0">
+            +{{ result.external_links_details|length - 10 }} more links
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="section">
+        <h3>Technical SEO</h3>
+        <div class="metric">
+          <span class="metric-label">Schema Markup:</span>
+          <span class="metric-value">{{ 'Yes' if result.has_schema else 'No' }}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Page Size:</span>
+          <span class="metric-value">{{ "%.1f KB"|format(result.page_load_size or 0) }}</span>
+        </div>
+        {% if result.detected_page_type %}
+        <div class="metric">
+          <span class="metric-label">Page Type:</span>
+          <span class="metric-value">{{ result.detected_page_type }}</span>
+        </div>
+        {% endif %}
+        {% if result.logo_url %}
+        <div class="metric">
+          <span class="metric-label">Logo URL:</span>
+          <span class="metric-value" style="color:#93c5fd;font-size:11px;word-break:break-all">{{ result.logo_url }}</span>
+        </div>
+        {% endif %}
+        {% if result.featured_image %}
+        <div class="metric">
+          <span class="metric-label">Featured Image:</span>
+          <span class="metric-value" style="color:#93c5fd;font-size:11px;word-break:break-all">{{ result.featured_image }}</span>
+        </div>
+        {% endif %}
+        {% if result.address %}
+        <div class="metric">
+          <span class="metric-label">Address:</span>
+          <span class="metric-value" style="color:#a9b3c7;font-size:12px">{{ result.address }}</span>
+        </div>
+        {% endif %}
+        {% if result.google_maps_url %}
+        <div class="metric">
+          <span class="metric-label">Google Maps:</span>
+          <span class="metric-value" style="color:#93c5fd;font-size:11px;word-break:break-all">{{ result.google_maps_url }}</span>
+        </div>
+        {% endif %}
+      </div>
+
+      {% if result.suggested_schema %}
+      <div class="section">
+        <h3 onclick="toggleSection('schema-{{ loop.index }}')" style="cursor:pointer;user-select:none">
+          Schema Markup Suggestions <span id="schema-{{ loop.index }}-arrow">▼</span>
+        </h3>
+        <div id="schema-{{ loop.index }}" style="display:none">
+          <div style="background:#0b1220;padding:12px;border-radius:6px;margin:8px 0">
+            <pre style="color:#a9b3c7;font-size:11px;white-space:pre-wrap;margin:0">{{ result.suggested_schema | tojson(indent=2) }}</pre>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if result.page_speed %}
+      <div class="section">
+        <h3>Page Speed Analysis</h3>
+        <div class="metric">
+          <span class="metric-label">Desktop Speed:</span>
+          <span class="metric-value" style="color:{% if result.page_speed.desktop and result.page_speed.desktop.load_time and result.page_speed.desktop.load_time <= 1.5 %}#10b981{% elif result.page_speed.desktop and result.page_speed.desktop.load_time and result.page_speed.desktop.load_time <= 3 %}#f59e0b{% else %}#ef4444{% endif %}">
+            {{ "%.2fs"|format(result.page_speed.desktop.load_time or 0) }}
+          </span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Mobile Speed:</span>
+          <span class="metric-value" style="color:{% if result.page_speed.mobile and result.page_speed.mobile.load_time and result.page_speed.mobile.load_time <= 2.5 %}#10b981{% elif result.page_speed.mobile and result.page_speed.mobile.load_time and result.page_speed.mobile.load_time <= 4 %}#f59e0b{% else %}#ef4444{% endif %}">
+            {{ "%.2fs"|format(result.page_speed.mobile.load_time or 0) }}
+          </span>
+        </div>
+        {% if result.page_speed.performance_rating %}
+        <div class="metric">
+          <span class="metric-label">Overall Rating:</span>
+          <span class="metric-value" style="color:{% if result.page_speed.performance_rating == 'عالی' %}#10b981{% elif result.page_speed.performance_rating == 'خوب' %}#f59e0b{% else %}#ef4444{% endif %}">
+            {{ result.page_speed.performance_rating }}
+          </span>
+        </div>
+        {% endif %}
+        {% if result.page_speed.performance_score %}
+        <div class="metric">
+          <span class="metric-label">Performance Score:</span>
+          <span class="metric-value" style="color:{% if result.page_speed.performance_score >= 80 %}#10b981{% elif result.page_speed.performance_score >= 60 %}#f59e0b{% else %}#ef4444{% endif %}">
+            {{ result.page_speed.performance_score }}/100
+          </span>
+        </div>
+        {% endif %}
+        {% if result.page_speed.error %}
+        <div class="metric">
+          <span class="metric-label">Speed Test Error:</span>
+          <span class="metric-value" style="color:#ef4444">{{ result.page_speed.error }}</span>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {% if result.mobile_ux %}
+      <div class="section">
+        <h3>Mobile UX/UI Analysis</h3>
+        <div class="metric">
+          <span class="metric-label">Mobile Friendly:</span>
+          <span class="metric-value" style="color:{% if result.mobile_ux.mobile_friendly %}#10b981{% else %}#ef4444{% endif %}">
+            {{ 'Yes' if result.mobile_ux.mobile_friendly else 'No' }}
+          </span>
+        </div>
+        {% if result.mobile_ux.ui_quality %}
+        <div class="metric">
+          <span class="metric-label">UI Quality:</span>
+          <span class="metric-value" style="color:{% if result.mobile_ux.ui_quality == 'عالی' %}#10b981{% elif result.mobile_ux.ui_quality == 'خوب' %}#f59e0b{% else %}#ef4444{% endif %}">
+            {{ result.mobile_ux.ui_quality }}
+          </span>
+        </div>
+        {% endif %}
+        {% if result.mobile_ux.ux_score %}
+        <div class="metric">
+          <span class="metric-label">UX Score:</span>
+          <span class="metric-value" style="color:{% if result.mobile_ux.ux_score >= 80 %}#10b981{% elif result.mobile_ux.ux_score >= 60 %}#f59e0b{% else %}#ef4444{% endif %}">
+            {{ result.mobile_ux.ux_score }}/100
+          </span>
+        </div>
+        {% endif %}
+        {% if result.mobile_ux.responsive_design %}
+        <div class="metric">
+          <span class="metric-label">Responsive Design:</span>
+          <span class="metric-value" style="color:{% if result.mobile_ux.responsive_design %}#10b981{% else %}#ef4444{% endif %}">
+            {{ 'Yes' if result.mobile_ux.responsive_design else 'No' }}
+          </span>
+        </div>
+        {% endif %}
+        {% if result.mobile_ux.touch_friendly %}
+        <div class="metric">
+          <span class="metric-label">Touch Friendly:</span>
+          <span class="metric-value" style="color:{% if result.mobile_ux.touch_friendly %}#10b981{% else %}#ef4444{% endif %}">
+            {{ 'Yes' if result.mobile_ux.touch_friendly else 'No' }}
+          </span>
+        </div>
+        {% endif %}
+        {% if result.mobile_ux.issues %}
+        <div class="metric">
+          <span class="metric-label">Issues Found:</span>
+          <span class="metric-value" style="color:#ef4444">{{ result.mobile_ux.issues|length }}</span>
+        </div>
+        {% endif %}
+        {% if result.mobile_ux.good_points %}
+        <div class="metric">
+          <span class="metric-label">Good Points:</span>
+          <span class="metric-value" style="color:#10b981">{{ result.mobile_ux.good_points|length }}</span>
+        </div>
+        {% endif %}
+      </div>
+
+      {% if result.mobile_ux.issues %}
+      <div class="section">
+        <h3 onclick="toggleSection('issues-{{ loop.index }}')" style="cursor:pointer;user-select:none">
+          Mobile Issues ({{ result.mobile_ux.issues|length }}) <span id="issues-{{ loop.index }}-arrow">▼</span>
+        </h3>
+        <div id="issues-{{ loop.index }}" style="display:none">
+          <div class="tags">
+            {% for issue in result.mobile_ux.issues %}
+            <span class="tag" style="background:#b91c1c;color:#fff">{{ issue }}</span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if result.mobile_ux.good_points %}
+      <div class="section">
+        <h3 onclick="toggleSection('good-points-{{ loop.index }}')" style="cursor:pointer;user-select:none">
+          Mobile Good Points ({{ result.mobile_ux.good_points|length }}) <span id="good-points-{{ loop.index }}-arrow">▼</span>
+        </h3>
+        <div id="good-points-{{ loop.index }}" style="display:none">
+          <div class="tags">
+            {% for point in result.mobile_ux.good_points %}
+            <span class="tag" style="background:#059669;color:#fff">{{ point }}</span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% endif %}
+
+      {% if result.content_structure %}
+      <div class="section">
+        <h3 onclick="toggleSection('content-{{ loop.index }}')" style="cursor:pointer;user-select:none">
+          Content Structure Analysis <span id="content-{{ loop.index }}-arrow">▼</span>
+        </h3>
+        <div id="content-{{ loop.index }}" style="display:none">
+          <div style="background:#0b1220;padding:12px;border-radius:6px;margin:8px 0">
+            <div style="color:#a9b3c7;font-size:12px;line-height:1.5">
+              {% if result.content_structure.paragraphs %}
+              <div style="margin:4px 0"><strong>Paragraphs:</strong> {{ result.content_structure.paragraphs }}</div>
+              {% endif %}
+              {% if result.content_structure.lists %}
+              <div style="margin:4px 0"><strong>Lists:</strong> {{ result.content_structure.lists }}</div>
+              {% endif %}
+              {% if result.content_structure.tables %}
+              <div style="margin:4px 0"><strong>Tables:</strong> {{ result.content_structure.tables }}</div>
+              {% endif %}
+              {% if result.content_structure.forms %}
+              <div style="margin:4px 0"><strong>Forms:</strong> {{ result.content_structure.forms }}</div>
+              {% endif %}
+              {% if result.content_structure.reading_level %}
+              <div style="margin:4px 0"><strong>Reading Level:</strong> {{ result.content_structure.reading_level }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if result.keywords_found %}
+      <div class="section">
+        <h3 onclick="toggleSection('keywords-{{ loop.index }}')" style="cursor:pointer;user-select:none">
+          Keywords Found ({{ result.keywords_found|length }}) <span id="keywords-{{ loop.index }}-arrow">▼</span>
+        </h3>
+        <div id="keywords-{{ loop.index }}" style="display:none">
+          <div class="tags">
+            {% for keyword in result.keywords_found %}
+            <span class="tag">{{ keyword }}</span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if result.keyword_tracking %}
+      <div class="section">
+        <h3 onclick="toggleSection('tracking-{{ loop.index }}')" style="cursor:pointer;user-select:none">
+          Keyword Tracking <span id="tracking-{{ loop.index }}-arrow">▼</span>
+        </h3>
+        <div id="tracking-{{ loop.index }}" style="display:none">
+          {% for keyword, data in result.keyword_tracking.items() %}
+          <div style="background:#0b1220;padding:8px;border-radius:6px;margin:4px 0">
+            <div style="color:#fbbf24;font-weight:600;margin-bottom:4px">{{ keyword }}</div>
+            <div style="color:#a9b3c7;font-size:11px">
+              <div>Density: {{ "%.2f"|format(data.density or 0) }}%</div>
+              <div>Count: {{ data.count or 0 }}</div>
+              <div>Positions: {{ data.positions|join(', ') if data.positions else 'Not found' }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if result.h1_tags %}
+      <div class="section">
+        <h3 onclick="toggleSection('h1-{{ loop.index }}')" style="cursor:pointer;user-select:none">
+          H1 Tags ({{ result.h1_tags|length }}) <span id="h1-{{ loop.index }}-arrow">▼</span>
+        </h3>
+        <div id="h1-{{ loop.index }}" class="tags" style="display:none">
+          {% for h1 in result.h1_tags %}
+          <span class="tag">{{ h1 }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if result.h2_tags %}
+      <div class="section">
+        <h3 onclick="toggleSection('h2-{{ loop.index }}')" style="cursor:pointer;user-select:none">
+          H2 Tags ({{ result.h2_tags|length }}) <span id="h2-{{ loop.index }}-arrow">▼</span>
+        </h3>
+        <div id="h2-{{ loop.index }}" class="tags" style="display:none">
+          {% for h2 in result.h2_tags %}
+          <span class="tag">{{ h2 }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if result.h3_tags %}
+      <div class="section">
+        <h3 onclick="toggleSection('h3-{{ loop.index }}')" style="cursor:pointer;user-select:none">
+          H3 Tags ({{ result.h3_tags|length }}) <span id="h3-{{ loop.index }}-arrow">▼</span>
+        </h3>
+        <div id="h3-{{ loop.index }}" class="tags" style="display:none">
+          {% for h3 in result.h3_tags %}
+          <span class="tag">{{ h3 }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if result.h4_tags %}
+      <div class="section">
+        <h3 onclick="toggleSection('h4-{{ loop.index }}')" style="cursor:pointer;user-select:none">
+          H4 Tags ({{ result.h4_tags|length }}) <span id="h4-{{ loop.index }}-arrow">▼</span>
+        </h3>
+        <div id="h4-{{ loop.index }}" class="tags" style="display:none">
+          {% for h4 in result.h4_tags %}
+          <span class="tag">{{ h4 }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if result.images_detailed and result.images_detailed.images %}
+      <div class="section">
+        <h3 onclick="toggleSection('images-{{ loop.index }}')" style="cursor:pointer;user-select:none">
+          Images List ({{ result.images_detailed.images|length }}) <span id="images-{{ loop.index }}-arrow">▼</span>
+        </h3>
+        <div id="images-{{ loop.index }}" class="image-list" style="display:none">
+          {% for img in result.images_detailed.images %}
+          <div class="image-item" style="margin:8px 0;padding:8px;background:#0b1220;border-radius:6px">
+            <div style="color:#93c5fd;font-size:12px;word-break:break-all">{{ img.src or 'No src' }}</div>
+            <div style="color:#a9b3c7;font-size:11px;margin-top:4px">
+              Alt: {{ img.alt or 'No alt text' }} | 
+              Type: {{ img.type or 'Unknown' }} | 
+              Has Link: {{ 'Yes' if img.is_linked else 'No' }}
+              {% if img.link_url %}
+              | Link: {{ img.link_url }}
+              {% endif %}
+              {% if img.width and img.height %}
+              | Size: {{ img.width }}x{{ img.height }}
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</body>
+</html>
+
+

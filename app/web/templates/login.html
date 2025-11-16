@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#0b1220;color:#e7eaf3;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
+    .card{background:#111a2b;border:1px solid #1f2a44;border-radius:10px;padding:24px;width:360px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    h1{font-size:20px;margin:0 0 16px}
+    label{display:block;font-size:13px;margin:12px 0 6px;color:#a9b3c7}
+    input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #2a3552;background:#0b1220;color:#e7eaf3}
+    .btn{width:100%;margin-top:16px;padding:10px 12px;background:#4f46e5;border:none;border-radius:8px;color:#fff;font-weight:600;cursor:pointer}
+    .btn:hover{background:#4338ca}
+    .flash{color:#fca5a5;font-size:13px;margin-bottom:8px}
+  </style>
+  </head>
+<body>
+  <form class="card" method="post" action="/login">
+    <h1>Sign in</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <label for="username">Username</label>
+    <input id="username" name="username" type="text" autocomplete="username" required />
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required />
+    <button class="btn" type="submit">Login</button>
+  </form>
+</body>
+</html>
+
+

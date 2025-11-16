@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Search Console</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+      background: #07111f;
+      color: #e7eaf3;
+      margin: 0;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: #0d1830;
+      border-bottom: 1px solid #1f2a44;
+    }
+    
+    .brand {
+      font-weight: 700;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    
+    select, input, button {
+      padding: 10px 14px;
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 6px;
+      color: #e7eaf3;
+      font-size: 14px;
+    }
+    
+    button {
+      background: #8b5cf6;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    
+    button:hover {
+      background: #7c3aed;
+    }
+    
+    .btn-disconnect {
+      background: #ef4444;
+    }
+    
+    .btn-disconnect:hover {
+      background: #dc2626;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 32px;
+      font-weight: bold;
+      color: #8b5cf6;
+      margin: 8px 0;
+    }
+    
+    .stat-label {
+      color: #a0aec0;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+    
+    .data-section {
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    
+    h2 {
+      margin: 0 0 20px 0;
+      font-size: 20px;
+      border-bottom: 1px solid #1f2a44;
+      padding-bottom: 12px;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #1f2a44;
+    }
+    
+    th {
+      color: #93c5fd;
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+    
+    td {
+      font-size: 14px;
+    }
+    
+    tr:hover {
+      background: rgba(139, 92, 246, 0.1);
+    }
+    
+    .query {
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .badge-good {
+      background: #10b981;
+      color: white;
+    }
+    
+    .badge-medium {
+      background: #f59e0b;
+      color: white;
+    }
+    
+    .badge-low {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #a0aec0;
+    }
+    
+    .error {
+      background: #ef4444;
+      color: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+    
+    .success {
+      background: #10b981;
+      color: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #a0aec0;
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">SEO Tools</div>
+    <nav>
+      <span>Signed in as {{ username }}</span>
+      &nbsp; | &nbsp;
+      <a href="/dashboard" style="color: #93c5fd; text-decoration: none;">Dashboard</a> &nbsp; | &nbsp;
+      <a href="/logout" style="color: #93c5fd; text-decoration: none;">Logout</a>
+    </nav>
+  </header>
+  
+  <div class="container">
+    <div class="controls">
+      <select id="propertySelect">
+        <option value="">Select a property...</option>
+        {% for prop in properties %}
+          <option value="{{ prop }}">{{ prop }}</option>
+        {% endfor %}
+      </select>
+      
+      <select id="daysSelect">
+        <option value="7">Last 7 days</option>
+        <option value="14">Last 14 days</option>
+        <option value="30" selected>Last 30 days</option>
+        <option value="90">Last 90 days</option>
+      </select>
+      
+      <button onclick="loadAnalytics()">Load Analytics</button>
+      
+      <form action="/search-console/disconnect" method="POST" style="display: inline;">
+        <button type="submit" class="btn-disconnect">Disconnect</button>
+      </form>
+    </div>
+    
+    <div id="messageArea"></div>
+    
+    <div id="contentArea">
+      <div class="empty-state">
+        <div class="empty-state-icon">📊</div>
+        <p>Select a property and click "Load Analytics" to see your data</p>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function showMessage(text, type = 'info') {
+      const area = document.getElementById('messageArea');
+      const className = type === 'error' ? 'error' : 'success';
+      area.innerHTML = `<div class="${className}">${text}</div>`;
+      setTimeout(() => {
+        area.innerHTML = '';
+      }, 5000);
+    }
+    
+    function loadAnalytics() {
+      const siteUrl = document.getElementById('propertySelect').value;
+      const days = document.getElementById('daysSelect').value;
+      
+      if (!siteUrl) {
+        showMessage('Please select a property', 'error');
+        return;
+      }
+      
+      const contentArea = document.getElementById('contentArea');
+      contentArea.innerHTML = '<div class="loading">Loading analytics data...</div>';
+      
+      fetch('/search-console/api/analytics', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          site_url: siteUrl,
+          days: parseInt(days),
+          limit: 50
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          contentArea.innerHTML = `<div class="error">${data.error}</div>`;
+          return;
+        }
+        
+        displayAnalytics(data);
+      })
+      .catch(error => {
+        contentArea.innerHTML = `<div class="error">Failed to load analytics: ${error.message}</div>`;
+      });
+    }
+    
+    function displayAnalytics(data) {
+      const contentArea = document.getElementById('contentArea');
+      
+      let html = '';
+      
+      if (data.summary && data.summary.success) {
+        const summary = data.summary;
+        html += `
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Total Impressions</div>
+              <div class="stat-value">${summary.total_impressions.toLocaleString()}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Total Clicks</div>
+              <div class="stat-value">${summary.total_clicks.toLocaleString()}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Average CTR</div>
+              <div class="stat-value">${summary.average_ctr}%</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Average Position</div>
+              <div class="stat-value">${summary.average_position}</div>
+            </div>
+          </div>
+        `;
+      }
+      
+      if (data.top_queries && data.top_queries.length > 0) {
+        html += `
+          <div class="data-section">
+            <h2>Top Search Queries</h2>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Query</th>
+                    <th>Impressions</th>
+                    <th>Clicks</th>
+                    <th>CTR</th>
+                    <th>Position</th>
+                  </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        data.top_queries.forEach((row, index) => {
+          const ctrBadge = row.ctr >= 5 ? 'badge-good' : row.ctr >= 2 ? 'badge-medium' : 'badge-low';
+          html += `
+            <tr>
+              <td class="query" title="${row.query}">${index + 1}. ${row.query}</td>
+              <td>${row.impressions.toLocaleString()}</td>
+              <td>${row.clicks.toLocaleString()}</td>
+              <td><span class="badge ${ctrBadge}">${row.ctr}%</span></td>
+              <td>${row.position}</td>
+            </tr>
+          `;
+        });
+        
+        html += `
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+      
+      if (data.top_pages && data.top_pages.length > 0) {
+        html += `
+          <div class="data-section">
+            <h2>Top Landing Pages</h2>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Page</th>
+                    <th>Impressions</th>
+                    <th>Clicks</th>
+                    <th>CTR</th>
+                    <th>Position</th>
+                  </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        data.top_pages.forEach((row, index) => {
+          const ctrBadge = row.ctr >= 5 ? 'badge-good' : row.ctr >= 2 ? 'badge-medium' : 'badge-low';
+          html += `
+            <tr>
+              <td class="query" title="${row.page}">${index + 1}. ${row.page}</td>
+              <td>${row.impressions.toLocaleString()}</td>
+              <td>${row.clicks.toLocaleString()}</td>
+              <td><span class="badge ${ctrBadge}">${row.ctr}%</span></td>
+              <td>${row.position}</td>
+            </tr>
+          `;
+        });
+        
+        html += `
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+      
+      if (!html) {
+        html = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>No data available for the selected period</p></div>';
+      }
+      
+      contentArea.innerHTML = html;
+    }
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>راهنمای اتصال به Google Search Console</title>
+  <style>
+    body {
+      font-family: 'Vazirmatn', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+      background: #07111f;
+      color: #e7eaf3;
+      margin: 0;
+      padding: 0;
+      line-height: 1.8;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: #0d1830;
+      border-bottom: 1px solid #1f2a44;
+    }
+    
+    .brand {
+      font-weight: 700;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+    
+    .header-section {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    
+    .header-section h1 {
+      font-size: 36px;
+      margin: 0 0 16px 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .header-section p {
+      color: #a0aec0;
+      font-size: 18px;
+    }
+    
+    .lang-switcher {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    
+    .lang-btn {
+      padding: 10px 24px;
+      background: #0d1830;
+      border: 2px solid #1f2a44;
+      border-radius: 8px;
+      color: #e7eaf3;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .lang-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-color: #667eea;
+    }
+    
+    .lang-btn:hover {
+      border-color: #667eea;
+    }
+    
+    .guide-section {
+      display: none;
+      background: #0d1830;
+      border: 1px solid #1f2a44;
+      border-radius: 12px;
+      padding: 40px;
+      margin-bottom: 40px;
+    }
+    
+    .guide-section.active {
+      display: block;
+    }
+    
+    .guide-section h2 {
+      font-size: 28px;
+      margin: 0 0 24px 0;
+      color: #8b5cf6;
+      border-bottom: 2px solid #1f2a44;
+      padding-bottom: 12px;
+    }
+    
+    .step {
+      margin: 32px 0;
+      padding: 24px;
+      background: rgba(139, 92, 246, 0.05);
+      border-right: 4px solid #8b5cf6;
+      border-radius: 8px;
+    }
+    
+    .step h3 {
+      font-size: 22px;
+      margin: 0 0 16px 0;
+      color: #93c5fd;
+    }
+    
+    .step p {
+      margin: 12px 0;
+      color: #cbd5e0;
+    }
+    
+    .step ol, .step ul {
+      margin: 12px 0;
+      padding-right: 24px;
+    }
+    
+    .step li {
+      margin: 8px 0;
+      color: #cbd5e0;
+    }
+    
+    .code-block {
+      background: #020817;
+      border: 1px solid #1f2a44;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+      font-family: 'Courier New', monospace;
+      direction: ltr;
+      text-align: left;
+      overflow-x: auto;
+    }
+    
+    .code-block code {
+      color: #10b981;
+      font-size: 14px;
+    }
+    
+    .warning {
+      background: rgba(239, 68, 68, 0.1);
+      border-right: 4px solid #ef4444;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+    
+    .info {
+      background: rgba(59, 130, 246, 0.1);
+      border-right: 4px solid #3b82f6;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+    
+    .success {
+      background: rgba(16, 185, 129, 0.1);
+      border-right: 4px solid #10b981;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 12px 24px;
+      background: #8b5cf6;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    
+    .back-link:hover {
+      background: #7c3aed;
+      text-decoration: none;
+    }
+    
+    .screenshot-placeholder {
+      background: #020817;
+      border: 2px dashed #1f2a44;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      color: #a0aec0;
+      margin: 16px 0;
+    }
+    
+    /* English direction */
+    .guide-section[data-lang="en"] {
+      direction: ltr;
+      text-align: left;
+    }
+    
+    .guide-section[data-lang="en"] .step {
+      border-right: none;
+      border-left: 4px solid #8b5cf6;
+    }
+    
+    .guide-section[data-lang="en"] .warning,
+    .guide-section[data-lang="en"] .info,
+    .guide-section[data-lang="en"] .success {
+      border-right: none;
+      border-left: 4px solid;
+    }
+    
+    .guide-section[data-lang="en"] .step ol,
+    .guide-section[data-lang="en"] .step ul {
+      padding-right: 0;
+      padding-left: 24px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">SEO Tools</div>
+    <nav style="direction: ltr;">
+      <span>Signed in as {{ username }}</span>
+      &nbsp; | &nbsp;
+      <a href="/dashboard" style="color: #93c5fd; text-decoration: none;">Dashboard</a> &nbsp; | &nbsp;
+      <a href="/logout" style="color: #93c5fd; text-decoration: none;">Logout</a>
+    </nav>
+  </header>
+  
+  <div class="container">
+    <div class="header-section">
+      <h1>📚 راهنمای اتصال به Google Search Console</h1>
+      <p>دستورالعمل کامل و مرحله به مرحله برای اتصال حساب کاربری شما</p>
+    </div>
+    
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="switchLanguage('fa')">🇮🇷 راهنمای فارسی</button>
+      <button class="lang-btn" onclick="switchLanguage('en')">🇬🇧 English Guide</button>
+    </div>
+    
+    <!-- Persian Guide -->
+    <div class="guide-section active" id="guide-fa" data-lang="fa">
+      <h2>📖 راهنمای فارسی - اتصال به گوگل سرچ کنسول</h2>
+      
+      <div class="info">
+        <strong>💡 توجه:</strong> این فرایند یکبار برای هر کاربر انجام می‌شود. پس از اتصال، شما می‌توانید به تمام داده‌های سرچ کنسول خود دسترسی داشته باشید.
+      </div>
+      
+      <!-- Step 1 -->
+      <div class="step">
+        <h3>مرحله ۱: ورود به Google Cloud Console</h3>
+        <p>برای شروع، باید یک پروژه در Google Cloud Console ایجاد کنید:</p>
+        <ol>
+          <li>به آدرس <code>console.cloud.google.com</code> بروید</li>
+          <li>با حساب گوگل خود وارد شوید (همان حسابی که دسترسی به Search Console دارد)</li>
+          <li>در نوار بالا، روی "Select a project" کلیک کنید</li>
+          <li>روی دکمه "New Project" کلیک کنید</li>
+          <li>نام پروژه را وارد کنید (مثلاً: SEO Analyze Pro)</li>
+          <li>روی "Create" کلیک کنید</li>
+        </ol>
+        <div class="screenshot-placeholder">
+          📸 تصویر: صفحه ایجاد پروژه جدید در Google Cloud Console
+        </div>
+      </div>
+      
+      <!-- Step 2 -->
+      <div class="step">
+        <h3>مرحله ۲: فعال‌سازی Google Search Console API</h3>
+        <p>حالا باید API مورد نیاز را فعال کنید:</p>
+        <ol>
+          <li>در منوی سمت چپ، به "APIs & Services" → "Library" بروید</li>
+          <li>در کادر جستجو، عبارت <strong>Search Console API</strong> را تایپ کنید</li>
+          <li>روی نتیجه "Google Search Console API" کلیک کنید</li>
+          <li>روی دکمه آبی رنگ "Enable" کلیک کنید</li>
+          <li>چند ثانیه صبر کنید تا API فعال شود</li>
+        </ol>
+        <div class="success">
+          ✅ اگر پیغام "API enabled" را دیدید، مرحله با موفقیت انجام شده است!
+        </div>
+      </div>
+      
+      <!-- Step 3 -->
+      <div class="step">
+        <h3>مرحله ۳: تنظیم OAuth Consent Screen</h3>
+        <p>این مرحله برای تأیید هویت برنامه ضروری است:</p>
+        <ol>
+          <li>از منوی چپ، به "APIs & Services" → "OAuth consent screen" بروید</li>
+          <li>نوع کاربر را انتخاب کنید:
+            <ul>
+              <li>اگر Google Workspace ندارید: <strong>External</strong> را انتخاب کنید</li>
+              <li>اگر Google Workspace دارید: می‌توانید Internal انتخاب کنید</li>
+            </ul>
+          </li>
+          <li>روی "Create" کلیک کنید</li>
+          <li><strong>App Information</strong> را پر کنید:
+            <ul>
+              <li>App name: نام برنامه (مثلاً SEO Analyze Pro)</li>
+              <li>User support email: ایمیل خود را وارد کنید</li>
+              <li>Developer contact information: ایمیل خود را وارد کنید</li>
+            </ul>
+          </li>
+          <li>روی "Save and Continue" کلیک کنید</li>
+          <li>در بخش <strong>Scopes</strong>:
+            <ul>
+              <li>روی "Add or Remove Scopes" کلیک کنید</li>
+              <li>عبارت <code>webmasters</code> را جستجو کنید</li>
+              <li>تیک <code>https://www.googleapis.com/auth/webmasters.readonly</code> را بزنید</li>
+              <li>روی "Update" و سپس "Save and Continue" کلیک کنید</li>
+            </ul>
+          </li>
+          <li>در بخش <strong>Test users</strong>:
+            <ul>
+              <li>روی "Add Users" کلیک کنید</li>
+              <li>ایمیل خود و سایر کاربران تست را اضافه کنید</li>
+              <li>روی "Save and Continue" کلیک کنید</li>
+            </ul>
+          </li>
+          <li>خلاصه را بررسی کنید و روی "Back to Dashboard" کلیک کنید</li>
+        </ol>
+      </div>
+      
+      <!-- Step 4 -->
+      <div class="step">
+        <h3>مرحله ۴: ایجاد OAuth 2.0 Credentials</h3>
+        <p>این مهم‌ترین مرحله است که کلیدهای احراز هویت را ایجاد می‌کند:</p>
+        <ol>
+          <li>از منوی چپ، به "APIs & Services" → "Credentials" بروید</li>
+          <li>روی "Create Credentials" کلیک کنید</li>
+          <li>از منوی باز شده، "OAuth client ID" را انتخاب کنید</li>
+          <li>Application type را <strong>Web application</strong> انتخاب کنید</li>
+          <li>نام را وارد کنید (مثلاً: SEO Analyze Web Client)</li>
+          <li><strong>Authorized JavaScript origins</strong> را اضافه کنید:</li>
+        </ol>
+        <div class="code-block">
+          <code>
+http://localhost:5000<br>
+http://seoanalyze.shahinvaseghi.ir<br>
+https://seoanalyze.shahinvaseghi.ir
+          </code>
+        </div>
+        <ol start="7">
+          <li><strong>Authorized redirect URIs</strong> را اضافه کنید (بسیار مهم!):</li>
+        </ol>
+        <div class="code-block">
+          <code>
+http://localhost:5000/search-console/oauth2callback<br>
+http://seoanalyze.shahinvaseghi.ir/search-console/oauth2callback<br>
+https://seoanalyze.shahinvaseghi.ir/search-console/oauth2callback
+          </code>
+        </div>
+        <div class="warning">
+          ⚠️ <strong>هشدار مهم:</strong> آدرس‌های redirect URIs باید دقیقاً مطابق با آدرس‌های بالا باشند. حتی یک اسلش (/) اضافه یا کم، باعث خطا می‌شود!
+        </div>
+        <ol start="8">
+          <li>روی "Create" کلیک کنید</li>
+          <li>یک پنجره ظاهر می‌شود که Client ID و Client Secret را نشان می‌دهد</li>
+          <li>روی دکمه <strong>"Download JSON"</strong> کلیک کنید تا فایل credentials را دانلود کنید</li>
+        </ol>
+      </div>
+      
+      <!-- Step 5 -->
+      <div class="step">
+        <h3>مرحله ۵: نصب Credentials در سرور</h3>
+        
+        <div class="success">
+          ✨ <strong>روش آسان (توصیه می‌شود):</strong> آپلود از طریق رابط وب
+        </div>
+        
+        <p><strong>🌐 روش 1: آپلود از طریق رابط وب (بدون نیاز به ترمینال)</strong></p>
+        <p>این روش برای کاربرانی که به ترمینال سرور دسترسی ندارند، ایده‌آل است:</p>
+        <ol>
+          <li>فایل دانلود شده را <strong>نگه دارید</strong> (نیازی به تغییر نام نیست)</li>
+          <li>از حساب <strong>Admin</strong> وارد شوید</li>
+          <li>به صفحه <strong>Dashboard</strong> بروید</li>
+          <li>روی لینک <strong>"⚙️ GSC Admin Setup (Upload OAuth)"</strong> کلیک کنید</li>
+          <li>فایل JSON را در ناحیه آپلود <strong>بکشید و رها کنید</strong> (یا کلیک کنید و انتخاب کنید)</li>
+          <li>روی دکمه <strong>"🚀 آپلود و راه‌اندازی سرویس"</strong> کلیک کنید</li>
+          <li>صبر کنید تا پیغام تایید ظاهر شود (حدود 5 ثانیه)</li>
+          <li>سرویس به صورت خودکار راه‌اندازی مجدد می‌شود!</li>
+        </ol>
+        
+        <div class="info">
+          💡 <strong>نکته:</strong> با این روش نیازی به دسترسی SSH، دانش ترمینال، یا دستورات لینوکس ندارید. همه چیز خودکار انجام می‌شود!
+        </div>
+        
+        <p style="text-align: center; margin: 24px 0;">
+          <a href="/search-console/admin/setup" style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+            🚀 رفتن به صفحه Admin Setup
+          </a>
+        </p>
+        
+        <hr style="border: none; border-top: 1px solid #1f2a44; margin: 32px 0;">
+        
+        <p><strong>💻 روش 2: آپلود دستی از طریق ترمینال (برای کاربران پیشرفته)</strong></p>
+        <p>اگر به ترمینال سرور دسترسی دارید، می‌توانید به صورت دستی آپلود کنید:</p>
+        <ol>
+          <li>فایل دانلود شده (نامش شبیه <code>client_secret_XXXXX.json</code> است) را پیدا کنید</li>
+          <li>نام فایل را به <code>google_oauth_client.json</code> تغییر دهید</li>
+          <li>از طریق SFTP یا SCP فایل را به سرور آپلود کنید:
+            <ul>
+              <li>مسیر مقصد: <code>/home/shahin/seoanalyzepro/configs/google_oauth_client.json</code></li>
+            </ul>
+          </li>
+        </ol>
+        
+        <p><strong>دستورات ترمینال:</strong></p>
+        <div class="code-block">
+          <code>
+# رفتن به پوشه configs<br>
+cd /home/shahin/seoanalyzepro/configs<br>
+<br>
+# آپلود فایل (از کامپیوتر محلی)<br>
+scp ~/Downloads/google_oauth_client.json shahin@seoanalyze.shahinvaseghi.ir:/home/shahin/seoanalyzepro/configs/<br>
+<br>
+# یا با استفاده از nano ایجاد کنید و محتوا را paste کنید<br>
+nano google_oauth_client.json<br>
+<br>
+# تنظیم دسترسی فایل<br>
+chmod 600 google_oauth_client.json
+          </code>
+        </div>
+        
+        <div class="warning">
+          ⚠️ <strong>توجه:</strong> اگر از روش دستی استفاده می‌کنید، فایل باید دقیقاً در مسیر <code>configs/google_oauth_client.json</code> باشد و دسترسی 600 داشته باشد.
+        </div>
+      </div>
+      
+      <!-- Step 6 -->
+      <div class="step">
+        <h3>مرحله ۶: راه‌اندازی مجدد سرویس</h3>
+        
+        <div class="info">
+          ✨ <strong>نکته مهم:</strong> اگر از روش 1 (رابط وب) استفاده کردید، این مرحله خودکار انجام شده است و نیازی به کار اضافی ندارید!
+        </div>
+        
+        <p><strong>فقط برای روش 2 (آپلود دستی):</strong></p>
+        <p>اگر فایل را به صورت دستی آپلود کردید، باید سرویس را restart کنید:</p>
+        <div class="code-block">
+          <code>
+sudo systemctl restart seoanalyzepro<br>
+<br>
+# بررسی وضعیت<br>
+sudo systemctl status seoanalyzepro
+          </code>
+        </div>
+        <div class="success">
+          ✅ اگر خروجی "active (running)" باشد، سرویس با موفقیت راه‌اندازی شده است!
+        </div>
+      </div>
+      
+      <!-- Step 7 -->
+      <div class="step">
+        <h3>مرحله ۷: اتصال حساب کاربری</h3>
+        <p>حالا می‌توانید Search Console خود را وصل کنید:</p>
+        <ol>
+          <li>به داشبورد برنامه بروید</li>
+          <li>روی "Google Search Console" کلیک کنید</li>
+          <li>روی دکمه بنفش <strong>"Connect Google Search Console"</strong> کلیک کنید</li>
+          <li>به صفحه ورود گوگل منتقل می‌شوید</li>
+          <li>حساب گوگل خود را انتخاب کنید (همان حسابی که به Search Console دسترسی دارد)</li>
+          <li>صفحه اجازه دسترسی را مرور کنید:
+            <ul>
+              <li>برنامه فقط می‌تواند داده‌های شما را <strong>بخواند</strong></li>
+              <li>هیچ تغییری در Search Console شما ایجاد نمی‌کند</li>
+            </ul>
+          </li>
+          <li>روی <strong>"Allow"</strong> یا <strong>"اجازه دادن"</strong> کلیک کنید</li>
+          <li>به برنامه برگردانده می‌شوید</li>
+          <li>لیست property های Search Console شما نمایش داده می‌شود</li>
+        </ol>
+        <div class="success">
+          🎉 <strong>تبریک!</strong> اتصال با موفقیت برقرار شد. حالا می‌توانید داده‌های خود را مشاهده کنید.
+        </div>
+      </div>
+      
+      <!-- Troubleshooting -->
+      <div class="step">
+        <h3>🔧 رفع مشکلات رایج</h3>
+        
+        <h4>خطای "redirect_uri_mismatch"</h4>
+        <p><strong>علت:</strong> آدرس redirect URI در درخواست با آنچه در Google Cloud Console ثبت شده مطابقت ندارد.</p>
+        <p><strong>راه حل:</strong></p>
+        <ul>
+          <li>به Google Cloud Console → Credentials بروید</li>
+          <li>OAuth 2.0 Client ID خود را ویرایش کنید</li>
+          <li>مطمئن شوید که دقیقاً این آدرس ثبت شده: <code>http://seoanalyze.shahinvaseghi.ir/search-console/oauth2callback</code></li>
+          <li>بدون اسلش اضافی در انتها!</li>
+        </ul>
+        
+        <h4>خطای "Access blocked"</h4>
+        <p><strong>علت:</strong> OAuth consent screen به درستی تنظیم نشده است.</p>
+        <p><strong>راه حل:</strong></p>
+        <ul>
+          <li>به OAuth consent screen بروید</li>
+          <li>ایمیل خود را به Test users اضافه کنید</li>
+          <li>مطمئن شوید Publishing status روی "Testing" باشد</li>
+        </ul>
+        
+        <h4>خطای "API has not been enabled"</h4>
+        <p><strong>علت:</strong> Search Console API فعال نشده است.</p>
+        <p><strong>راه حل:</strong></p>
+        <ul>
+          <li>به APIs & Services → Library بروید</li>
+          <li>Search Console API را پیدا کنید</li>
+          <li>روی Enable کلیک کنید</li>
+          <li>چند دقیقه صبر کنید و دوباره امتحان کنید</li>
+        </ul>
+      </div>
+      
+      <!-- Security Notes -->
+      <div class="step">
+        <h3>🔒 نکات امنیتی</h3>
+        <ul>
+          <li>فایل <code>google_oauth_client.json</code> حاوی اطلاعات حساس است، آن را به اشتراک نگذارید</li>
+          <li>هیچ‌گاه این فایل را در Git commit نکنید (در .gitignore اضافه شده است)</li>
+          <li>هر کاربر token های جداگانه‌ای دارد و نمی‌تواند به داده‌های کاربران دیگر دسترسی داشته باشد</li>
+          <li>برنامه فقط دسترسی read-only به Search Console دارد</li>
+          <li>می‌توانید هر زمان که بخواهید اتصال را قطع کنید</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- English Guide -->
+    <div class="guide-section" id="guide-en" data-lang="en">
+      <h2>📖 English Guide - Connecting to Google Search Console</h2>
+      
+      <div class="info">
+        <strong>💡 Note:</strong> This process is done once per user. After connecting, you can access all your Search Console data.
+      </div>
+      
+      <!-- Step 1 -->
+      <div class="step">
+        <h3>Step 1: Access Google Cloud Console</h3>
+        <p>First, you need to create a project in Google Cloud Console:</p>
+        <ol>
+          <li>Go to <code>console.cloud.google.com</code></li>
+          <li>Sign in with your Google account (the one with Search Console access)</li>
+          <li>Click "Select a project" in the top bar</li>
+          <li>Click "New Project"</li>
+          <li>Enter project name (e.g., SEO Analyze Pro)</li>
+          <li>Click "Create"</li>
+        </ol>
+        <div class="screenshot-placeholder">
+          📸 Screenshot: New project creation page in Google Cloud Console
+        </div>
+      </div>
+      
+      <!-- Step 2 -->
+      <div class="step">
+        <h3>Step 2: Enable Google Search Console API</h3>
+        <p>Now you need to enable the required API:</p>
+        <ol>
+          <li>In the left menu, go to "APIs & Services" → "Library"</li>
+          <li>In the search box, type <strong>Search Console API</strong></li>
+          <li>Click on "Google Search Console API" result</li>
+          <li>Click the blue "Enable" button</li>
+          <li>Wait a few seconds for the API to be enabled</li>
+        </ol>
+        <div class="success">
+          ✅ If you see "API enabled" message, the step was successful!
+        </div>
+      </div>
+      
+      <!-- Step 3 -->
+      <div class="step">
+        <h3>Step 3: Configure OAuth Consent Screen</h3>
+        <p>This step is necessary to verify your application's identity:</p>
+        <ol>
+          <li>From the left menu, go to "APIs & Services" → "OAuth consent screen"</li>
+          <li>Choose user type:
+            <ul>
+              <li>If you don't have Google Workspace: Select <strong>External</strong></li>
+              <li>If you have Google Workspace: You can select Internal</li>
+            </ul>
+          </li>
+          <li>Click "Create"</li>
+          <li>Fill in <strong>App Information</strong>:
+            <ul>
+              <li>App name: Application name (e.g., SEO Analyze Pro)</li>
+              <li>User support email: Enter your email</li>
+              <li>Developer contact information: Enter your email</li>
+            </ul>
+          </li>
+          <li>Click "Save and Continue"</li>
+          <li>In <strong>Scopes</strong> section:
+            <ul>
+              <li>Click "Add or Remove Scopes"</li>
+              <li>Search for <code>webmasters</code></li>
+              <li>Check <code>https://www.googleapis.com/auth/webmasters.readonly</code></li>
+              <li>Click "Update" then "Save and Continue"</li>
+            </ul>
+          </li>
+          <li>In <strong>Test users</strong> section:
+            <ul>
+              <li>Click "Add Users"</li>
+              <li>Add your email and other test users</li>
+              <li>Click "Save and Continue"</li>
+            </ul>
+          </li>
+          <li>Review the summary and click "Back to Dashboard"</li>
+        </ol>
+      </div>
+      
+      <!-- Step 4 -->
+      <div class="step">
+        <h3>Step 4: Create OAuth 2.0 Credentials</h3>
+        <p>This is the most important step that creates authentication keys:</p>
+        <ol>
+          <li>From the left menu, go to "APIs & Services" → "Credentials"</li>
+          <li>Click "Create Credentials"</li>
+          <li>From the dropdown menu, select "OAuth client ID"</li>
+          <li>Select Application type as <strong>Web application</strong></li>
+          <li>Enter a name (e.g., SEO Analyze Web Client)</li>
+          <li>Add <strong>Authorized JavaScript origins</strong>:</li>
+        </ol>
+        <div class="code-block">
+          <code>
+http://localhost:5000<br>
+http://seoanalyze.shahinvaseghi.ir<br>
+https://seoanalyze.shahinvaseghi.ir
+          </code>
+        </div>
+        <ol start="7">
+          <li>Add <strong>Authorized redirect URIs</strong> (very important!):</li>
+        </ol>
+        <div class="code-block">
+          <code>
+http://localhost:5000/search-console/oauth2callback<br>
+http://seoanalyze.shahinvaseghi.ir/search-console/oauth2callback<br>
+https://seoanalyze.shahinvaseghi.ir/search-console/oauth2callback
+          </code>
+        </div>
+        <div class="warning">
+          ⚠️ <strong>Important Warning:</strong> Redirect URIs must exactly match the addresses above. Even an extra or missing slash (/) will cause errors!
+        </div>
+        <ol start="8">
+          <li>Click "Create"</li>
+          <li>A dialog appears showing your Client ID and Client Secret</li>
+          <li>Click <strong>"Download JSON"</strong> button to download the credentials file</li>
+        </ol>
+      </div>
+      
+      <!-- Step 5 -->
+      <div class="step">
+        <h3>Step 5: Install Credentials on Server</h3>
+        
+        <div class="success">
+          ✨ <strong>Easy Method (Recommended):</strong> Upload via Web Interface
+        </div>
+        
+        <p><strong>🌐 Method 1: Upload via Web Interface (No Terminal Access Required)</strong></p>
+        <p>This method is ideal for users without SSH/terminal access:</p>
+        <ol>
+          <li><strong>Keep</strong> the downloaded file (no need to rename)</li>
+          <li>Login with an <strong>Admin</strong> account</li>
+          <li>Go to the <strong>Dashboard</strong> page</li>
+          <li>Click on <strong>"⚙️ GSC Admin Setup (Upload OAuth)"</strong> link</li>
+          <li><strong>Drag and drop</strong> the JSON file into the upload area (or click to browse)</li>
+          <li>Click the <strong>"🚀 آپلود و راه‌اندازی سرویس"</strong> button</li>
+          <li>Wait for confirmation message (about 5 seconds)</li>
+          <li>The service will automatically restart!</li>
+        </ol>
+        
+        <div class="info">
+          💡 <strong>Note:</strong> With this method, you don't need SSH access, terminal knowledge, or Linux commands. Everything is automated!
+        </div>
+        
+        <p style="text-align: center; margin: 24px 0;">
+          <a href="/search-console/admin/setup" style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+            🚀 Go to Admin Setup Page
+          </a>
+        </p>
+        
+        <hr style="border: none; border-top: 1px solid #1f2a44; margin: 32px 0;">
+        
+        <p><strong>💻 Method 2: Manual Upload via Terminal (For Advanced Users)</strong></p>
+        <p>If you have SSH access to the server, you can upload manually:</p>
+        <ol>
+          <li>Find the downloaded file (named something like <code>client_secret_XXXXX.json</code>)</li>
+          <li>Rename it to <code>google_oauth_client.json</code></li>
+          <li>Upload the file to the server via SFTP or SCP:
+            <ul>
+              <li>Destination path: <code>/home/shahin/seoanalyzepro/configs/google_oauth_client.json</code></li>
+            </ul>
+          </li>
+        </ol>
+        
+        <p><strong>Terminal Commands:</strong></p>
+        <div class="code-block">
+          <code>
+# Navigate to configs folder<br>
+cd /home/shahin/seoanalyzepro/configs<br>
+<br>
+# Upload file (from local computer)<br>
+scp ~/Downloads/google_oauth_client.json shahin@seoanalyze.shahinvaseghi.ir:/home/shahin/seoanalyzepro/configs/<br>
+<br>
+# Or create with nano and paste content<br>
+nano google_oauth_client.json<br>
+<br>
+# Set file permissions<br>
+chmod 600 google_oauth_client.json
+          </code>
+        </div>
+        
+        <div class="warning">
+          ⚠️ <strong>Warning:</strong> If using the manual method, the file must be exactly at <code>configs/google_oauth_client.json</code> with 600 permissions.
+        </div>
+      </div>
+      
+      <!-- Step 6 -->
+      <div class="step">
+        <h3>Step 6: Restart Service</h3>
+        
+        <div class="info">
+          ✨ <strong>Important Note:</strong> If you used Method 1 (Web Interface), this step was done automatically and you don't need to do anything!
+        </div>
+        
+        <p><strong>Only for Method 2 (Manual Upload):</strong></p>
+        <p>If you manually uploaded the file, you need to restart the service:</p>
+        <div class="code-block">
+          <code>
+sudo systemctl restart seoanalyzepro<br>
+<br>
+# Check status<br>
+sudo systemctl status seoanalyzepro
+          </code>
+        </div>
+        <div class="success">
+          ✅ If you see "active (running)", the service has started successfully!
+        </div>
+      </div>
+      
+      <!-- Step 7 -->
+      <div class="step">
+        <h3>Step 7: Connect Your Account</h3>
+        <p>Now you can connect your Search Console:</p>
+        <ol>
+          <li>Go to the application dashboard</li>
+          <li>Click on "Google Search Console"</li>
+          <li>Click the purple <strong>"Connect Google Search Console"</strong> button</li>
+          <li>You'll be redirected to Google's login page</li>
+          <li>Select your Google account (the one with Search Console access)</li>
+          <li>Review the permissions page:
+            <ul>
+              <li>The app can only <strong>read</strong> your data</li>
+              <li>It cannot make any changes to your Search Console</li>
+            </ul>
+          </li>
+          <li>Click <strong>"Allow"</strong></li>
+          <li>You'll be redirected back to the application</li>
+          <li>Your Search Console properties list will be displayed</li>
+        </ol>
+        <div class="success">
+          🎉 <strong>Congratulations!</strong> Connection successful. You can now view your data.
+        </div>
+      </div>
+      
+      <!-- Troubleshooting -->
+      <div class="step">
+        <h3>🔧 Common Issues</h3>
+        
+        <h4>"redirect_uri_mismatch" Error</h4>
+        <p><strong>Cause:</strong> The redirect URI in the request doesn't match what's registered in Google Cloud Console.</p>
+        <p><strong>Solution:</strong></p>
+        <ul>
+          <li>Go to Google Cloud Console → Credentials</li>
+          <li>Edit your OAuth 2.0 Client ID</li>
+          <li>Make sure this exact address is registered: <code>http://seoanalyze.shahinvaseghi.ir/search-console/oauth2callback</code></li>
+          <li>No trailing slash!</li>
+        </ul>
+        
+        <h4>"Access blocked" Error</h4>
+        <p><strong>Cause:</strong> OAuth consent screen is not properly configured.</p>
+        <p><strong>Solution:</strong></p>
+        <ul>
+          <li>Go to OAuth consent screen</li>
+          <li>Add your email to Test users</li>
+          <li>Make sure Publishing status is "Testing"</li>
+        </ul>
+        
+        <h4>"API has not been enabled" Error</h4>
+        <p><strong>Cause:</strong> Search Console API is not enabled.</p>
+        <p><strong>Solution:</strong></p>
+        <ul>
+          <li>Go to APIs & Services → Library</li>
+          <li>Find Search Console API</li>
+          <li>Click Enable</li>
+          <li>Wait a few minutes and try again</li>
+        </ul>
+      </div>
+      
+      <!-- Security Notes -->
+      <div class="step">
+        <h3>🔒 Security Notes</h3>
+        <ul>
+          <li>The <code>google_oauth_client.json</code> file contains sensitive information, do not share it</li>
+          <li>Never commit this file to Git (it's added to .gitignore)</li>
+          <li>Each user has separate tokens and cannot access other users' data</li>
+          <li>The application has read-only access to Search Console</li>
+          <li>You can disconnect at any time</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div style="text-align: center;">
+      <a href="/search-console/" class="back-link">← بازگشت به Search Console / Back to Search Console</a>
+    </div>
+  </div>
+  
+  <script>
+    function switchLanguage(lang) {
+      // Hide all guides
+      document.querySelectorAll('.guide-section').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      // Remove active from all buttons
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Show selected guide
+      document.getElementById('guide-' + lang).classList.add('active');
+      
+      // Activate button
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>
+

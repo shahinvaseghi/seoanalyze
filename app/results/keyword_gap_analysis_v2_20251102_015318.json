@@ -1,0 +1,45 @@
+{
+  "own_website_url": "https://clinicpaamchal.com/",
+  "competitor_urls": [
+    "https://pezeshkemovafagh.com/beauty-clinic/"
+  ],
+  "total_gaps_found": 768,
+  "total_opportunity_value": 90050,
+  "avg_difficulty": 2.0,
+  "avg_relevance": 13.841145833333334,
+  "processing_time_seconds": 2.2016353607177734,
+  "analysis_date": "2025-11-02T01:53:18.754110",
+  "analysis_version": "2.0",
+  "quick_wins_count": 0,
+  "high_priority_count": 0,
+  "recommendations": [
+    {
+      "title": "Build Top-of-Funnel Content",
+      "priority": "medium",
+      "description": "Found 727 informational keywords for awareness stage.",
+      "action": "Create comprehensive guides and how-to content",
+      "keywords": [
+        "کلینیک پوست کاشت",
+        "کلینیک پوست کاشت مو",
+        "کلینیک پوست کاشت مو لیزر",
+        "کلینیک ارائه شوند",
+        "کلینیک ارائه شوند شامل",
+        "دکتر رادمنش",
+        "مهم کلینیک",
+        "نکات مهم کلینیک",
+        "کلینیک دکتر",
+        "سایت کلینیک"
+      ]
+    },
+    {
+      "title": "Capture Transactional Intent",
+      "priority": "high",
+      "description": "2 transactional keywords found - direct revenue potential.",
+      "action": "Create service/product pages with strong CTAs",
+      "keywords": [
+        "خرید",
+        "سبد خرید"
+      ]
+    }
+  ]
+}

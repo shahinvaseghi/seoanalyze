@@ -1,0 +1,823 @@
+
+{# Macro to render opportunity cards #}
+{% macro render_opportunities(opportunities) %}
+<div class="opportunities-grid">
+  {% for opp in opportunities %}
+  <div class="opportunity-card">
+    <div class="opportunity-header">
+      <div style="flex: 1;">
+        <div class="opportunity-keyword">{{ opp.query.query_text }}</div>
+        <div class="opportunity-meta">
+          <span class="badge intent">
+            {{ opp.query.search_intent.value }}
+          </span>
+          <span class="badge difficulty-{{ opp.query.difficulty.value }}">
+            {{ opp.query.difficulty.value }}
+          </span>
+          <span class="badge priority">
+            {{ opp.priority_tier.replace('_', ' ').title() }}
+          </span>
+        </div>
+      </div>
+      <div class="opportunity-score">
+        <div class="score-circle">{{ "%.0f"|format(opp.opportunity_score) }}</div>
+        <div class="score-label">Score</div>
+      </div>
+    </div>
+    
+    <div class="opportunity-details">
+      <div class="detail-item">
+        <div class="detail-label">Relevance</div>
+        <div class="detail-value">{{ "%.0f"|format(opp.relevance_score) }}%</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Est. Traffic</div>
+        <div class="detail-value">{{ opp.estimated_monthly_traffic }}/mo</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Effort</div>
+        <div class="detail-value">{{ "%.0f"|format(opp.effort_estimate_hours) }}h</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Content Type</div>
+        <div class="detail-value" style="font-size: 0.9em;">{{ opp.content_type_needed.value }}</div>
+      </div>
+    </div>
+    
+    <div class="opportunity-actions">
+      <div class="actions-title">Recommended Actions:</div>
+      <ul>
+        {% for action in opp.recommended_actions[:3] %}
+        <li>{{ action }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Keyword Gap Analysis Results</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+      background: #0b1220;
+      color: #e7eaf3;
+      line-height: 1.6;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: #0d1830;
+      border-bottom: 1px solid #1f2a44;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .container {
+      padding: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    h1, h2, h3 { color: #e7eaf3; }
+    
+    /* Summary Cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    
+    .summary-card {
+      background: linear-gradient(135deg, #1e293b 0%, #111a2b 100%);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    
+    .summary-card:hover {
+      transform: translateY(-2px);
+      border-color: #4f46e5;
+    }
+    
+    .summary-card .label {
+      font-size: 0.85em;
+      color: #a9b3c7;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    
+    .summary-card .value {
+      font-size: 2.5em;
+      font-weight: 700;
+      color: #e7eaf3;
+      line-height: 1;
+    }
+    
+    .summary-card .value.highlight {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* Priority Matrix */
+    .priority-matrix {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    
+    .priority-card {
+      background: #111a2b;
+      border: 1px solid #1f2a44;
+      border-radius: 12px;
+      padding: 20px;
+      border-top: 4px solid;
+    }
+    
+    .priority-card.quick-win { border-top-color: #10b981; }
+    .priority-card.high { border-top-color: #f59e0b; }
+    .priority-card.medium { border-top-color: #3b82f6; }
+    .priority-card.long-term { border-top-color: #8b5cf6; }
+    
+    .priority-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 1.1em;
+    }
+    
+    .priority-card .count {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.9em;
+    }
+    
+    /* Filter Bar */
+    .filter-bar {
+      background: #111a2b;
+      border: 1px solid #1f2a44;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .filter-group label {
+      font-size: 0.9em;
+      color: #a9b3c7;
+      font-weight: 500;
+    }
+    
+    .filter-group select {
+      padding: 8px 12px;
+      border: 1px solid #2a3552;
+      border-radius: 8px;
+      background: #0b1220;
+      color: #e7eaf3;
+      font-size: 0.9em;
+      cursor: pointer;
+    }
+    
+    .filter-group select:focus {
+      outline: none;
+      border-color: #4f46e5;
+    }
+    
+    /* Opportunity Cards */
+    .opportunities-grid {
+      display: grid;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    
+    .opportunity-card {
+      background: #111a2b;
+      border: 1px solid #1f2a44;
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+    
+    .opportunity-card:hover {
+      border-color: #4f46e5;
+      transform: translateX(4px);
+    }
+    
+    .opportunity-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    
+    .opportunity-keyword {
+      font-size: 1.2em;
+      font-weight: 600;
+      color: #4f46e5;
+      margin-bottom: 8px;
+    }
+    
+    .opportunity-meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+    
+    .badge.intent { background: #1e293b; color: #93c5fd; }
+    .badge.difficulty-easy { background: #10b981; color: white; }
+    .badge.difficulty-medium { background: #f59e0b; color: white; }
+    .badge.difficulty-hard { background: #ef4444; color: white; }
+    .badge.priority { background: #4f46e5; color: white; }
+    
+    .opportunity-score {
+      text-align: center;
+    }
+    
+    .score-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1em;
+      font-weight: 700;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white;
+      margin: 0 auto 4px;
+    }
+    
+    .score-label {
+      font-size: 0.75em;
+      color: #a9b3c7;
+    }
+    
+    .opportunity-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      padding: 16px;
+      background: #0b1220;
+      border-radius: 8px;
+      margin: 12px 0;
+    }
+    
+    .detail-item {
+      text-align: center;
+    }
+    
+    .detail-label {
+      font-size: 0.75em;
+      color: #a9b3c7;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    
+    .detail-value {
+      font-size: 1.1em;
+      font-weight: 600;
+      color: #e7eaf3;
+    }
+    
+    .opportunity-actions {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #1f2a44;
+    }
+    
+    .actions-title {
+      font-size: 0.9em;
+      font-weight: 600;
+      color: #a9b3c7;
+      margin-bottom: 8px;
+    }
+    
+    .action-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .action-list li {
+      padding: 6px 0;
+      padding-left: 20px;
+      position: relative;
+      color: #e7eaf3;
+      font-size: 0.95em;
+    }
+    
+    .action-list li:before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: #4f46e5;
+      font-weight: 700;
+    }
+    
+    /* Recommendations */
+    .recommendation-card {
+      background: linear-gradient(135deg, #1e293b 0%, #111a2b 100%);
+      border: 1px solid #334155;
+      border-left: 4px solid #4f46e5;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 16px 0;
+    }
+    
+    .recommendation-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .recommendation-title {
+      font-size: 1.2em;
+      font-weight: 600;
+      color: #e7eaf3;
+    }
+    
+    .priority-badge {
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+    
+    .priority-badge.high { background: #ef4444; color: white; }
+    .priority-badge.medium { background: #f59e0b; color: white; }
+    .priority-badge.low { background: #3b82f6; color: white; }
+    
+    /* Section */
+    .section {
+      background: #111a2b;
+      border: 1px solid #1f2a44;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+    }
+    
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #1f2a44;
+    }
+    
+    .section-icon {
+      font-size: 1.5em;
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #1f2a44;
+    }
+    
+    .tab {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: #a9b3c7;
+      cursor: pointer;
+      font-size: 0.95em;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .tab:hover {
+      color: #e7eaf3;
+      background: rgba(79, 70, 229, 0.1);
+    }
+    
+    .tab.active {
+      color: #4f46e5;
+      border-bottom-color: #4f46e5;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Utilities */
+    nav a {
+      color: #93c5fd;
+      text-decoration: none;
+      margin: 0 8px;
+    }
+    
+    nav a:hover {
+      color: #dbeafe;
+      text-decoration: underline;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95em;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.2s;
+    }
+    
+    .btn.primary {
+      background: #4f46e5;
+      color: white;
+    }
+    
+    .btn.primary:hover {
+      background: #4338ca;
+      transform: translateY(-1px);
+    }
+    
+    .btn.secondary {
+      background: #334155;
+      color: white;
+    }
+    
+    .btn.secondary:hover {
+      background: #475569;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #a9b3c7;
+    }
+    
+    .empty-state-icon {
+      font-size: 3em;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <span style="font-weight: 700;">Enhanced Keyword Gap Results</span>
+      <span style="background: #4f46e5; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85em; margin-left: 12px;">v2.0</span>
+    </div>
+    <nav>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/keyword-gap-v2/">New Analysis</a>
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+  
+  <div class="container">
+    <h1>🚀 Enhanced Keyword Gap Analysis Results</h1>
+    
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="label">Total Gaps Found</div>
+        <div class="value highlight">{{ result.total_gaps_found }}</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Est. Monthly Traffic</div>
+        <div class="value">{{ "{:,.0f}".format(result.total_opportunity_value) }}</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Quick Wins</div>
+        <div class="value" style="color: #10b981;">{{ result.quick_wins|length }}</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">High Priority</div>
+        <div class="value" style="color: #f59e0b;">{{ result.high_priority|length }}</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Avg Relevance</div>
+        <div class="value">{{ "%.0f"|format(result.avg_relevance) }}%</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Processing Time</div>
+        <div class="value" style="font-size: 1.8em;">{{ "%.1f"|format(result.processing_time_seconds) }}s</div>
+      </div>
+    </div>
+    
+    <!-- Priority Matrix -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">📊</span>
+        <h2>Priority Matrix</h2>
+      </div>
+      
+      <div class="priority-matrix">
+        <div class="priority-card quick-win">
+          <h3>
+            ⚡ Quick Wins
+            <span class="count">{{ result.quick_wins|length }}</span>
+          </h3>
+          <p style="color: #a9b3c7; font-size: 0.95em;">
+            Easy to rank + highly relevant. Start here for fastest results.
+          </p>
+        </div>
+        
+        <div class="priority-card high">
+          <h3>
+            🎯 High Priority
+            <span class="count">{{ result.high_priority|length }}</span>
+          </h3>
+          <p style="color: #a9b3c7; font-size: 0.95em;">
+            High value opportunities. Invest resources for maximum impact.
+          </p>
+        </div>
+        
+        <div class="priority-card medium">
+          <h3>
+            📈 Medium Priority
+            <span class="count">{{ result.medium_priority|length }}</span>
+          </h3>
+          <p style="color: #a9b3c7; font-size: 0.95em;">
+            Moderate opportunities. Plan for phase 2 content.
+          </p>
+        </div>
+        
+        <div class="priority-card long-term">
+          <h3>
+            🎓 Long-term Strategy
+            <span class="count">{{ result.long_term|length }}</span>
+          </h3>
+          <p style="color: #a9b3c7; font-size: 0.95em;">
+            High value but difficult. Build authority over time.
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Strategic Recommendations -->
+    {% if result.strategic_recommendations %}
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">💡</span>
+        <h2>Strategic Recommendations</h2>
+      </div>
+      
+      {% for rec in result.strategic_recommendations %}
+      <div class="recommendation-card">
+        <div class="recommendation-header">
+          <div class="recommendation-title">{{ rec.title }}</div>
+          <div class="priority-badge {{ rec.priority }}">{{ rec.priority|upper }}</div>
+        </div>
+        <p style="color: #a9b3c7; margin-bottom: 12px;">{{ rec.description }}</p>
+        <p style="color: #e7eaf3; font-weight: 500;">
+          <strong>Action:</strong> {{ rec.action }}
+        </p>
+        {% if rec.keywords %}
+        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #1f2a44;">
+          <div style="font-size: 0.9em; color: #a9b3c7; margin-bottom: 8px;">
+            Top keywords ({{ rec.keywords|length }}):
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            {% for kw in rec.keywords[:8] %}
+            <span style="background: #1e293b; padding: 4px 10px; border-radius: 8px; font-size: 0.9em;">
+              {{ kw }}
+            </span>
+            {% endfor %}
+            {% if rec.keywords|length > 8 %}
+            <span style="color: #a9b3c7; font-size: 0.9em;">
+              +{{ rec.keywords|length - 8 }} more
+            </span>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Keyword Opportunities (Tabbed) -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">🔍</span>
+        <h2>Keyword Opportunities</h2>
+      </div>
+      
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('quick-wins-tab')">
+          ⚡ Quick Wins ({{ result.quick_wins|length }})
+        </button>
+        <button class="tab" onclick="showTab('high-priority-tab')">
+          🎯 High Priority ({{ result.high_priority|length }})
+        </button>
+        <button class="tab" onclick="showTab('informational-tab')">
+          📚 Informational ({{ result.informational_gaps|length }})
+        </button>
+        <button class="tab" onclick="showTab('transactional-tab')">
+          💰 Transactional ({{ result.transactional_gaps|length }})
+        </button>
+        {% if result.local_gaps|length > 0 %}
+        <button class="tab" onclick="showTab('local-tab')">
+          📍 Local ({{ result.local_gaps|length }})
+        </button>
+        {% endif %}
+      </div>
+      
+      <!-- Quick Wins Tab -->
+      <div id="quick-wins-tab" class="tab-content active">
+        {% if result.quick_wins %}
+          {{ render_opportunities(result.quick_wins[:10]) }}
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-state-icon">🎯</div>
+            <p>No quick wins found. Consider analyzing more competitors or adjusting business context.</p>
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- High Priority Tab -->
+      <div id="high-priority-tab" class="tab-content">
+        {% if result.high_priority %}
+          {{ render_opportunities(result.high_priority[:10]) }}
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <p>No high priority opportunities found.</p>
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Informational Tab -->
+      <div id="informational-tab" class="tab-content">
+        {% if result.informational_gaps %}
+          {{ render_opportunities(result.informational_gaps[:15]) }}
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-state-icon">📚</div>
+            <p>No informational keywords found.</p>
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Transactional Tab -->
+      <div id="transactional-tab" class="tab-content">
+        {% if result.transactional_gaps %}
+          {{ render_opportunities(result.transactional_gaps[:15]) }}
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-state-icon">💰</div>
+            <p>No transactional keywords found.</p>
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Local Tab -->
+      {% if result.local_gaps|length > 0 %}
+      <div id="local-tab" class="tab-content">
+        {{ render_opportunities(result.local_gaps[:15]) }}
+      </div>
+      {% endif %}
+    </div>
+    
+    <!-- Actions -->
+    <div style="text-align: center; margin: 40px 0;">
+      <a href="/keyword-gap-v2/" class="btn primary">🔄 New Analysis</a>
+      <a href="/dashboard" class="btn secondary">← Back to Dashboard</a>
+    </div>
+  </div>
+
+  <script>
+    function showTab(tabId) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Remove active class from all tab buttons
+      document.querySelectorAll('.tab').forEach(button => {
+        button.classList.remove('active');
+      });
+      
+      // Show selected tab
+      document.getElementById(tabId).classList.add('active');
+      
+      // Add active class to clicked button
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>
+
+{# Macro to render opportunity cards #}
+{% macro render_opportunities(opportunities) %}
+<div class="opportunities-grid">
+  {% for opp in opportunities %}
+  <div class="opportunity-card">
+    <div class="opportunity-header">
+      <div style="flex: 1;">
+        <div class="opportunity-keyword">{{ opp.query.query_text }}</div>
+        <div class="opportunity-meta">
+          <span class="badge intent">
+            {{ opp.query.search_intent.value }}
+          </span>
+          <span class="badge difficulty-{{ opp.query.difficulty.value }}">
+            {{ opp.query.difficulty.value }}
+          </span>
+          <span class="badge priority">
+            {{ opp.priority_tier.replace('_', ' ').title() }}
+          </span>
+        </div>
+      </div>
+      <div class="opportunity-score">
+        <div class="score-circle">{{ "%.0f"|format(opp.opportunity_score) }}</div>
+        <div class="score-label">Score</div>
+      </div>
+    </div>
+    
+    <div class="opportunity-details">
+      <div class="detail-item">
+        <div class="detail-label">Relevance</div>
+        <div class="detail-value">{{ "%.0f"|format(opp.relevance_score) }}%</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Est. Traffic</div>
+        <div class="detail-value">{{ opp.estimated_monthly_traffic }}/mo</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Effort</div>
+        <div class="detail-value">{{ "%.0f"|format(opp.effort_estimate_hours) }}h</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Content Type</div>
+        <div class="detail-value" style="font-size: 0.9em;">{{ opp.content_type_needed.value }}</div>
+      </div>
+    </div>
+    
+    {% if opp.recommended_actions %}
+    <div class="opportunity-actions">
+      <div class="actions-title">📋 Recommended Actions</div>
+      <ul class="action-list">
+        {% for action in opp.recommended_actions[:3] %}
+        <li>{{ action }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    
+    {% if opp.priority_reasoning %}
+    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #1f2a44;">
+      <div style="font-size: 0.85em; color: #a9b3c7;">
+        <strong>Why:</strong> {{ opp.priority_reasoning }}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
