@@ -3,23 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Content Audit</title>
+  <title>Content Audit - Comprehensive Analysis</title>
   <style>
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#07111f;color:#e7eaf3;margin:0}
     header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#0d1830;border-bottom:1px solid #1f2a44}
     .brand{font-weight:700}
-    .container{padding:24px;max-width:1200px;margin:0 auto}
+    .container{padding:24px;max-width:1400px;margin:0 auto}
     a{color:#93c5fd;text-decoration:none}
     .input-group{margin:20px 0}
     .input-group label{display:block;margin-bottom:8px;font-weight:500;color:#93c5fd}
     .input-group input{width:100%;max-width:600px;padding:10px;border:1px solid #1f2a44;border-radius:6px;background:#0d1830;color:#e7eaf3;font-size:14px}
     .btn{background:#10b981;color:#fff;border:none;border-radius:6px;padding:12px 24px;cursor:pointer;font-size:14px;font-weight:600}
     .btn:hover{background:#059669}
+    .btn:disabled{opacity:0.6;cursor:not-allowed}
     .section{background:#0d1830;border:1px solid #1f2a44;border-radius:8px;padding:20px;margin:16px 0}
-    .section h3{color:#93c5fd;margin-top:0}
+    .section h3{color:#93c5fd;margin-top:0;border-bottom:1px solid #1f2a44;padding-bottom:12px;margin-bottom:16px}
     .metric{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1f2a44}
+    .metric:last-child{border-bottom:none}
+    .metric-label{color:#a0aec0}
+    .metric-value{color:#e7eaf3;font-weight:600}
+    .score-box{text-align:center;padding:24px;background:#0d1830;border:1px solid #1f2a44;border-radius:8px;margin:16px 0}
+    .score-value{font-size:48px;font-weight:700;margin:8px 0}
+    .score-good{color:#10b981}
+    .score-medium{color:#f59e0b}
+    .score-low{color:#ef4444}
+    .badge{display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;margin-left:8px}
+    .badge-good{background:#10b981;color:white}
+    .badge-medium{background:#f59e0b;color:white}
+    .badge-low{background:#ef4444;color:white}
+    .badge-a{background:#10b981;color:white;font-size:16px;padding:6px 16px}
+    .badge-b{background:#3b82f6;color:white;font-size:16px;padding:6px 16px}
+    .badge-c{background:#f59e0b;color:white;font-size:16px;padding:6px 16px}
+    .badge-d{background:#f97316;color:white;font-size:16px;padding:6px 16px}
+    .badge-f{background:#ef4444;color:white;font-size:16px;padding:6px 16px}
+    .issue-item{padding:12px;margin:8px 0;background:#1f2a44;border-left:4px solid;border-radius:4px}
+    .issue-error{border-left-color:#ef4444}
+    .issue-warning{border-left-color:#f59e0b}
+    .issue-info{border-left-color:#3b82f6}
+    .issue-item .category{color:#93c5fd;font-size:12px;text-transform:uppercase;font-weight:600}
+    .issue-item .message{color:#e7eaf3;margin-top:4px}
+    .issue-item .impact{display:inline-block;padding:2px 8px;background:#1f2a44;border-radius:4px;font-size:11px;margin-top:4px;color:#a0aec0}
+    .recommendation-list{list-style:none;padding:0;margin:12px 0}
+    .recommendation-list li{padding:10px 12px;margin:6px 0;background:#1f2a44;border-left:3px solid #10b981;border-radius:4px;color:#e7eaf3}
+    .table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+    .table th{text-align:left;padding:10px;border-bottom:2px solid #1f2a44;color:#93c5fd;font-weight:600}
+    .table td{padding:10px;border-bottom:1px solid #1f2a44;color:#e7eaf3}
+    .table tr:hover{background:#1f2a44}
     .loading{text-align:center;padding:40px;color:#a0aec0}
     .error{background:#ef4444;color:white;padding:16px;border-radius:8px;margin:16px 0}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:16px 0}
+    .stat-box{background:#1f2a44;padding:16px;border-radius:6px;text-align:center}
+    .stat-value{font-size:24px;font-weight:700;color:#93c5fd;margin:4px 0}
+    .stat-label{font-size:12px;color:#a0aec0;text-transform:uppercase}
   </style>
 </head>
 <body>
@@ -32,35 +67,305 @@
   </header>
   <div class="container">
     <h1>📝 Content Audit</h1>
-    <p style="color:#a0aec0">Analyze content quality and find duplicates</p>
+    <p style="color:#a0aec0">Comprehensive content quality analysis and optimization recommendations</p>
     
     <div class="input-group">
       <label for="url">Website URL:</label>
       <input id="url" type="text" placeholder="https://example.com" />
     </div>
     
-    <button class="btn" onclick="analyze()">Analyze Content</button>
+    <button class="btn" id="analyzeBtn" onclick="analyze()">Analyze Content</button>
     <div id="results"></div>
   </div>
   <script>
+    function getScoreClass(score) {
+      if (score >= 80) return 'score-good';
+      if (score >= 60) return 'score-medium';
+      return 'score-low';
+    }
+    
+    function getGradeClass(grade) {
+      return `badge-${grade.toLowerCase()}`;
+    }
+    
+    function getIssueClass(type) {
+      if (type === 'error') return 'issue-error';
+      if (type === 'warning') return 'issue-warning';
+      return 'issue-info';
+    }
+    
     function analyze() {
       const url = document.getElementById('url').value.trim();
       const results = document.getElementById('results');
-      if (!url) { results.innerHTML = '<div class="error">Enter URL</div>'; return; }
-      results.innerHTML = '<div class="loading">Analyzing content...</div>';
-      fetch('/content-audit/api/analyze', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})})
-      .then(r => r.json()).then(d => {
-        if (d.error) { results.innerHTML = `<div class="error">${d.error}</div>`; return; }
-        let html = `<div class="section"><h3>Content Analysis</h3><div class="metric"><span>Word Count:</span><span>${d.content_analysis.word_count}</span></div><div class="metric"><span>Quality Score:</span><span>${d.content_analysis.quality_score}/100</span></div></div>`;
-        if (d.issues && d.issues.length > 0) {
-          html += '<div class="section"><h3>Issues</h3><ul>';
-          d.issues.forEach(issue => html += `<li>${issue}</li>`);
-          html += '</ul></div>';
+      const btn = document.getElementById('analyzeBtn');
+      
+      if (!url) { 
+        results.innerHTML = '<div class="error">Enter URL</div>'; 
+        return; 
+      }
+      
+      btn.disabled = true;
+      btn.textContent = 'Analyzing...';
+      results.innerHTML = '<div class="loading">Analyzing content quality...</div>';
+      
+      fetch('/content-audit/api/analyze', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url})
+      })
+      .then(r => r.json())
+      .then(d => {
+        btn.disabled = false;
+        btn.textContent = 'Analyze Content';
+        
+        if (d.error) { 
+          results.innerHTML = `<div class="error">${d.error}</div>`; 
+          return; 
         }
-        results.innerHTML = html;
-      }).catch(e => results.innerHTML = `<div class="error">Error: ${e.message}</div>`);
+        
+        displayResults(d);
+      })
+      .catch(e => {
+        btn.disabled = false;
+        btn.textContent = 'Analyze Content';
+        results.innerHTML = `<div class="error">Error: ${e.message}</div>`;
+      });
+    }
+    
+    function displayResults(data) {
+      let html = '';
+      const ca = data.content_analysis;
+      
+      // Overall Score
+      html += `
+        <div class="score-box">
+          <div class="score-value ${getScoreClass(ca.quality_score)}">${ca.quality_score}</div>
+          <p style="color:#a0aec0;margin-top:8px">Content Quality Score</p>
+          <span class="badge ${getGradeClass(ca.grade)}">Grade: ${ca.grade}</span>
+        </div>
+      `;
+      
+      // Content Statistics
+      html += `
+        <div class="section">
+          <h3>📊 Content Statistics</h3>
+          <div class="grid">
+            <div class="stat-box">
+              <div class="stat-value">${ca.word_count.toLocaleString()}</div>
+              <div class="stat-label">Words</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${ca.char_count.toLocaleString()}</div>
+              <div class="stat-label">Characters</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${ca.paragraph_count || 0}</div>
+              <div class="stat-label">Paragraphs</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${ca.readability.score}</div>
+              <div class="stat-label">Readability (${ca.readability.level})</div>
+            </div>
+          </div>
+          <div class="metric"><span class="metric-label">Average Sentence Length:</span><span class="metric-value">${ca.readability.avg_sentence_length} words</span></div>
+          <div class="metric"><span class="metric-label">Average Syllables per Word:</span><span class="metric-value">${ca.readability.avg_syllables_per_word}</span></div>
+        </div>
+      `;
+      
+      // Structure Analysis
+      html += `
+        <div class="section">
+          <h3>📐 Content Structure</h3>
+          <div class="grid">
+            <div class="stat-box">
+              <div class="stat-value">${data.structure.h1_count}</div>
+              <div class="stat-label">H1 Headings</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${data.structure.h2_count}</div>
+              <div class="stat-label">H2 Headings</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${data.structure.h3_count}</div>
+              <div class="stat-label">H3 Headings</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${data.structure.structure_score}</div>
+              <div class="stat-label">Structure Score</div>
+            </div>
+          </div>
+      `;
+      
+      if (data.structure.h1_texts && data.structure.h1_texts.length > 0) {
+        html += '<h4 style="color:#93c5fd;margin-top:16px">H1 Headings:</h4><ul style="list-style:none;padding:0">';
+        data.structure.h1_texts.forEach(h1 => {
+          html += `<li style="padding:6px 0;color:#e7eaf3">• ${h1}</li>`;
+        });
+        html += '</ul>';
+      }
+      
+      if (data.structure.h2_texts && data.structure.h2_texts.length > 0) {
+        html += '<h4 style="color:#93c5fd;margin-top:16px">H2 Headings (first 10):</h4><ul style="list-style:none;padding:0">';
+        data.structure.h2_texts.forEach(h2 => {
+          html += `<li style="padding:6px 0;color:#e7eaf3">• ${h2}</li>`;
+        });
+        html += '</ul>';
+      }
+      
+      html += '</div>';
+      
+      // Keyword Analysis
+      if (ca.keyword_analysis && ca.keyword_analysis.top_keywords) {
+        html += `
+          <div class="section">
+            <h3>🔑 Keyword Analysis</h3>
+            <div class="metric"><span class="metric-label">Unique Words:</span><span class="metric-value">${ca.keyword_analysis.total_unique_words}</span></div>
+            <h4 style="color:#93c5fd;margin-top:16px">Top Keywords:</h4>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Keyword</th>
+                  <th>Count</th>
+                  <th>Density</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        ca.keyword_analysis.top_keywords.slice(0, 15).forEach(kw => {
+          html += `
+            <tr>
+              <td>${kw.word}</td>
+              <td>${kw.count}</td>
+              <td>${kw.density}%</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table></div>`;
+      }
+      
+      // Links Analysis
+      html += `
+        <div class="section">
+          <h3>🔗 Links Analysis</h3>
+          <div class="grid">
+            <div class="stat-box">
+              <div class="stat-value">${data.links.internal_links_count}</div>
+              <div class="stat-label">Internal Links</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${data.links.external_links_count}</div>
+              <div class="stat-label">External Links</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${data.links.nofollow_links_count}</div>
+              <div class="stat-label">Nofollow Links</div>
+            </div>
+          </div>
+      `;
+      
+      if (data.links.internal_links && data.links.internal_links.length > 0) {
+        html += '<h4 style="color:#93c5fd;margin-top:16px">Internal Links (first 10):</h4><ul style="list-style:none;padding:0">';
+        data.links.internal_links.slice(0, 10).forEach(link => {
+          html += `<li style="padding:6px 0"><a href="${link.url}" target="_blank" style="color:#60a5fa">${link.text || link.url}</a></li>`;
+        });
+        html += '</ul>';
+      }
+      
+      html += '</div>';
+      
+      // Images Analysis
+      html += `
+        <div class="section">
+          <h3>🖼️ Images Analysis</h3>
+          <div class="grid">
+            <div class="stat-box">
+              <div class="stat-value">${data.images.total_images}</div>
+              <div class="stat-label">Total Images</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${data.images.images_with_alt}</div>
+              <div class="stat-label">With Alt Text</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${data.images.alt_text_coverage}%</div>
+              <div class="stat-label">Alt Text Coverage</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${data.images.large_images}</div>
+              <div class="stat-label">Large Images</div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Multimedia
+      html += `
+        <div class="section">
+          <h3>🎬 Multimedia Content</h3>
+          <div class="grid">
+            <div class="stat-box">
+              <div class="stat-value">${data.multimedia.videos}</div>
+              <div class="stat-label">Videos</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${data.multimedia.lists}</div>
+              <div class="stat-label">Lists</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${data.multimedia.tables}</div>
+              <div class="stat-label">Tables</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">${data.multimedia.forms}</div>
+              <div class="stat-label">Forms</div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Meta Information
+      html += `
+        <div class="section">
+          <h3>📋 Meta Information</h3>
+          <div class="metric"><span class="metric-label">Meta Description:</span><span class="metric-value">${data.meta.meta_description || 'Not found'}</span></div>
+          <div class="metric"><span class="metric-label">Meta Description Length:</span><span class="metric-value">${data.meta.meta_description_length} characters</span></div>
+          <div class="metric"><span class="metric-label">Has Publication Date:</span><span class="metric-value">${data.meta.has_publication_date ? 'Yes' : 'No'}</span></div>
+        </div>
+      `;
+      
+      // Issues
+      if (data.issues && data.issues.length > 0) {
+        html += `
+          <div class="section">
+            <h3>⚠️ Issues Found (${data.issues.length})</h3>
+        `;
+        data.issues.forEach(issue => {
+          html += `
+            <div class="issue-item ${getIssueClass(issue.type)}">
+              <div class="category">${issue.category}</div>
+              <div class="message">${issue.message}</div>
+              <div class="impact">Impact: ${issue.impact}</div>
+            </div>
+          `;
+        });
+        html += '</div>';
+      }
+      
+      // Recommendations
+      if (data.recommendations && data.recommendations.length > 0) {
+        html += `
+          <div class="section">
+            <h3>💡 Recommendations</h3>
+            <ul class="recommendation-list">
+        `;
+        data.recommendations.forEach(rec => {
+          html += `<li>${rec}</li>`;
+        });
+        html += '</ul></div>';
+      }
+      
+      results.innerHTML = html;
     }
   </script>
 </body>
 </html>
-
