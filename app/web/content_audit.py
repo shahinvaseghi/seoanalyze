@@ -13,6 +13,9 @@ from datetime import datetime
 import re
 from collections import Counter
 
+# Import stop words from keyword gap analyzer for advanced keyword extraction
+from app.core.keyword_gap_analyzer import PERSIAN_STOP_WORDS, ENGLISH_STOP_WORDS
+
 content_audit_bp = Blueprint('content_audit', __name__, url_prefix='/content-audit')
 
 
@@ -79,23 +82,130 @@ def calculate_readability(text: str) -> Dict[str, float]:
     }
 
 
-def analyze_keywords(text: str, min_length: int = 3) -> Dict[str, any]:
-    """Analyze keyword frequency and density"""
-    # Remove common stop words (Persian and English)
-    stop_words = {
-        'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
-        'از', 'به', 'در', 'با', 'برای', 'که', 'این', 'آن', 'است', 'بود', 'شود', 'می', 'را', 'یا'
+def _tokenize_text_advanced(text: str) -> List[str]:
+    """Tokenize text into words using advanced filtering (same as keyword gap analyzer)"""
+    # Clean text - remove special characters but keep Persian and English letters
+    text = re.sub(r'[^\w\s\u0600-\u06FF]', ' ', text)
+    
+    # Split into words
+    words = text.split()
+    
+    # Filter and clean words
+    cleaned_words = []
+    for word in words:
+        word = word.strip().lower()
+        if _is_valid_keyword_advanced(word):
+            cleaned_words.append(word)
+    
+    return cleaned_words
+
+
+def _is_valid_keyword_advanced(word: str) -> bool:
+    """Check if word is a valid keyword (same logic as keyword gap analyzer)"""
+    # Basic checks
+    if not word or not word.strip():
+        return False
+    
+    # Check if word contains only letters (no numbers or special chars)
+    if not word.isalpha():
+        return False
+    
+    # Check stop words (most important filter)
+    if word in PERSIAN_STOP_WORDS or word in ENGLISH_STOP_WORDS:
+        return False
+    
+    # Check for very common Persian words that are not SEO keywords
+    common_non_keywords = {
+        # Basic verbs and auxiliaries
+        'است', 'بود', 'باشد', 'هست', 'هستند', 'بودند', 'باشند', 'خواهند',
+        'کرد', 'کرده', 'کردند', 'کرده‌اند', 'می‌کنند', 'می‌کند', 'می‌شود',
+        'می‌شوند', 'می‌تواند', 'می‌توانند', 'می‌توان', 'می‌خواهد', 'می‌خواهند',
+        'خواهد', 'خواست', 'خواسته', 'داشت', 'داشته', 'داشته‌اند', 'می‌داشت',
+        'می‌داشتند', 'شد', 'شده', 'شده‌اند',
+        
+        # Common pronouns and determiners
+        'این', 'آن', 'همه', 'همه‌ی', 'تمام', 'کلی', 'بعضی', 'برخی', 'هر',
+        'هیچ', 'کسی', 'چیزی', 'کدام', 'چه', 'چرا', 'کجا', 'کی', 'چگونه',
+        
+        # Common prepositions and conjunctions
+        'و', 'در', 'از', 'به', 'که', 'با', 'برای', 'تا', 'را', 'هم', 'نیز',
+        'همچنین', 'اما', 'ولی', 'اگر', 'چون', 'زیرا', 'نه', 'نمی', 'نمی‌شود',
+        'نمی‌تواند', 'نمی‌خواهد', 'نمی‌کند', 'نمی‌باشد',
+        
+        # Common adjectives that are too generic
+        'خوب', 'بد', 'زیبا', 'زشت', 'بزرگ', 'کوچک', 'بلند', 'کوتاه', 'پهن',
+        'باریک', 'ضخیم', 'نازک', 'سنگین', 'سبک', 'گرم', 'سرد', 'داغ', 'خنک',
+        'مرطوب', 'خشک', 'تمیز', 'کثیف', 'جدید', 'قدیمی', 'تازه', 'کهنه',
+        'سریع', 'آهسته', 'تند', 'کند', 'آسان', 'سخت', 'مشکل', 'راحت',
+        
+        # Common nouns that are too generic for SEO
+        'چیز', 'کار', 'مورد', 'نوع', 'گونه', 'مدل', 'سبک', 'روش', 'طریقه',
+        'شیوه', 'نحوه', 'چگونگی', 'کیفیت', 'مقدار', 'تعداد', 'اندازه',
+        'حجم', 'وزن', 'فاصله', 'مسافت', 'مساحت', 'محیط', 'دور', 'داخل',
+        'خارج', 'بالا', 'پایین', 'چپ', 'راست', 'وسط', 'کنار', 'جلوی',
+        'پشت', 'زیر', 'روی', 'بین', 'میان', 'نزدیک', 'قبل', 'بعد', 'حالا',
+        
+        # Time-related words
+        'امروز', 'دیروز', 'فردا', 'هفته', 'ماه', 'سال', 'ساعت', 'دقیقه',
+        'ثانیه', 'روز', 'شب', 'صبح', 'ظهر', 'عصر', 'شام',
+        
+        # Common Persian suffixes/prefixes and compound word parts
+        'های', 'ها', 'ان', 'ات', 'ین', 'ون', 'می', 'نمی',
+        'سازی', 'بستر', 'پیاده', 'نگهداری', 'پشتیبانی', 'خدمات', 'تخصصی',
+        'طراحی', 'دوره', 'شبکه', 'پروژه', 'مهندس', 'تیم',
+        
+        # Common compound word endings (that shouldn't be standalone keywords)
+        'سازی', 'بندی', 'دهی', 'گیری', 'پذیری', 'پذیری', 'کننده', 'کنندگان',
+        'دار', 'داران', 'دارنده', 'دارندگان', 'یاب', 'یابی', 'یابان',
+        'پذیر', 'پذیران', 'پذیرنده', 'پذیرندگان',
+        
+        # Common standalone words that are usually part of compounds
+        'بستر', 'پیاده', 'نگهداری', 'پشتیبانی', 'خدمات', 'تخصصی', 'طراحی',
+        'دوره', 'شبکه', 'پروژه', 'مهندس', 'تیم', 'سیستم', 'نرم', 'افزار',
+        'سخت', 'افزار', 'برنامه', 'نویسی', 'توسعه', 'پیاده', 'سازی',
+        
+        # Directional and positional words
+        'شمال', 'جنوب', 'شرق', 'غرب', 'وسط', 'کنار', 'جلوی', 'پشت', 'زیر', 'روی'
     }
     
-    # Extract words
-    words = re.findall(r'\b\w+\b', text.lower())
-    words = [w for w in words if len(w) >= min_length and w not in stop_words]
+    if word in common_non_keywords:
+        return False
+    
+    # Check for words that are too short
+    if len(word) < 2:
+        return False
+    
+    # Allow 2-letter words only if they are meaningful
+    if len(word) == 2:
+        meaningful_2_letter = {
+            'مو', 'چشم', 'دست', 'پا', 'سر', 'صورت', 'بدن', 'قلب', 'کبد',
+            'کلیه', 'روده', 'معده', 'ریه', 'مغز', 'استخوان', 'پوست', 'خون',
+            'آب', 'هوا', 'خاک', 'آتش', 'طلا', 'نقره', 'مس', 'آهن', 'فولاد',
+            'چوب', 'سنگ', 'شیشه', 'پلاستیک', 'کاغذ', 'پارچه', 'نخ', 'ریسمان'
+        }
+        if word not in meaningful_2_letter:
+            return False
+    
+    return True
+
+
+def analyze_keywords(text: str, min_length: int = 2) -> Dict[str, any]:
+    """Analyze keyword frequency and density using advanced filtering (same as keyword gap analyzer)"""
+    # Use advanced tokenization
+    words = _tokenize_text_advanced(text)
+    
+    if not words:
+        return {
+            'total_unique_words': 0,
+            'top_keywords': [],
+            'keyword_density_warnings': []
+        }
     
     word_freq = Counter(words)
     total_words = len(words)
     
-    # Get top keywords
-    top_keywords = word_freq.most_common(20)
+    # Get top keywords (only words that appear more than once)
+    top_keywords = [(word, count) for word, count in word_freq.most_common(30) if count > 1]
     
     # Calculate keyword density
     keyword_density = {}
@@ -103,10 +213,13 @@ def analyze_keywords(text: str, min_length: int = 3) -> Dict[str, any]:
         density = (count / total_words * 100) if total_words > 0 else 0
         keyword_density[word] = round(density, 2)
     
+    # Sort by frequency (descending)
+    top_keywords_sorted = sorted(top_keywords, key=lambda x: x[1], reverse=True)[:20]
+    
     return {
         'total_unique_words': len(word_freq),
         'top_keywords': [{'word': word, 'count': count, 'density': keyword_density[word]} 
-                        for word, count in top_keywords],
+                        for word, count in top_keywords_sorted],
         'keyword_density_warnings': [
             word for word, density in keyword_density.items() 
             if density > 3  # Over-optimization warning

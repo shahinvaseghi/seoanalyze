@@ -48,10 +48,18 @@
     </nav>
   </header>
   <div class="container">
-    <h1>🔍 Google Custom Search - SERP Analysis</h1>
-    <p style="color:#a0aec0">Real Google search results using Custom Search API (100 queries/day free)</p>
+    <h1>🔍 Search Engine - SERP Analysis</h1>
+    <p style="color:#a0aec0">Search results using Google Custom Search API or DuckDuckGo (no API key needed)</p>
     
     <div id="configStatus"></div>
+    <div id="searchEngineSelector" style="margin:16px 0">
+      <label style="color:#93c5fd;margin-right:12px">Search Engine:</label>
+      <select id="searchEngine" style="padding:8px;border:1px solid #1f2a44;border-radius:6px;background:#0d1830;color:#e7eaf3">
+        <option value="google">Google (Custom Search API)</option>
+        <option value="duckduckgo" selected>DuckDuckGo (No API Key Required)</option>
+      </select>
+      <span style="color:#a0aec0;font-size:12px;margin-left:12px">💡 DuckDuckGo doesn't require billing or API key</span>
+    </div>
     
     <div class="tabs">
       <div class="tab active" onclick="switchTab('search')">Search</div>
@@ -164,15 +172,30 @@
   <script>
     checkConfig();
     function checkConfig() {
+      const searchEngine = document.getElementById('searchEngine').value;
+      const status = document.getElementById('configStatus');
+      
+      if (searchEngine === 'duckduckgo') {
+        status.innerHTML = '<div class="info-box"><h4>✓ DuckDuckGo Ready</h4><p>No API key or billing required. Ready to search!</p></div>';
+        return;
+      }
+      
       fetch('/google-search/api/config').then(r => r.json()).then(d => {
-        const status = document.getElementById('configStatus');
         if (!d.configured) {
-          status.innerHTML = '<div class="warning-box"><h4>⚠️ API Not Configured</h4><p>Please add Google Custom Search API key and Search Engine ID to <code>configs/api_keys.json</code></p></div>';
+          status.innerHTML = '<div class="warning-box"><h4>⚠️ Google API Not Configured</h4><p>Please add Google Custom Search API key and Search Engine ID to <code>configs/api_keys.json</code> or use DuckDuckGo instead</p></div>';
         } else {
-          status.innerHTML = `<div class="info-box"><h4>✓ API Configured</h4><p>Daily Queries: ${d.daily_queries_used}/100 (${d.daily_queries_remaining} remaining)</p></div>`;
+          status.innerHTML = `<div class="info-box"><h4>✓ Google API Configured</h4><p>Daily Queries: ${d.daily_queries_used}/100 (${d.daily_queries_remaining} remaining)</p></div>`;
         }
       });
     }
+    
+    // Update config status when search engine changes
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchEngineSelect = document.getElementById('searchEngine');
+      if (searchEngineSelect) {
+        searchEngineSelect.addEventListener('change', checkConfig);
+      }
+    });
     function switchTab(tab) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -182,19 +205,25 @@
     function performSearch() {
       const query = document.getElementById('searchQuery').value.trim();
       const results = document.getElementById('searchResults');
+      const searchEngine = document.getElementById('searchEngine').value;
       if (!query) { results.innerHTML = '<div class="error">Enter search query</div>'; return; }
-      results.innerHTML = '<div class="loading">Searching...</div>';
-      fetch('/google-search/api/search', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query, num_results:parseInt(document.getElementById('numResults').value), country:document.getElementById('country').value, language:document.getElementById('language').value, site:document.getElementById('siteFilter').value.trim()||null})})
+      results.innerHTML = '<div class="loading">Searching with ' + (searchEngine === 'duckduckgo' ? 'DuckDuckGo' : 'Google') + '...</div>';
+      fetch('/google-search/api/search', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query, num_results:parseInt(document.getElementById('numResults').value), country:document.getElementById('country').value, language:document.getElementById('language').value, site:document.getElementById('siteFilter').value.trim()||null, use_duckduckgo: searchEngine === 'duckduckgo'})})
       .then(r => r.json()).then(d => {
         if (d.error) { results.innerHTML = `<div class="error">${d.error}</div>`; return; }
-        let html = `<p><strong>Total Results:</strong> ${d.total_results.toLocaleString()} | <strong>Search Time:</strong> ${d.search_time}s</p>`;
+        let html = '';
+        if (d.warning || d.fallback_message) {
+          html += `<div class="info-box" style="background:#1e3a8a"><p>${d.warning || d.fallback_message}</p></div>`;
+        }
+        html += `<p><strong>Total Results:</strong> ${d.total_results.toLocaleString()} | <strong>Search Time:</strong> ${d.search_time}s | <strong>Source:</strong> ${d.source || 'Google'}</p>`;
         if (d.items && d.items.length > 0) {
           d.items.forEach(item => {
             const badgeClass = item.position <= 3 ? 'rank-badge-top' : item.position <= 7 ? 'rank-badge-middle' : 'rank-badge-bottom';
             html += `<div class="result-item"><h4>${item.title} <span class="rank-badge ${badgeClass}">#${item.position}</span></h4><a href="${item.link}" target="_blank">${item.display_link || item.link}</a><p>${item.snippet}</p></div>`;
           });
         }
-        html += `<p style="color:#a0aec0;margin-top:16px">Queries Used: ${d.daily_queries_used}/100</p>`;
+        const limit = searchEngine === 'duckduckgo' ? 200 : 100;
+        html += `<p style="color:#a0aec0;margin-top:16px">Queries Used: ${d.daily_queries_used}/${limit}</p>`;
         results.innerHTML = html;
         checkConfig();
       }).catch(e => results.innerHTML = `<div class="error">Error: ${e.message}</div>`);
@@ -203,9 +232,10 @@
       const keyword = document.getElementById('rankKeyword').value.trim();
       const url = document.getElementById('rankUrl').value.trim();
       const results = document.getElementById('rankResults');
+      const searchEngine = document.getElementById('searchEngine').value;
       if (!keyword || !url) { results.innerHTML = '<div class="error">Enter keyword and URL</div>'; return; }
-      results.innerHTML = '<div class="loading">Searching for rank...</div>';
-      fetch('/google-search/api/rank', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keyword, url, country:document.getElementById('rankCountry').value, max_pages:parseInt(document.getElementById('maxPages').value)})})
+      results.innerHTML = '<div class="loading">Searching for rank with ' + (searchEngine === 'duckduckgo' ? 'DuckDuckGo' : 'Google') + '...</div>';
+      fetch('/google-search/api/rank', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({keyword, url, country:document.getElementById('rankCountry').value, max_pages:parseInt(document.getElementById('maxPages').value), use_duckduckgo: searchEngine === 'duckduckgo'})})
       .then(r => r.json()).then(d => {
         if (d.error) { results.innerHTML = `<div class="error">${d.error}</div>`; return; }
         let html = '';

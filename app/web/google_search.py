@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 
 from app.core.google_custom_search import GoogleCustomSearch
+from app.core.duckduckgo_search import DuckDuckGoSearch
 
 google_search_bp = Blueprint('google_search', __name__, url_prefix='/google-search')
 
@@ -32,18 +33,32 @@ def google_search_page():
 @google_search_bp.route('/api/search', methods=['POST'])
 @login_required
 def search():
-    """Perform Google search"""
+    """Perform search (Google Custom Search API or DuckDuckGo fallback)"""
     data = request.json or {}
     query = data.get('query')
     num_results = int(data.get('num_results', 10))
     country = data.get('country', 'us')
     language = data.get('language', 'en')
     site = data.get('site')
+    use_duckduckgo = data.get('use_duckduckgo', False)  # Option to force DuckDuckGo
     
     if not query:
         return jsonify({'error': 'Query is required'}), 400
     
     try:
+        # Try DuckDuckGo if requested or if Google API fails
+        if use_duckduckgo:
+            search_client = DuckDuckGoSearch()
+            results = search_client.search(
+                query=query,
+                num_results=num_results,
+                country=country,
+                language=language,
+                site=site
+            )
+            return jsonify(results)
+        
+        # Try Google Custom Search API first
         search_client = GoogleCustomSearch()
         results = search_client.search(
             query=query,
@@ -52,6 +67,20 @@ def search():
             language=language,
             site=site
         )
+        
+        # If Google API fails, try DuckDuckGo as fallback
+        if not results.get('success') and results.get('error_code') == 403:
+            duckduckgo_client = DuckDuckGoSearch()
+            duckduckgo_results = duckduckgo_client.search(
+                query=query,
+                num_results=num_results,
+                country=country,
+                language=language,
+                site=site
+            )
+            if duckduckgo_results.get('success'):
+                duckduckgo_results['fallback_message'] = 'Google API unavailable, using DuckDuckGo instead'
+                return jsonify(duckduckgo_results)
         
         return jsonify(results)
         
@@ -72,19 +101,45 @@ def find_rank():
     country = data.get('country', 'us')
     language = data.get('language', 'en')
     max_pages = int(data.get('max_pages', 10))
+    use_duckduckgo = data.get('use_duckduckgo', False)
     
     if not keyword or not target_url:
         return jsonify({'error': 'Keyword and URL are required'}), 400
     
     try:
-        search_client = GoogleCustomSearch()
-        result = search_client.find_keyword_rank(
-            keyword=keyword,
-            target_url=target_url,
-            country=country,
-            language=language,
-            max_pages=max_pages
-        )
+        # Use DuckDuckGo if requested
+        if use_duckduckgo:
+            search_client = DuckDuckGoSearch()
+            result = search_client.find_keyword_rank(
+                keyword=keyword,
+                target_url=target_url,
+                country=country,
+                language=language,
+                max_pages=max_pages
+            )
+        else:
+            # Try Google Custom Search API first
+            search_client = GoogleCustomSearch()
+            result = search_client.find_keyword_rank(
+                keyword=keyword,
+                target_url=target_url,
+                country=country,
+                language=language,
+                max_pages=max_pages
+            )
+            
+            # Fallback to DuckDuckGo if Google fails
+            if not result.get('success'):
+                duckduckgo_client = DuckDuckGoSearch()
+                result = duckduckgo_client.find_keyword_rank(
+                    keyword=keyword,
+                    target_url=target_url,
+                    country=country,
+                    language=language,
+                    max_pages=max_pages
+                )
+                if result.get('success'):
+                    result['fallback_message'] = 'Google API unavailable, using DuckDuckGo instead'
         
         # If rank found, also save to rank tracker
         if result.get('success') and result.get('found'):

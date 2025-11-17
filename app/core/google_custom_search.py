@@ -1,12 +1,17 @@
 """
 Google Custom Search API Integration
 Provides SERP results and keyword ranking tracking
+Falls back to web scraping if API is not available
 """
 import requests
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 import json
 from pathlib import Path
+from bs4 import BeautifulSoup
+from urllib.parse import quote_plus, urlparse
+import time
+import random
 
 
 class GoogleCustomSearch:
@@ -28,10 +33,26 @@ class GoogleCustomSearch:
         self.base_url = "https://www.googleapis.com/customsearch/v1"
         self.daily_queries = 0
         self.last_reset_date = datetime.now().date()
+        self.use_scraping_fallback = False  # Flag to use scraping if API fails
         
         # Load config if not provided
         if not self.api_key or not self.search_engine_id:
             self._load_config()
+        
+        # Headers for scraping
+        self.scraping_headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'fa-IR,fa;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Referer': 'https://www.google.com/',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'same-origin'
+        }
     
     def _load_config(self):
         """Load API credentials from config file"""
@@ -101,6 +122,38 @@ class GoogleCustomSearch:
         
         try:
             response = requests.get(self.base_url, params=params, timeout=10)
+            
+            # Check for specific error responses
+            if response.status_code == 403:
+                error_data = response.json() if response.content else {}
+                error_message = error_data.get('error', {}).get('message', 'Forbidden')
+                
+                # Try scraping fallback if API fails
+                if not self.use_scraping_fallback:
+                    self.use_scraping_fallback = True
+                    scraping_result = self._search_via_scraping(query, num_results, country, language, site)
+                    if scraping_result.get('success'):
+                        scraping_result['warning'] = 'Using web scraping fallback (API unavailable). Results may be limited.'
+                        return scraping_result
+                
+                return {
+                    'error': f'API access denied (403): {error_message}. Please check: 1) Custom Search API is enabled, 2) API key has access to Custom Search API, 3) Billing is enabled. Trying scraping fallback...',
+                    'success': False,
+                    'error_code': 403,
+                    'error_details': error_data.get('error', {}),
+                    'fallback_attempted': True
+                }
+            
+            if response.status_code == 400:
+                error_data = response.json() if response.content else {}
+                error_message = error_data.get('error', {}).get('message', 'Bad Request')
+                return {
+                    'error': f'Invalid request (400): {error_message}',
+                    'success': False,
+                    'error_code': 400,
+                    'error_details': error_data.get('error', {})
+                }
+            
             response.raise_for_status()
             
             self.daily_queries += 1
@@ -131,6 +184,14 @@ class GoogleCustomSearch:
             return results
             
         except requests.exceptions.RequestException as e:
+            # Try scraping fallback on network errors
+            if not self.use_scraping_fallback:
+                self.use_scraping_fallback = True
+                scraping_result = self._search_via_scraping(query, num_results, country, language, site)
+                if scraping_result.get('success'):
+                    scraping_result['warning'] = 'Using web scraping fallback (API unavailable). Results may be limited.'
+                    return scraping_result
+            
             return {
                 'error': f'API request failed: {str(e)}',
                 'success': False
@@ -138,6 +199,150 @@ class GoogleCustomSearch:
         except Exception as e:
             return {
                 'error': f'Unexpected error: {str(e)}',
+                'success': False
+            }
+    
+    def _search_via_scraping(self, query: str, num_results: int = 10, country: str = 'us',
+                            language: str = 'en', site: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Fallback method: Scrape Google search results directly
+        WARNING: This may trigger CAPTCHA or rate limiting
+        """
+        try:
+            # Build search URL
+            search_query = query
+            if site:
+                search_query = f"site:{site} {query}"
+            
+            encoded_query = quote_plus(search_query)
+            
+            # Google search URL with parameters
+            search_url = f"https://www.google.com/search?q={encoded_query}&num={min(num_results, 10)}"
+            
+            # Add country and language parameters
+            if country:
+                search_url += f"&gl={country}"
+            if language:
+                lang_map = {'fa': 'fa-IR', 'en': 'en-US', 'de': 'de-DE'}
+                search_url += f"&hl={lang_map.get(language, language)}"
+            
+            # Add random delay to avoid rate limiting
+            time.sleep(random.uniform(1, 3))
+            
+            # Make request with realistic headers
+            response = requests.get(search_url, headers=self.scraping_headers, timeout=15)
+            
+            if response.status_code != 200:
+                return {
+                    'error': f'Scraping failed: HTTP {response.status_code}',
+                    'success': False
+                }
+            
+            # Check for CAPTCHA
+            if 'captcha' in response.text.lower() or 'sorry' in response.text.lower():
+                return {
+                    'error': 'Google CAPTCHA detected. Please try again later or use VPN.',
+                    'success': False,
+                    'captcha_detected': True
+                }
+            
+            soup = BeautifulSoup(response.content, 'html.parser')
+            
+            # Extract search results
+            items = []
+            
+            # Method 1: Modern Google results (div.g)
+            for result in soup.find_all('div', class_='g'):
+                try:
+                    # Find title link
+                    title_elem = result.find('h3')
+                    link_elem = result.find('a', href=True)
+                    
+                    if not link_elem:
+                        continue
+                    
+                    # Extract URL (handle Google redirects)
+                    href = link_elem.get('href', '')
+                    if href.startswith('/url?q='):
+                        # Extract actual URL from Google redirect
+                        from urllib.parse import parse_qs, urlparse
+                        parsed = urlparse(href)
+                        params = parse_qs(parsed.query)
+                        url = params.get('q', [href])[0]
+                    elif href.startswith('http'):
+                        url = href
+                    else:
+                        continue
+                    
+                    # Skip Google's own pages
+                    if 'google.com' in url or 'youtube.com' in url:
+                        continue
+                    
+                    # Extract title
+                    title = title_elem.get_text() if title_elem else link_elem.get_text()
+                    
+                    # Extract snippet
+                    snippet_elem = result.find('span', class_=['aCOpRe', 'st'])
+                    if not snippet_elem:
+                        snippet_elem = result.find('div', class_='VwiC3b')
+                    snippet = snippet_elem.get_text() if snippet_elem else ''
+                    
+                    # Extract display link
+                    display_link = urlparse(url).netloc
+                    
+                    items.append({
+                        'title': title.strip(),
+                        'link': url,
+                        'snippet': snippet.strip(),
+                        'display_link': display_link,
+                        'position': len(items) + 1
+                    })
+                    
+                    if len(items) >= num_results:
+                        break
+                except Exception:
+                    continue
+            
+            # Method 2: Alternative parsing (backup)
+            if len(items) < 3:
+                for link in soup.find_all('a', href=True):
+                    href = link.get('href', '')
+                    if href.startswith('/url?q='):
+                        from urllib.parse import parse_qs, urlparse
+                        parsed = urlparse(href)
+                        params = parse_qs(parsed.query)
+                        url = params.get('q', [None])[0]
+                        
+                        if url and 'google.com' not in url and 'youtube.com' not in url:
+                            title = link.get_text().strip()
+                            if title and len(title) > 5:
+                                items.append({
+                                    'title': title,
+                                    'link': url,
+                                    'snippet': '',
+                                    'display_link': urlparse(url).netloc,
+                                    'position': len(items) + 1
+                                })
+                                
+                                if len(items) >= num_results:
+                                    break
+            
+            return {
+                'success': True,
+                'query': query,
+                'total_results': len(items) * 10,  # Estimate
+                'search_time': 0.5,  # Estimate
+                'items': items[:num_results],
+                'daily_queries_used': self.daily_queries,
+                'daily_queries_remaining': 100 - self.daily_queries,
+                'timestamp': datetime.now().isoformat(),
+                'method': 'scraping',
+                'warning': 'Results obtained via web scraping. May be limited or blocked by Google.'
+            }
+            
+        except Exception as e:
+            return {
+                'error': f'Scraping failed: {str(e)}',
                 'success': False
             }
     
