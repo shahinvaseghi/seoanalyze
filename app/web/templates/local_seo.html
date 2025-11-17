@@ -3,23 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Local SEO Analysis</title>
+  <title>Local SEO Analysis - City-Based Analysis</title>
   <style>
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#07111f;color:#e7eaf3;margin:0}
     header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#0d1830;border-bottom:1px solid #1f2a44}
     .brand{font-weight:700}
-    .container{padding:24px;max-width:1200px;margin:0 auto}
+    .container{padding:24px;max-width:1400px;margin:0 auto}
     a{color:#93c5fd;text-decoration:none}
     .input-group{margin:20px 0}
     .input-group label{display:block;margin-bottom:8px;font-weight:500;color:#93c5fd}
-    .input-group input{width:100%;max-width:600px;padding:10px;border:1px solid #1f2a44;border-radius:6px;background:#0d1830;color:#e7eaf3;font-size:14px}
-    .btn{background:#10b981;color:#fff;border:none;border-radius:6px;padding:12px 24px;cursor:pointer;font-size:14px;font-weight:600}
+    .input-group input,.input-group select{width:100%;max-width:600px;padding:10px;border:1px solid #1f2a44;border-radius:6px;background:#0d1830;color:#e7eaf3;font-size:14px}
+    .btn{background:#10b981;color:#fff;border:none;border-radius:6px;padding:12px 24px;cursor:pointer;font-size:14px;font-weight:600;margin-right:8px}
     .btn:hover{background:#059669}
+    .btn:disabled{opacity:0.6;cursor:not-allowed}
+    .btn-secondary{background:#3b82f6}
+    .btn-secondary:hover{background:#2563eb}
     .section{background:#0d1830;border:1px solid #1f2a44;border-radius:8px;padding:20px;margin:16px 0}
-    .section h3{color:#93c5fd;margin-top:0}
+    .section h3{color:#93c5fd;margin-top:0;border-bottom:1px solid #1f2a44;padding-bottom:12px}
     .metric{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1f2a44}
+    .metric:last-child{border-bottom:none}
+    .metric-label{color:#a0aec0}
+    .metric-value{color:#e7eaf3;font-weight:600}
+    .score-box{background:#0d1830;border:1px solid #1f2a44;border-radius:8px;padding:24px;margin:16px 0;text-align:center}
+    .score-value{font-size:48px;font-weight:700;color:#10b981;margin:8px 0}
+    .badge{display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;margin-left:8px}
+    .badge-good{background:#10b981;color:white}
+    .badge-warning{background:#f59e0b;color:white}
+    .badge-error{background:#ef4444;color:white}
+    .action-item{padding:16px;margin:12px 0;background:#1f2a44;border-left:4px solid #3b82f6;border-radius:4px}
+    .action-item.critical{border-left-color:#ef4444}
+    .action-item.high{border-left-color:#f59e0b}
+    .action-item.medium{border-left-color:#3b82f6}
+    .competitor-item{padding:12px;margin:8px 0;background:#1f2a44;border-radius:4px}
+    .competitor-item h4{margin:0 0 8px 0;color:#93c5fd}
+    .competitor-item a{color:#60a5fa;font-size:13px;word-break:break-all}
+    .tabs{display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid #1f2a44}
+    .tab{padding:12px 24px;cursor:pointer;border-bottom:2px solid transparent;color:#a0aec0}
+    .tab.active{border-bottom-color:#10b981;color:#10b981;font-weight:600}
+    .tab-content{display:none}
+    .tab-content.active{display:block}
     .loading{text-align:center;padding:40px;color:#a0aec0}
     .error{background:#ef4444;color:white;padding:16px;border-radius:8px;margin:16px 0}
+    .recommendation-list{list-style:none;padding:0;margin:12px 0}
+    .recommendation-list li{padding:8px 0;color:#a0aec0;border-bottom:1px solid #1f2a44}
+    .recommendation-list li:last-child{border-bottom:none}
+    .recommendation-list li:before{content:"→ ";color:#93c5fd;margin-left:8px}
   </style>
 </head>
 <body>
@@ -31,38 +59,435 @@
     </nav>
   </header>
   <div class="container">
-    <h1>📍 Local SEO Analysis</h1>
-    <p style="color:#a0aec0">Local SEO optimization analysis</p>
+    <h1>📍 Local SEO Analysis - City-Based Analysis</h1>
+    <p style="color:#a0aec0">Analyze Local SEO for a specific city and compare with competitors</p>
     
-    <div class="input-group">
-      <label for="url">Website URL:</label>
-      <input id="url" type="text" placeholder="https://example.com" />
-    </div>
-    <div class="input-group">
-      <label for="businessName">Business Name (Optional):</label>
-      <input id="businessName" type="text" placeholder="Business Name" />
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('analyze')">Analyze Page</div>
+      <div class="tab" onclick="switchTab('find')">Find Competitors</div>
+      <div class="tab" onclick="switchTab('compare')">Compare Competitors</div>
     </div>
     
-    <button class="btn" onclick="analyze()">Analyze Local SEO</button>
-    <div id="results"></div>
+    <!-- Analyze Tab -->
+    <div id="analyzeTab" class="tab-content active">
+      <div class="section">
+        <h3>Local SEO Analysis</h3>
+        <div class="input-group">
+          <label for="url">Website URL:</label>
+          <input id="url" type="text" placeholder="https://example.com" />
+        </div>
+        <div class="input-group">
+          <label for="businessName">Business Name (Optional):</label>
+          <input id="businessName" type="text" placeholder="Business Name" />
+        </div>
+        <div style="display:flex;gap:12px;align-items:end">
+          <div class="input-group" style="margin:0;flex:1">
+            <label for="province">Province (استان):</label>
+            <select id="province" onchange="updateCities()">
+              <option value="">Select Province</option>
+              <option value="تهران">تهران</option>
+              <option value="اصفهان">اصفهان</option>
+              <option value="خراسان رضوی">خراسان رضوی</option>
+              <option value="فارس">فارس</option>
+              <option value="آذربایجان شرقی">آذربایجان شرقی</option>
+              <option value="البرز">البرز</option>
+              <option value="قم">قم</option>
+              <option value="خوزستان">خوزستان</option>
+            </select>
+          </div>
+          <div class="input-group" style="margin:0;flex:1">
+            <label for="city">City (شهر):</label>
+            <select id="city">
+              <option value="">Select City</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn" id="analyzeBtn" onclick="analyze()">Analyze Local SEO</button>
+        <div id="results"></div>
+      </div>
+    </div>
+    
+    <!-- Find Competitors Tab -->
+    <div id="findTab" class="tab-content">
+      <div class="section">
+        <h3>Find Competitors in City</h3>
+        <div class="input-group">
+          <label for="findBusinessType">Business Type (نوع کسب‌وکار):</label>
+          <input id="findBusinessType" type="text" placeholder="دندانپزشک، کلینیک، مطب، رستوران" />
+        </div>
+        <div style="display:flex;gap:12px;align-items:end">
+          <div class="input-group" style="margin:0;flex:1">
+            <label for="findProvince">Province:</label>
+            <select id="findProvince" onchange="updateFindCities()">
+              <option value="">Select Province</option>
+              <option value="تهران">تهران</option>
+              <option value="اصفهان">اصفهان</option>
+              <option value="خراسان رضوی">خراسان رضوی</option>
+              <option value="فارس">فارس</option>
+              <option value="آذربایجان شرقی">آذربایجان شرقی</option>
+              <option value="البرز">البرز</option>
+              <option value="قم">قم</option>
+              <option value="خوزستان">خوزستان</option>
+            </select>
+          </div>
+          <div class="input-group" style="margin:0;flex:1">
+            <label for="findCity">City:</label>
+            <select id="findCity">
+              <option value="">Select City</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn" id="findBtn" onclick="findCompetitors()">Find Competitors</button>
+        <div id="findResults"></div>
+      </div>
+    </div>
+    
+    <!-- Compare Tab -->
+    <div id="compareTab" class="tab-content">
+      <div class="section">
+        <h3>Compare with Competitors</h3>
+        <div class="input-group">
+          <label for="compareUrl">Your Website URL:</label>
+          <input id="compareUrl" type="text" placeholder="https://example.com" />
+        </div>
+        <div class="input-group">
+          <label for="compareBusinessType">Business Type:</label>
+          <input id="compareBusinessType" type="text" placeholder="دندانپزشک، کلینیک" />
+        </div>
+        <div style="display:flex;gap:12px;align-items:end">
+          <div class="input-group" style="margin:0;flex:1">
+            <label for="compareProvince">Province:</label>
+            <select id="compareProvince" onchange="updateCompareCities()">
+              <option value="">Select Province</option>
+              <option value="تهران">تهران</option>
+              <option value="اصفهان">اصفهان</option>
+              <option value="خراسان رضوی">خراسان رضوی</option>
+              <option value="فارس">فارس</option>
+              <option value="آذربایجان شرقی">آذربایجان شرقی</option>
+              <option value="البرز">البرز</option>
+              <option value="قم">قم</option>
+              <option value="خوزستان">خوزستان</option>
+            </select>
+          </div>
+          <div class="input-group" style="margin:0;flex:1">
+            <label for="compareCity">City:</label>
+            <select id="compareCity">
+              <option value="">Select City</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn" id="compareBtn" onclick="compareCompetitors()">Compare</button>
+        <div id="compareResults"></div>
+      </div>
+    </div>
   </div>
+  
   <script>
+    const citiesByProvince = {
+      'تهران': ['تهران', 'شهریار', 'ورامین', 'اسلامشهر', 'کرج'],
+      'اصفهان': ['اصفهان', 'کاشان', 'نجف‌آباد', 'خمینی‌شهر'],
+      'خراسان رضوی': ['مشهد', 'نیشابور', 'سبزوار'],
+      'فارس': ['شیراز', 'مرودشت', 'کازرون'],
+      'آذربایجان شرقی': ['تبریز', 'مراغه', 'میانه'],
+      'البرز': ['کرج', 'هشتگرد', 'فردیس'],
+      'قم': ['قم'],
+      'خوزستان': ['اهواز', 'آبادان', 'دزفول']
+    };
+    
+    function updateCities() {
+      const province = document.getElementById('province').value;
+      const citySelect = document.getElementById('city');
+      citySelect.innerHTML = '<option value="">Select City</option>';
+      if (province && citiesByProvince[province]) {
+        citiesByProvince[province].forEach(city => {
+          citySelect.innerHTML += `<option value="${city}">${city}</option>`;
+        });
+      }
+    }
+    
+    function updateFindCities() {
+      const province = document.getElementById('findProvince').value;
+      const citySelect = document.getElementById('findCity');
+      citySelect.innerHTML = '<option value="">Select City</option>';
+      if (province && citiesByProvince[province]) {
+        citiesByProvince[province].forEach(city => {
+          citySelect.innerHTML += `<option value="${city}">${city}</option>`;
+        });
+      }
+    }
+    
+    function updateCompareCities() {
+      const province = document.getElementById('compareProvince').value;
+      const citySelect = document.getElementById('compareCity');
+      citySelect.innerHTML = '<option value="">Select City</option>';
+      if (province && citiesByProvince[province]) {
+        citiesByProvince[province].forEach(city => {
+          citySelect.innerHTML += `<option value="${city}">${city}</option>`;
+        });
+      }
+    }
+    
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tab + 'Tab').classList.add('active');
+    }
+    
     function analyze() {
       const url = document.getElementById('url').value.trim();
       const businessName = document.getElementById('businessName').value.trim();
+      const province = document.getElementById('province').value;
+      const city = document.getElementById('city').value;
       const results = document.getElementById('results');
-      if (!url) { results.innerHTML = '<div class="error">Enter URL</div>'; return; }
-      results.innerHTML = '<div class="loading">Analyzing...</div>';
-      fetch('/local-seo/api/analyze', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url, business_name:businessName})})
-      .then(r => r.json()).then(d => {
-        if (d.error) { results.innerHTML = `<div class="error">${d.error}</div>`; return; }
-        let html = `<div class="section"><h3>NAP Consistency</h3><div class="metric"><span>Consistent:</span><span>${d.nap_consistency.consistent ? 'Yes' : 'No'}</span></div><div class="metric"><span>Score:</span><span>${d.nap_consistency.score}/100</span></div></div>`;
-        html += `<div class="section"><h3>Google Maps</h3><div class="metric"><span>Has Embedded Map:</span><span>${d.google_maps.has_embedded_map ? 'Yes' : 'No'}</span></div></div>`;
-        html += `<div class="section"><h3>Overall Score: ${d.overall_score}/100</h3></div>`;
+      const btn = document.getElementById('analyzeBtn');
+      
+      if (!url) { 
+        results.innerHTML = '<div class="error">Enter URL</div>'; 
+        return; 
+      }
+      
+      btn.disabled = true;
+      btn.textContent = 'Analyzing...';
+      results.innerHTML = '<div class="loading">Analyzing Local SEO...</div>';
+      
+      fetch('/local-seo/api/analyze', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url, business_name: businessName, province, city})
+      })
+      .then(r => r.json())
+      .then(d => {
+        btn.disabled = false;
+        btn.textContent = 'Analyze Local SEO';
+        
+        if (d.error) { 
+          results.innerHTML = `<div class="error">${d.error}</div>`; 
+          return; 
+        }
+        
+        displayResults(d);
+      })
+      .catch(e => {
+        btn.disabled = false;
+        btn.textContent = 'Analyze Local SEO';
+        results.innerHTML = `<div class="error">Error: ${e.message}</div>`;
+      });
+    }
+    
+    function displayResults(data) {
+      let html = '';
+      
+      // Overall Score
+      html += `
+        <div class="score-box">
+          <h2>Local SEO Score</h2>
+          <div class="score-value">${data.overall_score || 0}</div>
+          <p style="color:#a0aec0">Grade: <strong>${data.grade || 'N/A'}</strong></p>
+        </div>
+      `;
+      
+      // City Analysis
+      if (data.city_analysis) {
+        html += '<div class="section"><h3>🏙️ City-Specific Analysis</h3>';
+        html += `<div class="metric"><span class="metric-label">Target City:</span><span class="metric-value">${data.city_analysis.target_city}</span></div>`;
+        html += `<div class="metric"><span class="metric-label">City Optimization Score:</span><span class="metric-value">${data.city_analysis.city_optimization_score}/100</span></div>`;
+        
+        const keywords = data.city_analysis.city_keywords_found;
+        html += '<h4 style="color:#93c5fd;margin-top:16px">City Keywords Check:</h4>';
+        html += `<div class="metric"><span class="metric-label">In Title:</span><span class="metric-value"><span class="badge ${keywords.in_title ? 'badge-good' : 'badge-error'}">${keywords.in_title ? 'Yes' : 'No'}</span></span></div>`;
+        html += `<div class="metric"><span class="metric-label">In H1:</span><span class="metric-value"><span class="badge ${keywords.in_h1 ? 'badge-good' : 'badge-error'}">${keywords.in_h1 ? 'Yes' : 'No'}</span></span></div>`;
+        html += `<div class="metric"><span class="metric-label">In Meta Description:</span><span class="metric-value"><span class="badge ${keywords.in_meta_description ? 'badge-good' : 'badge-error'}">${keywords.in_meta_description ? 'Yes' : 'No'}</span></span></div>`;
+        html += `<div class="metric"><span class="metric-label">Mentions in Content:</span><span class="metric-value">${keywords.count_in_content}</span></div>`;
+        
+        if (data.city_analysis.recommendations && data.city_analysis.recommendations.length > 0) {
+          html += '<h4 style="color:#93c5fd;margin-top:16px">City-Specific Recommendations:</h4><ul class="recommendation-list">';
+          data.city_analysis.recommendations.forEach(rec => {
+            html += `<li>${rec}</li>`;
+          });
+          html += '</ul>';
+        }
+        html += '</div>';
+      }
+      
+      // Priority Actions
+      if (data.priority_actions && data.priority_actions.length > 0) {
+        html += '<div class="section"><h3>⚠️ Priority Actions</h3>';
+        data.priority_actions.forEach(action => {
+          const priorityClass = action.priority.toLowerCase();
+          const badgeClass = action.priority === 'CRITICAL' ? 'badge-error' : 
+                           action.priority === 'HIGH' ? 'badge-warning' : 'badge-good';
+          html += `
+            <div class="action-item ${priorityClass}">
+              <div><span class="badge ${badgeClass}">${action.priority}</span> <strong>${action.category}</strong></div>
+              <div style="margin-top:8px">${action.action}</div>
+              ${action.details ? `<div style="color:#a0aec0;font-size:13px;margin-top:4px">${action.details}</div>` : ''}
+            </div>
+          `;
+        });
+        html += '</div>';
+      }
+      
+      // NAP Consistency
+      if (data.nap_consistency) {
+        html += '<div class="section"><h3>📋 NAP Consistency</h3>';
+        html += `<div class="metric"><span class="metric-label">Consistent:</span><span class="metric-value"><span class="badge ${data.nap_consistency.consistent ? 'badge-good' : 'badge-error'}">${data.nap_consistency.consistent ? 'Yes' : 'No'}</span></span></div>`;
+        html += `<div class="metric"><span class="metric-label">Score:</span><span class="metric-value">${data.nap_consistency.score}/100</span></div>`;
+        if (data.nap_consistency.name) html += `<div class="metric"><span class="metric-label">Name:</span><span class="metric-value">${data.nap_consistency.name}</span></div>`;
+        if (data.nap_consistency.address) html += `<div class="metric"><span class="metric-label">Address:</span><span class="metric-value">${data.nap_consistency.address}</span></div>`;
+        if (data.nap_consistency.phone) html += `<div class="metric"><span class="metric-label">Phone:</span><span class="metric-value">${data.nap_consistency.phone}</span></div>`;
+        html += '</div>';
+      }
+      
+      // Google Maps
+      if (data.google_maps) {
+        html += '<div class="section"><h3>🗺️ Google Maps</h3>';
+        html += `<div class="metric"><span class="metric-label">Has Embedded Map:</span><span class="metric-value"><span class="badge ${data.google_maps.has_embedded_map ? 'badge-good' : 'badge-error'}">${data.google_maps.has_embedded_map ? 'Yes' : 'No'}</span></span></div>`;
+        if (data.google_maps.recommendations && data.google_maps.recommendations.length > 0) {
+          html += '<ul class="recommendation-list">';
+          data.google_maps.recommendations.forEach(rec => {
+            html += `<li>${rec}</li>`;
+          });
+          html += '</ul>';
+        }
+        html += '</div>';
+      }
+      
+      // Geo Schema
+      if (data.geo_schema) {
+        html += '<div class="section"><h3>📍 Geographic Schema</h3>';
+        html += `<div class="metric"><span class="metric-label">Has Geo Coordinates:</span><span class="metric-value"><span class="badge ${data.geo_schema.has_geo_coordinates ? 'badge-good' : 'badge-error'}">${data.geo_schema.has_geo_coordinates ? 'Yes' : 'No'}</span></span></div>`;
+        html += `<div class="metric"><span class="metric-label">Has Area Served:</span><span class="metric-value"><span class="badge ${data.geo_schema.has_area_served ? 'badge-good' : 'badge-error'}">${data.geo_schema.has_area_served ? 'Yes' : 'No'}</span></span></div>`;
+        if (data.geo_schema.areas_served && data.geo_schema.areas_served.length > 0) {
+          html += `<div class="metric"><span class="metric-label">Areas Served:</span><span class="metric-value">${data.geo_schema.areas_served.join(', ')}</span></div>`;
+        }
+        if (data.geo_schema.recommendations && data.geo_schema.recommendations.length > 0) {
+          html += '<ul class="recommendation-list">';
+          data.geo_schema.recommendations.forEach(rec => {
+            html += `<li>${rec}</li>`;
+          });
+          html += '</ul>';
+        }
+        html += '</div>';
+      }
+      
+      document.getElementById('results').innerHTML = html;
+    }
+    
+    function findCompetitors() {
+      const businessType = document.getElementById('findBusinessType').value.trim();
+      const province = document.getElementById('findProvince').value;
+      const city = document.getElementById('findCity').value;
+      const results = document.getElementById('findResults');
+      const btn = document.getElementById('findBtn');
+      
+      if (!businessType || !city) {
+        results.innerHTML = '<div class="error">Enter business type and select city</div>';
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.textContent = 'Searching...';
+      results.innerHTML = '<div class="loading">Finding competitors in ' + city + '...</div>';
+      
+      fetch('/local-seo/api/find-competitors', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({business_type: businessType, city, province})
+      })
+      .then(r => r.json())
+      .then(d => {
+        btn.disabled = false;
+        btn.textContent = 'Find Competitors';
+        
+        if (d.error) {
+          results.innerHTML = `<div class="error">${d.error}</div>`;
+          return;
+        }
+        
+        let html = `<div class="section"><h3>Competitors Found in ${city}</h3>`;
+        html += `<p>Found <strong>${d.competitors_found}</strong> competitors for "${d.query}"</p>`;
+        if (d.competitors && d.competitors.length > 0) {
+          d.competitors.forEach(comp => {
+            html += `
+              <div class="competitor-item">
+                <h4>#${comp.position} - ${comp.title}</h4>
+                <a href="${comp.url}" target="_blank">${comp.url}</a>
+                <p style="color:#a0aec0;font-size:13px;margin-top:8px">${comp.snippet}</p>
+              </div>
+            `;
+          });
+        }
+        html += '</div>';
         results.innerHTML = html;
-      }).catch(e => results.innerHTML = `<div class="error">Error: ${e.message}</div>`);
+      })
+      .catch(e => {
+        btn.disabled = false;
+        btn.textContent = 'Find Competitors';
+        results.innerHTML = `<div class="error">Error: ${e.message}</div>`;
+      });
+    }
+    
+    function compareCompetitors() {
+      const url = document.getElementById('compareUrl').value.trim();
+      const businessType = document.getElementById('compareBusinessType').value.trim();
+      const province = document.getElementById('compareProvince').value;
+      const city = document.getElementById('compareCity').value;
+      const results = document.getElementById('compareResults');
+      const btn = document.getElementById('compareBtn');
+      
+      if (!url || !city) {
+        results.innerHTML = '<div class="error">Enter URL and select city</div>';
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.textContent = 'Comparing...';
+      results.innerHTML = '<div class="loading">Comparing with competitors in ' + city + '...</div>';
+      
+      fetch('/local-seo/api/compare-competitors', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url, business_type: businessType, city, province})
+      })
+      .then(r => r.json())
+      .then(d => {
+        btn.disabled = false;
+        btn.textContent = 'Compare';
+        
+        if (d.error) {
+          results.innerHTML = `<div class="error">${d.error}</div>`;
+          return;
+        }
+        
+        const comp = d.comparison;
+        let html = `<div class="section"><h3>Comparison Results for ${city}</h3>`;
+        html += `<div class="score-box"><h4>Your Score</h4><div class="score-value">${comp.target.overall_score}</div><p>City Score: ${comp.target.city_score}/100</p></div>`;
+        html += `<div class="metric"><span class="metric-label">Average Competitor Score:</span><span class="metric-value">${comp.average_competitor_score}</span></div>`;
+        html += `<div class="metric"><span class="metric-label">Your Position:</span><span class="metric-value"><span class="badge ${comp.target_vs_competitors.position === 'above' ? 'badge-good' : 'badge-error'}">${comp.target_vs_competitors.position === 'above' ? 'Above Average' : 'Below Average'}</span></span></div>`;
+        
+        if (comp.competitors && comp.competitors.length > 0) {
+          html += '<h4 style="color:#93c5fd;margin-top:16px">Competitor Details:</h4>';
+          comp.competitors.forEach((comp, idx) => {
+            html += `
+              <div class="competitor-item">
+                <h4>Competitor #${idx + 1}</h4>
+                <a href="${comp.url}" target="_blank">${comp.url}</a>
+                <div class="metric"><span>Overall Score:</span><span>${comp.overall_score}</span></div>
+                <div class="metric"><span>City Score:</span><span>${comp.city_score}</span></div>
+              </div>
+            `;
+          });
+        }
+        html += '</div>';
+        results.innerHTML = html;
+      })
+      .catch(e => {
+        btn.disabled = false;
+        btn.textContent = 'Compare';
+        results.innerHTML = `<div class="error">Error: ${e.message}</div>`;
+      });
     }
   </script>
 </body>
 </html>
-

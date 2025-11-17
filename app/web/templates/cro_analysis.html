@@ -3,23 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CRO Analysis</title>
+  <title>CRO Analysis - UX/UI Best Practices</title>
   <style>
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:#07111f;color:#e7eaf3;margin:0}
     header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#0d1830;border-bottom:1px solid #1f2a44}
     .brand{font-weight:700}
-    .container{padding:24px;max-width:1200px;margin:0 auto}
+    .container{padding:24px;max-width:1400px;margin:0 auto}
     a{color:#93c5fd;text-decoration:none}
     .input-group{margin:20px 0}
     .input-group label{display:block;margin-bottom:8px;font-weight:500;color:#93c5fd}
     .input-group input{width:100%;max-width:600px;padding:10px;border:1px solid #1f2a44;border-radius:6px;background:#0d1830;color:#e7eaf3;font-size:14px}
     .btn{background:#10b981;color:#fff;border:none;border-radius:6px;padding:12px 24px;cursor:pointer;font-size:14px;font-weight:600}
     .btn:hover{background:#059669}
+    .btn:disabled{opacity:0.6;cursor:not-allowed}
     .section{background:#0d1830;border:1px solid #1f2a44;border-radius:8px;padding:20px;margin:16px 0}
-    .section h3{color:#93c5fd;margin-top:0}
+    .section h3{color:#93c5fd;margin-top:0;border-bottom:1px solid #1f2a44;padding-bottom:12px}
     .metric{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1f2a44}
+    .metric:last-child{border-bottom:none}
+    .metric-label{color:#a0aec0}
+    .metric-value{color:#e7eaf3;font-weight:600}
+    .score-box{background:#0d1830;border:1px solid #1f2a44;border-radius:8px;padding:24px;margin:16px 0;text-align:center}
+    .score-value{font-size:48px;font-weight:700;color:#10b981;margin:8px 0}
+    .badge{display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;margin-left:8px}
+    .badge-good{background:#10b981;color:white}
+    .badge-warning{background:#f59e0b;color:white}
+    .badge-error{background:#ef4444;color:white}
+    .badge-critical{background:#dc2626;color:white}
+    .action-item{padding:16px;margin:12px 0;background:#1f2a44;border-left:4px solid #3b82f6;border-radius:4px}
+    .action-item.critical{border-left-color:#ef4444}
+    .action-item.high{border-left-color:#f59e0b}
+    .action-item.medium{border-left-color:#3b82f6}
+    .action-item.low{border-left-color:#10b981}
+    .action-priority{font-weight:700;margin-bottom:4px}
+    .action-category{color:#93c5fd;font-size:12px;margin-bottom:4px}
+    .action-text{color:#e7eaf3;margin:8px 0}
+    .action-impact{color:#a0aec0;font-size:13px;font-style:italic}
+    .check-item{padding:8px 0;display:flex;align-items:start;gap:8px}
+    .check-item.passed{color:#10b981}
+    .check-item.failed{color:#ef4444}
+    .check-item.warning{color:#f59e0b}
     .loading{text-align:center;padding:40px;color:#a0aec0}
     .error{background:#ef4444;color:white;padding:16px;border-radius:8px;margin:16px 0}
+    .recommendation-list{list-style:none;padding:0;margin:12px 0}
+    .recommendation-list li{padding:8px 0;color:#a0aec0;border-bottom:1px solid #1f2a44}
+    .recommendation-list li:last-child{border-bottom:none}
+    .recommendation-list li:before{content:"→ ";color:#93c5fd;margin-left:8px}
   </style>
 </head>
 <body>
@@ -31,32 +59,165 @@
     </nav>
   </header>
   <div class="container">
-    <h1>💰 CRO Analysis</h1>
-    <p style="color:#a0aec0">Conversion Rate Optimization Analysis</p>
+    <h1>💰 CRO Analysis - UX/UI Best Practices</h1>
+    <p style="color:#a0aec0">Comprehensive Conversion Rate Optimization analysis with actionable recommendations based on UX/UI best practices</p>
     
     <div class="input-group">
       <label for="url">Website URL:</label>
       <input id="url" type="text" placeholder="https://example.com" />
     </div>
     
-    <button class="btn" onclick="analyze()">Analyze CRO</button>
+    <button class="btn" id="analyzeBtn" onclick="analyze()">Analyze CRO</button>
     <div id="results"></div>
   </div>
   <script>
     function analyze() {
       const url = document.getElementById('url').value.trim();
       const results = document.getElementById('results');
-      if (!url) { results.innerHTML = '<div class="error">Enter URL</div>'; return; }
-      results.innerHTML = '<div class="loading">Analyzing...</div>';
-      fetch('/cro-analysis/api/analyze', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})})
-      .then(r => r.json()).then(d => {
-        if (d.error) { results.innerHTML = `<div class="error">${d.error}</div>`; return; }
-        let html = `<div class="section"><h3>CTA Analysis</h3><div class="metric"><span>Total CTAs:</span><span>${d.cta_analysis.total_ctas}</span></div></div>`;
-        html += `<div class="section"><h3>Trust Signals</h3><div class="metric"><span>Trust Score:</span><span>${d.trust_signals.trust_score}/100</span></div></div>`;
-        results.innerHTML = html;
-      }).catch(e => results.innerHTML = `<div class="error">Error: ${e.message}</div>`);
+      const btn = document.getElementById('analyzeBtn');
+      
+      if (!url) { 
+        results.innerHTML = '<div class="error">Please enter a URL</div>'; 
+        return; 
+      }
+      
+      btn.disabled = true;
+      btn.textContent = 'Analyzing...';
+      results.innerHTML = '<div class="loading">🔍 Analyzing page for CRO, UX, and UI best practices... This may take a minute.</div>';
+      
+      fetch('/cro-analysis/api/analyze', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url})
+      })
+      .then(r => r.json())
+      .then(d => {
+        btn.disabled = false;
+        btn.textContent = 'Analyze CRO';
+        
+        if (d.error) { 
+          results.innerHTML = `<div class="error">${d.error}</div>`; 
+          return; 
+        }
+        
+        displayResults(d);
+      })
+      .catch(e => {
+        btn.disabled = false;
+        btn.textContent = 'Analyze CRO';
+        results.innerHTML = `<div class="error">Error: ${e.message}</div>`;
+      });
+    }
+    
+    function displayResults(data) {
+      const resultsDiv = document.getElementById('results');
+      let html = '';
+      
+      // Overall Score
+      html += `
+        <div class="score-box">
+          <h2>CRO Score</h2>
+          <div class="score-value">${data.overall_score || 0}</div>
+          <p style="color:#a0aec0">Grade: <strong>${data.grade || 'N/A'}</strong></p>
+        </div>
+      `;
+      
+      // Priority Actions - Most Important!
+      if (data.priority_actions && data.priority_actions.length > 0) {
+        html += '<div class="section"><h3>🎯 Priority Actions - Recommended Improvements</h3>';
+        data.priority_actions.forEach(action => {
+          const priorityClass = action.priority.toLowerCase();
+          const badgeClass = action.priority === 'CRITICAL' ? 'badge-critical' : 
+                           action.priority === 'HIGH' ? 'badge-error' : 
+                           action.priority === 'MEDIUM' ? 'badge-warning' : 'badge-good';
+          html += `
+            <div class="action-item ${priorityClass}">
+              <div class="action-priority">
+                <span class="badge ${badgeClass}">${action.priority}</span>
+                <span class="action-category">${action.category}</span>
+              </div>
+              <div class="action-text">${action.action}</div>
+              ${action.impact ? `<div class="action-impact">Impact: ${action.impact}</div>` : ''}
+            </div>
+          `;
+        });
+        html += '</div>';
+      }
+      
+      // CTA Analysis
+      if (data.cta_analysis) {
+        html += '<div class="section"><h3>📢 Call-to-Action (CTA) Analysis</h3>';
+        html += `<div class="metric"><span class="metric-label">Total CTAs:</span><span class="metric-value">${data.cta_analysis.total_ctas || 0}</span></div>`;
+        html += `<div class="metric"><span class="metric-label">Above Fold CTAs:</span><span class="metric-value">${data.cta_analysis.above_fold_ctas || 0}</span></div>`;
+        if (data.cta_analysis.recommendations && data.cta_analysis.recommendations.length > 0) {
+          html += '<h4 style="color:#93c5fd;margin-top:16px">Recommendations:</h4><ul class="recommendation-list">';
+          data.cta_analysis.recommendations.forEach(rec => {
+            html += `<li>${rec}</li>`;
+          });
+          html += '</ul>';
+        }
+        html += '</div>';
+      }
+      
+      // Form Analysis
+      if (data.form_analysis) {
+        html += '<div class="section"><h3>📝 Form Analysis</h3>';
+        html += `<div class="metric"><span class="metric-label">Total Forms:</span><span class="metric-value">${data.form_analysis.total_forms || 0}</span></div>`;
+        html += `<div class="metric"><span class="metric-label">Average Fields:</span><span class="metric-value">${data.form_analysis.avg_fields ? data.form_analysis.avg_fields.toFixed(1) : 0}</span></div>`;
+        if (data.form_analysis.recommendations && data.form_analysis.recommendations.length > 0) {
+          html += '<h4 style="color:#93c5fd;margin-top:16px">Recommendations:</h4><ul class="recommendation-list">';
+          data.form_analysis.recommendations.forEach(rec => {
+            html += `<li>${rec}</li>`;
+          });
+          html += '</ul>';
+        }
+        html += '</div>';
+      }
+      
+      // Trust Signals
+      if (data.trust_signals) {
+        html += '<div class="section"><h3>🛡️ Trust Signals</h3>';
+        html += `<div class="metric"><span class="metric-label">Trust Score:</span><span class="metric-value">${data.trust_signals.trust_score || 0}/100</span></div>`;
+        html += `<div class="metric"><span class="metric-label">Phone:</span><span class="metric-value"><span class="badge ${data.trust_signals.has_phone ? 'badge-good' : 'badge-error'}">${data.trust_signals.has_phone ? 'Found' : 'Missing'}</span></span></div>`;
+        html += `<div class="metric"><span class="metric-label">Email:</span><span class="metric-value"><span class="badge ${data.trust_signals.has_email ? 'badge-good' : 'badge-error'}">${data.trust_signals.has_email ? 'Found' : 'Missing'}</span></span></div>`;
+        html += `<div class="metric"><span class="metric-label">Address:</span><span class="metric-value"><span class="badge ${data.trust_signals.has_address ? 'badge-good' : 'badge-error'}">${data.trust_signals.has_address ? 'Found' : 'Missing'}</span></span></div>`;
+        html += `<div class="metric"><span class="metric-label">Reviews/Testimonials:</span><span class="metric-value"><span class="badge ${data.trust_signals.has_reviews || data.trust_signals.has_testimonials ? 'badge-good' : 'badge-error'}">${data.trust_signals.has_reviews || data.trust_signals.has_testimonials ? 'Found' : 'Missing'}</span></span></div>`;
+        html += `<div class="metric"><span class="metric-label">Social Proof:</span><span class="metric-value"><span class="badge ${data.trust_signals.has_social_proof ? 'badge-good' : 'badge-error'}">${data.trust_signals.has_social_proof ? 'Found' : 'Missing'}</span></span></div>`;
+        html += '</div>';
+      }
+      
+      // Accessibility
+      if (data.accessibility) {
+        html += '<div class="section"><h3>♿ Accessibility Analysis</h3>';
+        html += `<div class="metric"><span class="metric-label">Accessibility Score:</span><span class="metric-value">${data.accessibility.score || 0}/100</span></div>`;
+        html += `<div class="metric"><span class="metric-label">Grade:</span><span class="metric-value">${data.accessibility.grade || 'N/A'}</span></div>`;
+        
+        if (data.accessibility.passed && data.accessibility.passed.length > 0) {
+          html += '<h4 style="color:#10b981;margin-top:16px">✅ Passed Checks:</h4>';
+          data.accessibility.passed.forEach(item => {
+            html += `<div class="check-item passed">${item}</div>`;
+          });
+        }
+        
+        if (data.accessibility.failed && data.accessibility.failed.length > 0) {
+          html += '<h4 style="color:#ef4444;margin-top:16px">❌ Failed Checks:</h4>';
+          data.accessibility.failed.forEach(item => {
+            html += `<div class="check-item failed">${item}</div>`;
+          });
+        }
+        
+        if (data.accessibility.warnings && data.accessibility.warnings.length > 0) {
+          html += '<h4 style="color:#f59e0b;margin-top:16px">⚠️ Warnings:</h4>';
+          data.accessibility.warnings.forEach(item => {
+            html += `<div class="check-item warning">${item}</div>`;
+          });
+        }
+        
+        html += '</div>';
+      }
+      
+      resultsDiv.innerHTML = html;
     }
   </script>
 </body>
 </html>
-

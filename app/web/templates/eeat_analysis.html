@@ -15,13 +15,34 @@
     .input-group input{width:100%;max-width:600px;padding:10px;border:1px solid #1f2a44;border-radius:6px;background:#0d1830;color:#e7eaf3;font-size:14px}
     .btn{background:#10b981;color:#fff;border:none;border-radius:6px;padding:12px 24px;cursor:pointer;font-size:14px;font-weight:600}
     .btn:hover{background:#059669}
+    .btn:disabled{opacity:0.6;cursor:not-allowed}
     .section{background:#0d1830;border:1px solid #1f2a44;border-radius:8px;padding:20px;margin:16px 0}
-    .section h3{color:#93c5fd;margin-top:0}
+    .section h3{color:#93c5fd;margin-top:0;border-bottom:1px solid #1f2a44;padding-bottom:12px;margin-bottom:16px}
     .metric{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1f2a44}
+    .metric:last-child{border-bottom:none}
     .score-box{text-align:center;padding:24px;background:#0d1830;border:1px solid #1f2a44;border-radius:8px;margin:16px 0}
     .score-value{font-size:48px;font-weight:700;color:#10b981}
+    .component-score{font-size:32px;font-weight:700;margin:8px 0}
+    .score-good{color:#10b981}
+    .score-medium{color:#f59e0b}
+    .score-low{color:#ef4444}
+    .badge{display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;margin-left:8px}
+    .badge-good{background:#10b981;color:white}
+    .badge-medium{background:#f59e0b;color:white}
+    .badge-low{background:#ef4444;color:white}
+    .recommendations{margin-top:16px;padding-top:16px;border-top:1px solid #1f2a44}
+    .recommendations h4{color:#93c5fd;margin-bottom:12px;font-size:14px;text-transform:uppercase;letter-spacing:0.5px}
+    .recommendation-list{list-style:none;padding:0;margin:0}
+    .recommendation-list li{padding:10px 12px;margin:6px 0;background:#1f2a44;border-left:3px solid #3b82f6;border-radius:4px;color:#e7eaf3;font-size:14px;line-height:1.5}
+    .recommendation-list li:first-child{margin-top:0}
     .loading{text-align:center;padding:40px;color:#a0aec0}
     .error{background:#ef4444;color:white;padding:16px;border-radius:8px;margin:16px 0}
+    .grade-badge{display:inline-block;padding:6px 14px;border-radius:16px;font-size:14px;font-weight:700;margin-left:12px}
+    .grade-a{background:#10b981;color:white}
+    .grade-b{background:#3b82f6;color:white}
+    .grade-c{background:#f59e0b;color:white}
+    .grade-d{background:#f97316;color:white}
+    .grade-f{background:#ef4444;color:white}
   </style>
 </head>
 <body>
@@ -41,27 +62,187 @@
       <input id="url" type="text" placeholder="https://example.com" />
     </div>
     
-    <button class="btn" onclick="analyze()">Analyze E-E-A-T</button>
+    <button class="btn" id="analyzeBtn" onclick="analyze()">Analyze E-E-A-T</button>
     <div id="results"></div>
   </div>
   <script>
+    function getScoreClass(score) {
+      if (score >= 70) return 'score-good';
+      if (score >= 50) return 'score-medium';
+      return 'score-low';
+    }
+    
+    function getGradeClass(grade) {
+      return `grade-${grade.toLowerCase()}`;
+    }
+    
+    function getBadgeClass(score) {
+      if (score >= 70) return 'badge-good';
+      if (score >= 50) return 'badge-medium';
+      return 'badge-low';
+    }
+    
     function analyze() {
       const url = document.getElementById('url').value.trim();
       const results = document.getElementById('results');
-      if (!url) { results.innerHTML = '<div class="error">Enter URL</div>'; return; }
-      results.innerHTML = '<div class="loading">Analyzing...</div>';
-      fetch('/eeat-analysis/api/analyze', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})})
-      .then(r => r.json()).then(d => {
-        if (d.error) { results.innerHTML = `<div class="error">${d.error}</div>`; return; }
-        let html = `<div class="score-box"><div class="score-value">${d.overall_score}</div><p>Overall E-E-A-T Score</p></div>`;
-        html += `<div class="section"><h3>Expertise: ${d.expertise.score}/100</h3></div>`;
-        html += `<div class="section"><h3>Experience: ${d.experience.score}/100</h3></div>`;
-        html += `<div class="section"><h3>Authoritativeness: ${d.authoritativeness.score}/100</h3></div>`;
-        html += `<div class="section"><h3>Trustworthiness: ${d.trustworthiness.score}/100</h3></div>`;
-        results.innerHTML = html;
-      }).catch(e => results.innerHTML = `<div class="error">Error: ${e.message}</div>`);
+      const btn = document.getElementById('analyzeBtn');
+      
+      if (!url) { 
+        results.innerHTML = '<div class="error">Enter URL</div>'; 
+        return; 
+      }
+      
+      btn.disabled = true;
+      btn.textContent = 'Analyzing...';
+      results.innerHTML = '<div class="loading">Analyzing E-E-A-T signals...</div>';
+      
+      fetch('/eeat-analysis/api/analyze', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url})
+      })
+      .then(r => r.json())
+      .then(d => {
+        btn.disabled = false;
+        btn.textContent = 'Analyze E-E-A-T';
+        
+        if (d.error) { 
+          results.innerHTML = `<div class="error">${d.error}</div>`; 
+          return; 
+        }
+        
+        displayResults(d);
+      })
+      .catch(e => {
+        btn.disabled = false;
+        btn.textContent = 'Analyze E-E-A-T';
+        results.innerHTML = `<div class="error">Error: ${e.message}</div>`;
+      });
+    }
+    
+    function displayResults(data) {
+      let html = '';
+      
+      // Overall Score
+      const websiteTypeLabels = {
+        'educational': '🎓 Educational Website',
+        'medical': '🏥 Medical Website',
+        'ecommerce': '🛒 E-commerce Website',
+        'general': '🌐 General Website'
+      };
+      const websiteTypeLabel = websiteTypeLabels[data.website_type] || '🌐 Website';
+      
+      html += `
+        <div class="score-box">
+          <div class="score-value ${getScoreClass(data.overall_score)}">${data.overall_score}</div>
+          <p style="color:#a0aec0;margin-top:8px">Overall E-E-A-T Score</p>
+          <span class="grade-badge ${getGradeClass(data.overall_grade)}">Grade: ${data.overall_grade}</span>
+          ${data.website_type ? `<p style="color:#93c5fd;margin-top:12px;font-size:14px">${websiteTypeLabel}</p>` : ''}
+        </div>
+      `;
+      
+      // Expertise Section
+      html += `
+        <div class="section">
+          <h3>
+            🎓 Expertise: 
+            <span class="component-score ${getScoreClass(data.expertise.score)}">${data.expertise.score}/100</span>
+            <span class="badge ${getBadgeClass(data.expertise.score)}">${data.expertise.grade}</span>
+          </h3>
+          <div class="recommendations">
+            <h4>💡 Recommendations to Improve Expertise:</h4>
+            <ul class="recommendation-list">
+      `;
+      if (data.expertise.recommendations && data.expertise.recommendations.length > 0) {
+        data.expertise.recommendations.forEach(rec => {
+          html += `<li>${rec}</li>`;
+        });
+      } else {
+        html += `<li>✅ No specific recommendations. Maintain current expertise signals.</li>`;
+      }
+      html += `
+            </ul>
+          </div>
+        </div>
+      `;
+      
+      // Experience Section
+      html += `
+        <div class="section">
+          <h3>
+            ⭐ Experience: 
+            <span class="component-score ${getScoreClass(data.experience.score)}">${data.experience.score}/100</span>
+            <span class="badge ${getBadgeClass(data.experience.score)}">${data.experience.grade}</span>
+          </h3>
+          <div class="recommendations">
+            <h4>💡 Recommendations to Improve Experience:</h4>
+            <ul class="recommendation-list">
+      `;
+      if (data.experience.recommendations && data.experience.recommendations.length > 0) {
+        data.experience.recommendations.forEach(rec => {
+          html += `<li>${rec}</li>`;
+        });
+      } else {
+        html += `<li>✅ No specific recommendations. Maintain current experience signals.</li>`;
+      }
+      html += `
+            </ul>
+          </div>
+        </div>
+      `;
+      
+      // Authoritativeness Section
+      html += `
+        <div class="section">
+          <h3>
+            📚 Authoritativeness: 
+            <span class="component-score ${getScoreClass(data.authoritativeness.score)}">${data.authoritativeness.score}/100</span>
+            <span class="badge ${getBadgeClass(data.authoritativeness.score)}">${data.authoritativeness.grade}</span>
+          </h3>
+          <div class="recommendations">
+            <h4>💡 Recommendations to Improve Authoritativeness:</h4>
+            <ul class="recommendation-list">
+      `;
+      if (data.authoritativeness.recommendations && data.authoritativeness.recommendations.length > 0) {
+        data.authoritativeness.recommendations.forEach(rec => {
+          html += `<li>${rec}</li>`;
+        });
+      } else {
+        html += `<li>✅ No specific recommendations. Maintain current authoritativeness signals.</li>`;
+      }
+      html += `
+            </ul>
+          </div>
+        </div>
+      `;
+      
+      // Trustworthiness Section
+      html += `
+        <div class="section">
+          <h3>
+            🔒 Trustworthiness: 
+            <span class="component-score ${getScoreClass(data.trustworthiness.score)}">${data.trustworthiness.score}/100</span>
+            <span class="badge ${getBadgeClass(data.trustworthiness.score)}">${data.trustworthiness.grade}</span>
+          </h3>
+          <div class="recommendations">
+            <h4>💡 Recommendations to Improve Trustworthiness:</h4>
+            <ul class="recommendation-list">
+      `;
+      if (data.trustworthiness.recommendations && data.trustworthiness.recommendations.length > 0) {
+        data.trustworthiness.recommendations.forEach(rec => {
+          html += `<li>${rec}</li>`;
+        });
+      } else {
+        html += `<li>✅ No specific recommendations. Maintain current trustworthiness signals.</li>`;
+      }
+      html += `
+            </ul>
+          </div>
+        </div>
+      `;
+      
+      results.innerHTML = html;
     }
   </script>
 </body>
 </html>
-

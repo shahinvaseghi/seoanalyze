@@ -53,44 +53,103 @@ def find_sitemap_urls(base_url: str) -> List[str]:
     return sitemap_urls
 
 
-def parse_sitemap(sitemap_url: str) -> Dict[str, any]:
+def parse_sitemap(sitemap_url: str, headers: Dict = None) -> Dict[str, any]:
     """Parse XML sitemap"""
     try:
-        response = requests.get(sitemap_url, timeout=30)
+        if headers is None:
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        
+        response = requests.get(sitemap_url, timeout=30, headers=headers)
         response.raise_for_status()
         
-        root = ET.fromstring(response.content)
+        # Try to parse XML
+        try:
+            root = ET.fromstring(response.content)
+        except ET.ParseError:
+            # Try to handle namespaces more flexibly
+            content = response.content
+            # Remove namespace declarations if they cause issues
+            content = re.sub(b'xmlns="[^"]*"', b'', content)
+            content = re.sub(b'xmlns:sitemap="[^"]*"', b'', content)
+            root = ET.fromstring(content)
         
-        # Handle sitemap index
-        if root.tag.endswith('sitemapindex'):
+        # Handle sitemap index - check both with and without namespace
+        namespace = '{http://www.sitemaps.org/schemas/sitemap/0.9}'
+        
+        # Try with namespace first
+        sitemap_elements = root.findall(f'.//{namespace}sitemap')
+        if not sitemap_elements:
+            # Try without namespace
+            sitemap_elements = root.findall('.//sitemap')
+        
+        if sitemap_elements:
+            # This is a sitemap index
             sitemaps = []
-            for sitemap in root.findall('.//{http://www.sitemaps.org/schemas/sitemap/0.9}sitemap'):
-                loc = sitemap.find('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')
-                if loc is not None:
-                    sitemaps.append(loc.text)
-            return {'type': 'index', 'sitemaps': sitemaps}
-        
-        # Handle regular sitemap
-        urls = []
-        for url_elem in root.findall('.//{http://www.sitemaps.org/schemas/sitemap/0.9}url'):
-            loc = url_elem.find('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')
-            lastmod = url_elem.find('{http://www.sitemaps.org/schemas/sitemap/0.9}lastmod')
-            changefreq = url_elem.find('{http://www.sitemaps.org/schemas/sitemap/0.9}changefreq')
-            priority = url_elem.find('{http://www.sitemaps.org/schemas/sitemap/0.9}priority')
+            for sitemap in sitemap_elements:
+                # Try with namespace
+                loc = sitemap.find(f'{namespace}loc')
+                if loc is None:
+                    # Try without namespace
+                    loc = sitemap.find('loc')
+                
+                lastmod = sitemap.find(f'{namespace}lastmod')
+                if lastmod is None:
+                    lastmod = sitemap.find('lastmod')
+                
+                if loc is not None and loc.text:
+                    sitemaps.append({
+                        'url': loc.text,
+                        'lastmod': lastmod.text if lastmod is not None else None
+                    })
             
-            url_data = {
-                'url': loc.text if loc is not None else None,
-                'lastmod': lastmod.text if lastmod is not None else None,
-                'changefreq': changefreq.text if changefreq is not None else None,
-                'priority': priority.text if priority is not None else None
-            }
-            if url_data['url']:
-                urls.append(url_data)
+            return {'type': 'index', 'sitemaps': sitemaps, 'total': len(sitemaps)}
         
-        return {'type': 'urlset', 'urls': urls, 'total': len(urls)}
+        # Handle regular sitemap - try with namespace first
+        url_elements = root.findall(f'.//{namespace}url')
+        if not url_elements:
+            # Try without namespace
+            url_elements = root.findall('.//url')
         
+        if url_elements:
+            urls = []
+            for url_elem in url_elements:
+                # Try with namespace
+                loc = url_elem.find(f'{namespace}loc')
+                if loc is None:
+                    loc = url_elem.find('loc')
+                
+                lastmod = url_elem.find(f'{namespace}lastmod')
+                if lastmod is None:
+                    lastmod = url_elem.find('lastmod')
+                
+                changefreq = url_elem.find(f'{namespace}changefreq')
+                if changefreq is None:
+                    changefreq = url_elem.find('changefreq')
+                
+                priority = url_elem.find(f'{namespace}priority')
+                if priority is None:
+                    priority = url_elem.find('priority')
+                
+                if loc is not None and loc.text:
+                    url_data = {
+                        'url': loc.text,
+                        'lastmod': lastmod.text if lastmod is not None else None,
+                        'changefreq': changefreq.text if changefreq is not None else None,
+                        'priority': priority.text if priority is not None else None
+                    }
+                    urls.append(url_data)
+            
+            return {'type': 'urlset', 'urls': urls, 'total': len(urls)}
+        
+        # If we get here, couldn't parse
+        return {'error': 'Unknown sitemap format'}
+        
+    except requests.RequestException as e:
+        return {'error': f'Failed to fetch sitemap: {str(e)}'}
     except Exception as e:
-        return {'error': str(e)}
+        return {'error': f'Failed to parse sitemap: {str(e)}'}
 
 
 @sitemap_analyzer_bp.route('/')
@@ -98,6 +157,39 @@ def parse_sitemap(sitemap_url: str) -> Dict[str, any]:
 def sitemap_analyzer_page():
     """Sitemap Analyzer main page"""
     return render_template('sitemap_analyzer.html')
+
+
+def parse_all_sitemaps(sitemap_url: str, headers: Dict = None, max_depth: int = 3, visited: Set = None) -> Dict[str, any]:
+    """Recursively parse sitemap and all nested sitemaps"""
+    if visited is None:
+        visited = set()
+    
+    if sitemap_url in visited or max_depth <= 0:
+        return {'sitemaps': [], 'urls': []}
+    
+    visited.add(sitemap_url)
+    
+    result = parse_sitemap(sitemap_url, headers)
+    
+    if 'error' in result:
+        return {'sitemaps': [], 'urls': [], 'errors': [f'{sitemap_url}: {result["error"]}']}
+    
+    all_sitemaps = [{'url': sitemap_url, 'type': result.get('type'), 'total': result.get('total', 0)}]
+    all_urls = []
+    
+    if result.get('type') == 'index':
+        # Parse all sitemaps in the index
+        for sitemap_info in result.get('sitemaps', []):
+            nested_url = sitemap_info.get('url') if isinstance(sitemap_info, dict) else sitemap_info
+            if nested_url:
+                nested_result = parse_all_sitemaps(nested_url, headers, max_depth - 1, visited)
+                all_sitemaps.extend(nested_result.get('sitemaps', []))
+                all_urls.extend(nested_result.get('urls', []))
+    elif result.get('type') == 'urlset':
+        # This is a regular sitemap with URLs
+        all_urls.extend(result.get('urls', []))
+    
+    return {'sitemaps': all_sitemaps, 'urls': all_urls}
 
 
 @sitemap_analyzer_bp.route('/api/analyze', methods=['POST'])
@@ -112,6 +204,10 @@ def analyze_sitemap():
         return jsonify({'error': 'URL is required'}), 400
     
     try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        
         # Find sitemap URLs
         if sitemap_url:
             sitemap_urls = [sitemap_url]
@@ -120,35 +216,53 @@ def analyze_sitemap():
         
         found_sitemaps = []
         all_urls = []
+        errors = []
         
-        for sitemap_url in sitemap_urls:
+        # Try each potential sitemap URL
+        for potential_url in sitemap_urls:
             try:
-                result = parse_sitemap(sitemap_url)
-                if 'error' not in result:
-                    found_sitemaps.append({
-                        'url': sitemap_url,
-                        'type': result.get('type'),
-                        'total': result.get('total', 0),
-                        'urls': result.get('urls', [])[:100]  # Limit for response
-                    })
-                    if result.get('type') == 'urlset':
+                # First check if it exists
+                response = requests.head(potential_url, timeout=10, headers=headers, allow_redirects=True)
+                if response.status_code == 200:
+                    # Parse this sitemap and all nested ones
+                    result = parse_all_sitemaps(potential_url, headers)
+                    if result.get('sitemaps'):
+                        found_sitemaps.extend(result.get('sitemaps', []))
                         all_urls.extend(result.get('urls', []))
-            except:
+                        break  # Found a valid sitemap, no need to check others
+            except requests.RequestException:
                 continue
+            except Exception as e:
+                errors.append(f'Error checking {potential_url}: {str(e)}')
+                continue
+        
+        # If no sitemap found, try to parse the first URL anyway (might be a sitemap)
+        if not found_sitemaps and sitemap_urls:
+            try:
+                result = parse_all_sitemaps(sitemap_urls[0], headers)
+                if result.get('sitemaps'):
+                    found_sitemaps.extend(result.get('sitemaps', []))
+                    all_urls.extend(result.get('urls', []))
+            except Exception as e:
+                errors.append(f'Error parsing {sitemap_urls[0]}: {str(e)}')
         
         # Analyze sitemap
         issues = []
         if not found_sitemaps:
-            issues.append('No sitemap found')
+            issues.append('No sitemap found. Checked: ' + ', '.join(sitemap_urls[:3]))
         
         # Check for common issues
         total_urls = len(all_urls)
-        if total_urls > 50000:
-            issues.append(f'Sitemap has {total_urls} URLs (Google recommends max 50,000)')
+        if total_urls > 0:
+            if total_urls > 50000:
+                issues.append(f'Sitemap has {total_urls} URLs (Google recommends max 50,000)')
+            
+            urls_without_lastmod = [u for u in all_urls if not u.get('lastmod')]
+            if len(urls_without_lastmod) > total_urls * 0.5:
+                issues.append(f'{len(urls_without_lastmod)} URLs missing lastmod date ({round(len(urls_without_lastmod)/total_urls*100, 1)}%)')
         
-        urls_without_lastmod = [u for u in all_urls if not u.get('lastmod')]
-        if len(urls_without_lastmod) > total_urls * 0.5:
-            issues.append(f'{len(urls_without_lastmod)} URLs missing lastmod date')
+        # Limit URLs in response for performance
+        limited_urls = all_urls[:500]  # Show first 500 URLs
         
         return jsonify({
             'success': True,
@@ -156,12 +270,18 @@ def analyze_sitemap():
             'sitemaps_found': len(found_sitemaps),
             'sitemaps': found_sitemaps,
             'total_urls': total_urls,
+            'urls': limited_urls,
             'issues': issues,
+            'errors': errors if errors else None,
             'timestamp': datetime.now().isoformat()
         })
         
     except Exception as e:
-        return jsonify({'error': f'Sitemap analysis failed: {str(e)}'}), 500
+        import traceback
+        return jsonify({
+            'error': f'Sitemap analysis failed: {str(e)}',
+            'traceback': traceback.format_exc()
+        }), 500
 
 
 @sitemap_analyzer_bp.route('/api/generate', methods=['POST'])

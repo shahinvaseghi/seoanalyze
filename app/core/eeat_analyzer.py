@@ -12,12 +12,31 @@ class EEATAnalyzer:
     """Analyzes E-E-A-T signals in content"""
     
     def __init__(self):
+        # Website type detection keywords
+        self.educational_keywords = [
+            'آموزش', 'دوره', 'course', 'training', 'learn', 'tutorial', 'آموزشگاه',
+            'مدرس', 'instructor', 'teacher', 'استاد', 'کلاس', 'class', 'workshop',
+            'گواهینامه', 'certificate', 'certification', 'دیپلم', 'diploma'
+        ]
+        
+        self.medical_keywords = [
+            'دکتر', 'پزشک', 'متخصص', 'doctor', 'specialist', 'medical',
+            'بیمارستان', 'hospital', 'کلینیک', 'clinic', 'درمان', 'treatment',
+            'جراحی', 'surgery', 'بیمار', 'patient', 'نظام پزشکی'
+        ]
+        
+        self.ecommerce_keywords = [
+            'خرید', 'فروش', 'buy', 'sell', 'product', 'محصول', 'قیمت', 'price',
+            'سفارش', 'order', 'سبد خرید', 'cart', 'checkout'
+        ]
+        
         # Expertise signals (Persian and English)
         self.expertise_keywords = [
             'دکتر', 'پزشک', 'متخصص', 'doctor', 'specialist', 'expert',
             'md', 'phd', 'استاد', 'professor', 'دانشیار',
             'مدرک', 'certificate', 'گواهینامه', 'board certified',
-            'فلوشیپ', 'fellowship', 'رزیدنت', 'resident'
+            'فلوشیپ', 'fellowship', 'رزیدنت', 'resident',
+            'مدرس', 'instructor', 'teacher', 'trainer', 'coach'
         ]
         
         # Authority signals
@@ -57,6 +76,9 @@ class EEATAnalyzer:
         """
         text = soup.get_text().lower()
         
+        # Detect website type
+        website_type = self._detect_website_type(soup, text, url)
+        
         # Analyze each component
         expertise = self._analyze_expertise(soup, text)
         experience = self._analyze_experience(soup, text)
@@ -71,9 +93,16 @@ class EEATAnalyzer:
             trustworthiness['score'] * 0.2
         )
         
+        # Generate recommendations for each component (based on website type)
+        expertise['recommendations'] = self._generate_expertise_recommendations(expertise, soup, text, website_type)
+        experience['recommendations'] = self._generate_experience_recommendations(experience, soup, text, website_type)
+        authoritativeness['recommendations'] = self._generate_authoritativeness_recommendations(authoritativeness, soup, text, website_type)
+        trustworthiness['recommendations'] = self._generate_trustworthiness_recommendations(trustworthiness, soup, text, website_type)
+        
         return {
             'overall_score': round(overall_score, 1),
             'overall_grade': self._get_grade(overall_score),
+            'website_type': website_type,
             'expertise': expertise,
             'experience': experience,
             'authoritativeness': authoritativeness,
@@ -360,35 +389,345 @@ class EEATAnalyzer:
         else:
             return 'F'
     
-    def _generate_recommendations(self, expertise, experience, authoritativeness, trustworthiness) -> List[str]:
-        """Generate actionable recommendations"""
+    def _detect_website_type(self, soup: BeautifulSoup, text: str, url: str) -> str:
+        """Detect website type based on content and keywords"""
+        # Count keyword matches
+        educational_score = sum(1 for kw in self.educational_keywords if kw in text or kw in url.lower())
+        medical_score = sum(1 for kw in self.medical_keywords if kw in text or kw in url.lower())
+        ecommerce_score = sum(1 for kw in self.ecommerce_keywords if kw in text or kw in url.lower())
+        
+        # Check URL patterns
+        if any(pattern in url.lower() for pattern in ['/course', '/training', '/learn', '/آموزش', '/دوره']):
+            educational_score += 3
+        if any(pattern in url.lower() for pattern in ['/doctor', '/clinic', '/hospital', '/پزشک', '/کلینیک']):
+            medical_score += 3
+        if any(pattern in url.lower() for pattern in ['/shop', '/product', '/buy', '/خرید', '/فروش']):
+            ecommerce_score += 3
+        
+        # Determine type
+        if educational_score > medical_score and educational_score > ecommerce_score:
+            return 'educational'
+        elif medical_score > educational_score and medical_score > ecommerce_score:
+            return 'medical'
+        elif ecommerce_score > educational_score and ecommerce_score > medical_score:
+            return 'ecommerce'
+        else:
+            return 'general'
+    
+    def _generate_expertise_recommendations(self, expertise: Dict, soup: BeautifulSoup, text: str, website_type: str) -> List[str]:
+        """Generate expertise-specific recommendations based on website type"""
         recommendations = []
         
-        # Expertise recommendations
+        # Check if author bio exists
+        author_sections = soup.find_all(['section', 'div'], class_=re.compile(r'author|writer|bio|instructor|teacher', re.I))
+        if not author_sections:
+            if website_type == 'educational':
+                recommendations.append("✍️ Add a detailed instructor/teacher bio section with teaching credentials, education, and experience")
+            elif website_type == 'medical':
+                recommendations.append("✍️ Add a detailed doctor/physician bio section with medical credentials, education, and specialization")
+            else:
+                recommendations.append("✍️ Add a detailed author bio section with credentials, education, and professional background")
+        
+        # Check for Person schema
+        scripts = soup.find_all('script', type='application/ld+json')
+        has_person_schema = False
+        for script in scripts:
+            try:
+                import json
+                data = json.loads(script.string)
+                if isinstance(data, dict) and (data.get('@type') == 'Person' or 'author' in data):
+                    has_person_schema = True
+                    break
+            except:
+                pass
+        
+        if not has_person_schema:
+            if website_type == 'educational':
+                recommendations.append("👨‍🏫 Implement Person schema (JSON-LD) for instructor/teacher profile with teaching credentials")
+            elif website_type == 'medical':
+                recommendations.append("👨‍⚕️ Implement Person schema (JSON-LD) for doctor/physician profile with medical credentials")
+            else:
+                recommendations.append("👤 Implement Person schema (JSON-LD) for author profile with credentials")
+        
+        # Type-specific recommendations
+        if website_type == 'educational':
+            if expertise['score'] < 50:
+                recommendations.append("🎓 Display teaching certifications, educational degrees, and professional qualifications")
+                recommendations.append("📚 Mention courses taught, student success rates, and teaching experience")
+            if expertise['score'] < 70:
+                recommendations.append("🏆 Highlight teaching awards, recognitions, and educational achievements")
+                recommendations.append("📖 Showcase published educational content, tutorials, or course materials")
+        elif website_type == 'medical':
+            if expertise['score'] < 50:
+                recommendations.append("🎓 Mention relevant medical certifications, board memberships, and professional qualifications")
+                recommendations.append("📜 Display educational background (university, medical school, degrees)")
+            if expertise['score'] < 70:
+                recommendations.append("🏆 Highlight medical awards, recognitions, and professional achievements")
+                recommendations.append("📚 Mention medical publications, research papers, or contributions to the field")
+        else:
+            if expertise['score'] < 50:
+                recommendations.append("🎓 Mention relevant certifications, qualifications, and professional background")
+                recommendations.append("📜 Display educational background and professional training")
+            if expertise['score'] < 70:
+                recommendations.append("🏆 Highlight awards, recognitions, and professional achievements")
+                recommendations.append("📚 Mention publications, articles, or contributions to your field")
+        
+        if not recommendations:
+            recommendations.append("✅ Good expertise signals detected. Continue maintaining credentials and qualifications.")
+        
+        return recommendations
+    
+    def _generate_experience_recommendations(self, experience: Dict, soup: BeautifulSoup, text: str, website_type: str) -> List[str]:
+        """Generate experience-specific recommendations based on website type"""
+        recommendations = []
+        
+        # Check for portfolio/images
+        images = soup.find_all('img')
+        portfolio_images = [
+            img for img in images
+            if any(term in img.get('alt', '').lower() for term in ['قبل', 'بعد', 'before', 'after', 'نمونه', 'portfolio', 'student', 'کار'])
+        ]
+        
+        # Check for testimonials
+        review_sections = soup.find_all(['div', 'section'], class_=re.compile(r'review|testimonial|نظر|student|feedback', re.I))
+        
+        # Check for years of experience
+        years_pattern = r'(\d+)\s*(سال|year).*?(تجربه|سابقه|experience|teaching)'
+        has_years = re.search(years_pattern, text, re.I)
+        
+        if website_type == 'educational':
+            if not portfolio_images:
+                recommendations.append("📷 Add student work examples, course completion certificates, or success stories with images")
+            if not review_sections:
+                recommendations.append("⭐ Include student testimonials, reviews, and success stories")
+            if not has_years:
+                recommendations.append("📊 Mention years of teaching experience and number of students taught")
+            if experience['score'] < 50:
+                recommendations.append("📈 Add statistics: number of students, course completion rates, student satisfaction")
+                recommendations.append("🎬 Include video testimonials from successful students")
+            if experience['score'] < 70:
+                recommendations.append("📋 Create detailed case studies showing student progress and achievements")
+                recommendations.append("🏅 Display teaching milestones, certifications, and educational achievements")
+        elif website_type == 'medical':
+            if not portfolio_images:
+                recommendations.append("📷 Add before/after portfolio images with descriptive alt text")
+            if not review_sections:
+                recommendations.append("⭐ Include patient testimonials, reviews, and case studies")
+            if not has_years:
+                recommendations.append("📊 Mention years of experience and number of cases/patients treated")
+            if experience['score'] < 50:
+                recommendations.append("📈 Add statistics: number of successful cases, patient satisfaction rate")
+                recommendations.append("🎬 Include video testimonials or patient success stories")
+            if experience['score'] < 70:
+                recommendations.append("📋 Create detailed case studies with before/after results")
+                recommendations.append("🏅 Display professional milestones and career highlights")
+        else:
+            if not portfolio_images:
+                recommendations.append("📷 Add portfolio images, project examples, or work samples with descriptive alt text")
+            if not review_sections:
+                recommendations.append("⭐ Include client testimonials, reviews, and case studies")
+            if not has_years:
+                recommendations.append("📊 Mention years of experience and number of projects/clients")
+            if experience['score'] < 50:
+                recommendations.append("📈 Add statistics: number of successful projects, client satisfaction rate")
+                recommendations.append("🎬 Include video testimonials or success stories")
+            if experience['score'] < 70:
+                recommendations.append("📋 Create detailed case studies showing project results")
+                recommendations.append("🏅 Display professional milestones and career highlights")
+        
+        if not recommendations:
+            recommendations.append("✅ Good experience signals detected. Continue showcasing your work and achievements.")
+        
+        return recommendations
+    
+    def _generate_authoritativeness_recommendations(self, authoritativeness: Dict, soup: BeautifulSoup, text: str, website_type: str) -> List[str]:
+        """Generate authoritativeness-specific recommendations based on website type"""
+        recommendations = []
+        
+        # Check for external citations
+        external_links = soup.find_all('a', href=re.compile(r'^https?://'))
+        
+        if website_type == 'educational':
+            authority_domains = [
+                'coursera', 'udemy', 'edx', 'khan academy', 'ted', 'youtube.com/education',
+                'wikipedia', 'stackoverflow', 'github', 'medium', 'towards data science',
+                'ministry of education', 'وزارت آموزش', 'دانشگاه'
+            ]
+            authoritative_links = [
+                link for link in external_links
+                if any(domain in link.get('href', '').lower() for domain in authority_domains)
+            ]
+            
+            if not authoritative_links:
+                recommendations.append("📚 Add references to authoritative educational sources (Coursera, Udemy, educational institutions, Wikipedia)")
+        elif website_type == 'medical':
+            authority_domains = [
+                'pubmed', 'nih.gov', 'who.int', 'cdc.gov',
+                'behdasht.gov.ir', 'fda.gov', 'ncbi',
+                'sciencedirect', 'springer', 'wiley'
+            ]
+            authoritative_links = [
+                link for link in external_links
+                if any(domain in link.get('href', '').lower() for domain in authority_domains)
+            ]
+            
+            if not authoritative_links:
+                recommendations.append("📚 Add references to authoritative sources (PubMed, medical journals, WHO, FDA)")
+        else:
+            authority_domains = [
+                'wikipedia', 'gov', 'edu', 'org', 'research', 'study'
+            ]
+            authoritative_links = [
+                link for link in external_links
+                if any(domain in link.get('href', '').lower() for domain in authority_domains)
+            ]
+            
+            if not authoritative_links:
+                recommendations.append("📚 Add references to authoritative sources relevant to your field")
+        
+        # Check for references section
+        ref_sections = soup.find_all(['section', 'div'], id=re.compile(r'reference|منابع|sources', re.I))
+        if not ref_sections and not re.search(r'منابع|references|sources', text, re.I):
+            if website_type == 'educational':
+                recommendations.append("📖 Create a references section citing educational resources, tutorials, and learning materials")
+            elif website_type == 'medical':
+                recommendations.append("📖 Create a references section citing medical journals and research papers")
+            else:
+                recommendations.append("📖 Create a references section citing authoritative sources")
+        
+        # Check for publication dates
+        date_patterns = [
+            r'تاریخ\s+انتشار',
+            r'به‌روزرسانی',
+            r'published|updated',
+            r'datePublished|dateModified'
+        ]
+        
+        has_date = any(re.search(pattern, text, re.I) for pattern in date_patterns)
+        if not has_date:
+            recommendations.append("📅 Include publication date and last updated date to show content freshness")
+        
+        if website_type == 'educational':
+            if authoritativeness['score'] < 50:
+                recommendations.append("🏫 Mention educational affiliations (universities, training centers, educational institutions)")
+                recommendations.append("🔗 Link to authoritative educational sources and learning platforms")
+            if authoritativeness['score'] < 70:
+                recommendations.append("📝 Cite recent educational research, teaching methodologies, and best practices")
+                recommendations.append("🌐 Get backlinks from educational websites, blogs, and learning communities")
+        elif website_type == 'medical':
+            if authoritativeness['score'] < 50:
+                recommendations.append("🏥 Mention institutional affiliations (hospitals, universities, medical centers)")
+                recommendations.append("🔗 Link to authoritative external sources and research papers")
+            if authoritativeness['score'] < 70:
+                recommendations.append("📝 Cite recent studies and medical research relevant to your content")
+                recommendations.append("🌐 Get backlinks from authoritative medical websites and organizations")
+        else:
+            if authoritativeness['score'] < 50:
+                recommendations.append("🏢 Mention professional affiliations and industry associations")
+                recommendations.append("🔗 Link to authoritative external sources in your field")
+            if authoritativeness['score'] < 70:
+                recommendations.append("📝 Cite recent research, studies, and industry best practices")
+                recommendations.append("🌐 Get backlinks from authoritative websites in your industry")
+        
+        if not recommendations:
+            recommendations.append("✅ Good authoritativeness signals detected. Continue citing authoritative sources.")
+        
+        return recommendations
+    
+    def _generate_trustworthiness_recommendations(self, trustworthiness: Dict, soup: BeautifulSoup, text: str, website_type: str) -> List[str]:
+        """Generate trustworthiness-specific recommendations based on website type"""
+        recommendations = []
+        
+        # Check for contact information
+        contact_patterns = [
+            r'\+?\d{10,}',
+            r'[\w\.-]+@[\w\.-]+\.\w+',
+            r'تلفن|phone|mobile',
+            r'آدرس|address'
+        ]
+        
+        contact_found = any(re.search(pattern, text, re.I) for pattern in contact_patterns)
+        if not contact_found:
+            recommendations.append("📞 Add complete contact information (phone, email, physical address)")
+        
+        # Check for privacy policy
+        privacy_links = soup.find_all('a', href=re.compile(r'privacy|حریم\s*خصوصی', re.I))
+        if not privacy_links and not re.search(r'privacy|حریم\s*خصوصی', text, re.I):
+            recommendations.append("🔒 Add privacy policy page and link to it in footer")
+        
+        # Check for terms of service
+        terms_links = soup.find_all('a', href=re.compile(r'terms|قوانین', re.I))
+        if not terms_links:
+            if website_type == 'educational':
+                recommendations.append("📋 Add terms of service and refund policy for course purchases")
+            else:
+                recommendations.append("📋 Add terms of service page for legal transparency")
+        
+        # Check for security badges
+        cert_patterns = [
+            r'ssl|secure',
+            r'enamad|نماد اعتماد',
+            r'samandehi|ساماندهی',
+            r'verified|تایید\s*شده'
+        ]
+        
+        has_cert = any(re.search(pattern, text, re.I) for pattern in cert_patterns)
+        if not has_cert:
+            recommendations.append("✅ Display trust badges (eNamad, Samandehi, SSL certificate)")
+        
+        # Check for social media
+        social_patterns = [
+            r'instagram', r'telegram', r'twitter',
+            r'facebook', r'linkedin', r'youtube'
+        ]
+        
+        social_count = sum(1 for pattern in social_patterns if re.search(pattern, text, re.I))
+        if social_count < 2:
+            recommendations.append("👥 Add social media profiles (Instagram, Telegram, LinkedIn) with verification")
+        
+        if website_type == 'educational':
+            if trustworthiness['score'] < 50:
+                recommendations.append("🆔 Display educational licenses, teaching certifications, and accreditations")
+                recommendations.append("📸 Add real photos of instructors, classrooms, or learning environment")
+            if trustworthiness['score'] < 70:
+                recommendations.append("💬 Add live chat or quick contact form for student inquiries")
+                recommendations.append("⭐ Display student reviews and ratings from trusted platforms")
+        elif website_type == 'medical':
+            if trustworthiness['score'] < 50:
+                recommendations.append("🆔 Display professional licenses and medical certifications prominently")
+                recommendations.append("📸 Add real photos of the team/facility to build trust")
+            if trustworthiness['score'] < 70:
+                recommendations.append("💬 Add live chat or quick contact form for easy communication")
+                recommendations.append("⭐ Display patient reviews and ratings from trusted platforms")
+        else:
+            if trustworthiness['score'] < 50:
+                recommendations.append("🆔 Display professional licenses and certifications prominently")
+                recommendations.append("📸 Add real photos of the team/facility to build trust")
+            if trustworthiness['score'] < 70:
+                recommendations.append("💬 Add live chat or quick contact form for easy communication")
+                recommendations.append("⭐ Display customer reviews and ratings from trusted platforms")
+        
+        if not recommendations:
+            recommendations.append("✅ Good trustworthiness signals detected. Continue maintaining transparency and trust.")
+        
+        return recommendations
+    
+    def _generate_recommendations(self, expertise, experience, authoritativeness, trustworthiness) -> List[str]:
+        """Generate overall actionable recommendations"""
+        recommendations = []
+        
+        # Overall priority recommendations
         if expertise['score'] < 70:
-            recommendations.append("✍️ Add detailed author bio with credentials and education")
-            recommendations.append("👨‍⚕️ Implement Person schema for author/doctor profile")
-            recommendations.append("🎓 Mention relevant certifications and board memberships")
+            recommendations.append("🎓 Priority: Improve expertise signals by adding author credentials and qualifications")
         
-        # Experience recommendations
         if experience['score'] < 70:
-            recommendations.append("📷 Add before/after portfolio images with alt text")
-            recommendations.append("⭐ Include patient testimonials and reviews")
-            recommendations.append("📊 Mention years of experience and number of cases")
+            recommendations.append("⭐ Priority: Showcase experience through portfolio, testimonials, and case studies")
         
-        # Authoritativeness recommendations
         if authoritativeness['score'] < 70:
-            recommendations.append("📚 Add references to medical journals (PubMed, etc.)")
-            recommendations.append("📅 Include publication and last updated dates")
-            recommendations.append("🏥 Mention institutional affiliations")
-            recommendations.append("🔗 Link to authoritative external sources")
+            recommendations.append("📚 Priority: Build authoritativeness by citing authoritative sources and research")
         
-        # Trustworthiness recommendations
         if trustworthiness['score'] < 70:
-            recommendations.append("📞 Add complete contact information (phone, email, address)")
-            recommendations.append("🔒 Add privacy policy and terms of service pages")
-            recommendations.append("✅ Display trust badges (eNamad, Samandehi, SSL)")
-            recommendations.append("👥 Add social media profiles and verification")
+            recommendations.append("🔒 Priority: Enhance trustworthiness with contact info, policies, and trust badges")
         
         return recommendations
 

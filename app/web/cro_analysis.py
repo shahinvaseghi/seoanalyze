@@ -55,6 +55,7 @@ def analyze_cro():
             'cta_analysis': {
                 'total_ctas': cro_report.cta_analysis.total_ctas,
                 'cta_types': cro_report.cta_analysis.cta_types,
+                'cta_locations': cro_report.cta_analysis.cta_locations,
                 'above_fold_ctas': cro_report.cta_analysis.above_fold_ctas,
                 'optimal_placement': cro_report.cta_analysis.optimal_placement,
                 'recommendations': cro_report.cta_analysis.recommendations
@@ -80,14 +81,16 @@ def analyze_cro():
             },
             'accessibility': {
                 'score': cro_report.accessibility.score,
-                'has_alt_text': cro_report.accessibility.has_alt_text,
-                'has_aria_labels': cro_report.accessibility.has_aria_labels,
-                'has_keyboard_navigation': cro_report.accessibility.has_keyboard_navigation,
-                'has_contrast': cro_report.accessibility.has_contrast,
-                'issues': cro_report.accessibility.issues,
-                'recommendations': cro_report.accessibility.recommendations
+                'grade': cro_report.accessibility.grade,
+                'passed': cro_report.accessibility.passed,
+                'failed': cro_report.accessibility.failed,
+                'warnings': cro_report.accessibility.warnings,
+                'aria_issues': cro_report.accessibility.aria_issues if hasattr(cro_report.accessibility, 'aria_issues') else [],
+                'color_contrast_issues': cro_report.accessibility.color_contrast_issues if hasattr(cro_report.accessibility, 'color_contrast_issues') else [],
+                'keyboard_navigation_issues': cro_report.accessibility.keyboard_navigation_issues if hasattr(cro_report.accessibility, 'keyboard_navigation_issues') else []
             },
-            'overall_score': cro_report.overall_score,
+            'priority_actions': cro_report.priority_actions,
+            'overall_score': cro_report.overall_cro_score,
             'grade': cro_report.grade
         })
         

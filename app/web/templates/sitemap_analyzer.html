@@ -50,19 +50,116 @@
       const url = document.getElementById('url').value.trim();
       const sitemapUrl = document.getElementById('sitemapUrl').value.trim();
       const results = document.getElementById('results');
-      if (!url) { results.innerHTML = '<div class="error">Enter URL</div>'; return; }
+      const btn = document.querySelector('.btn');
+      
+      if (!url) { 
+        results.innerHTML = '<div class="error">Enter URL</div>'; 
+        return; 
+      }
+      
+      btn.disabled = true;
+      btn.textContent = 'Analyzing...';
       results.innerHTML = '<div class="loading">Analyzing sitemap...</div>';
-      fetch('/sitemap-analyzer/api/analyze', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url, sitemap_url:sitemapUrl || null})})
-      .then(r => r.json()).then(d => {
-        if (d.error) { results.innerHTML = `<div class="error">${d.error}</div>`; return; }
-        let html = `<div class="section"><h3>Sitemap Analysis</h3><p>Sitemaps Found: ${d.sitemaps_found}</p><p>Total URLs: ${d.total_urls}</p></div>`;
-        if (d.issues && d.issues.length > 0) {
-          html += '<div class="section"><h3>Issues</h3><ul>';
-          d.issues.forEach(issue => html += `<li>${issue}</li>`);
-          html += '</ul></div>';
+      
+      fetch('/sitemap-analyzer/api/analyze', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url, sitemap_url: sitemapUrl || null})
+      })
+      .then(r => r.json())
+      .then(d => {
+        btn.disabled = false;
+        btn.textContent = 'Analyze Sitemap';
+        
+        if (d.error) { 
+          results.innerHTML = `<div class="error">${d.error}${d.traceback ? '<br><pre style="font-size:11px;overflow:auto">' + d.traceback + '</pre>' : ''}</div>`; 
+          return; 
         }
+        
+        let html = '';
+        
+        // Summary
+        html += `<div class="section">
+          <h3>📊 Sitemap Analysis</h3>
+          <p><strong>Sitemaps Found:</strong> ${d.sitemaps_found}</p>
+          <p><strong>Total URLs:</strong> ${d.total_urls.toLocaleString()}</p>
+          ${d.timestamp ? `<p style="color:#a0aec0;font-size:12px">Analyzed at: ${new Date(d.timestamp).toLocaleString()}</p>` : ''}
+        </div>`;
+        
+        // Sitemaps list
+        if (d.sitemaps && d.sitemaps.length > 0) {
+          html += `<div class="section">
+            <h3>🗺️ Found Sitemaps</h3>
+            <ul style="list-style:none;padding:0">`;
+          d.sitemaps.forEach((sitemap, idx) => {
+            html += `<li style="padding:8px 0;border-bottom:1px solid #1f2a44">
+              <strong>${idx + 1}.</strong> 
+              <a href="${sitemap.url}" target="_blank" style="color:#60a5fa">${sitemap.url}</a>
+              <span style="color:#a0aec0;font-size:12px;margin-left:8px">(${sitemap.type || 'unknown'}, ${sitemap.total || 0} URLs)</span>
+            </li>`;
+          });
+          html += `</ul></div>`;
+        }
+        
+        // Issues
+        if (d.issues && d.issues.length > 0) {
+          html += `<div class="section">
+            <h3>⚠️ Issues</h3>
+            <ul style="list-style:none;padding:0">`;
+          d.issues.forEach(issue => {
+            html += `<li style="padding:8px 0;border-bottom:1px solid #1f2a44;color:#f59e0b">⚠️ ${issue}</li>`;
+          });
+          html += `</ul></div>`;
+        }
+        
+        // Errors
+        if (d.errors && d.errors.length > 0) {
+          html += `<div class="section">
+            <h3>❌ Errors</h3>
+            <ul style="list-style:none;padding:0">`;
+          d.errors.forEach(error => {
+            html += `<li style="padding:8px 0;border-bottom:1px solid #1f2a44;color:#ef4444">❌ ${error}</li>`;
+          });
+          html += `</ul></div>`;
+        }
+        
+        // URLs list (limited)
+        if (d.urls && d.urls.length > 0) {
+          html += `<div class="section">
+            <h3>🔗 URLs (showing first ${d.urls.length} of ${d.total_urls.toLocaleString()})</h3>
+            <div style="max-height:400px;overflow-y:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:13px">
+                <thead>
+                  <tr style="border-bottom:2px solid #1f2a44">
+                    <th style="text-align:left;padding:8px">URL</th>
+                    <th style="text-align:left;padding:8px">Last Modified</th>
+                    <th style="text-align:left;padding:8px">Priority</th>
+                  </tr>
+                </thead>
+                <tbody>`;
+          d.urls.forEach((urlItem, idx) => {
+            html += `<tr style="border-bottom:1px solid #1f2a44">
+              <td style="padding:8px">
+                <a href="${urlItem.url}" target="_blank" style="color:#60a5fa;word-break:break-all">${urlItem.url}</a>
+              </td>
+              <td style="padding:8px;color:#a0aec0">${urlItem.lastmod || 'N/A'}</td>
+              <td style="padding:8px;color:#a0aec0">${urlItem.priority || 'N/A'}</td>
+            </tr>`;
+          });
+          html += `</tbody></table></div></div>`;
+        }
+        
+        if (!html) {
+          html = '<div class="section"><h3>No Results</h3><p>No sitemap data found.</p></div>';
+        }
+        
         results.innerHTML = html;
-      }).catch(e => results.innerHTML = `<div class="error">Error: ${e.message}</div>`);
+      })
+      .catch(e => {
+        btn.disabled = false;
+        btn.textContent = 'Analyze Sitemap';
+        results.innerHTML = `<div class="error">Error: ${e.message}</div>`;
+      });
     }
   </script>
 </body>
